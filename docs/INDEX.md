@@ -8,14 +8,18 @@
 - `protocol/identity-model.md`
 - `protocol/attestation-model.md`
 - `protocol/signing-and-provenance.md`
+- `protocol/object-schemas.md`
+- `protocol/message-formats.md`
 
 ## Architecture
 - `architecture/system-architecture.md`
 - `architecture/trust-states.md`
+- `architecture/reference-verifier.md`
 
 ## MVP
 - `mvp/mvp-definition.md`
 - `mvp/repo-roadmap.md`
+- `mvp/first-demo-flow.md`
 
 ## Threat model
 - `threat-model/threat-model.md`
