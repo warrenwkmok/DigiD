@@ -1,0 +1,38 @@
+# DigiD repo roadmap
+
+## Phase 1 — concept and protocol foundation
+- define the product thesis
+- define the trust states
+- define identity, attestation, and signing models
+- define the MVP wedge
+- define privacy and threat-model stance
+
+## Phase 2 — reference architecture
+- model verifier service
+- model registry and revocation service
+- define adapter contracts
+- define trust-indicator UI behavior
+
+## Phase 3 — prototype implementation
+- create a simple identity object format
+- create a signing and verification library
+- build a basic verifier API
+- build a small demo UI for trust-state display
+
+## Phase 4 — channel proof of concept
+- prototype one voice use case
+- prototype one messaging or email use case
+- prototype one media provenance use case
+
+## Phase 5 — productization
+- org admin model
+- delegated agent issuance
+- key rotation and recovery flows
+- enterprise and developer integrations
+
+## Immediate next steps
+- turn these docs into a tighter protocol draft
+- define the exact identity object schema
+- define the exact signed event schema
+- decide the first demo channel
+- choose whether the first code should be a verifier API or signing SDK
