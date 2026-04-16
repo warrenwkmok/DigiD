@@ -13,11 +13,10 @@ Should the first product even expose this deeply, or stay more focused on verifi
 How should verifiers interpret revocation checks, stale status, offline checks, and cached results?
 
 ## OQ-004 — What is the exact first implementation wedge?
-Should the first technical proof be:
-- verifier API
-- verifier CLI
-- trust-state UI demo
-- voice-session proof of concept
+Current leaning after the v0.3 schema tightening:
+- start with verifier CLI or minimal local API over static fixtures
+- make the first rendered proof a voice-session trust-state demo
+- postpone broader adapter work until the fixture and verifier story is coherent
 
 ## OQ-005 — How should pseudonymous identities be treated in UX?
 How do we keep pseudonymous identities legitimate without misleading receivers into over-trusting or under-trusting them?
@@ -30,3 +29,9 @@ Should the default UX be warning-first, hard-fail for live surfaces, or context-
 
 ## OQ-008 — How opinionated should revocation freshness policy be in v1?
 Should DigiD standardize concrete freshness windows by interaction class, or leave them to verifier policy profiles?
+
+## OQ-009 — Should `dgd.communication` be mandatory in every live demo flow?
+The current docs now lean yes because it cleanly binds signer, operator, delegation, session, and purpose. If that stays true, the first code slice should model it as a required fixture, not an optional abstraction.
+
+## OQ-010 — Which payload fields must be signable versus merely referenced by digest?
+The current v0.3 draft prefers detached content with digests, but the implementation wedge still needs a crisp rule for when summary fields, purpose strings, and UI-rendered trust text are inside or outside the signed payload.

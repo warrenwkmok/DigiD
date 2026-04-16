@@ -81,3 +81,14 @@ Every meaningful critique should end up in one of these states:
 - action taken: The working build loop remains anchored around verifier-first design and the first demo flow around verified agent voice communication.
 - linked docs: `docs/mvp/first-demo-flow.md`, `docs/mvp/mvp-definition.md`
 - notes: Re-check this after each expansion of scope.
+
+## DF-006 — Tighten schema binding between objects, envelopes, and the demo fixture set
+- source: `2026-04-15 DigiD focused build loop`
+- date: 2026-04-15
+- area: protocol
+- severity: high
+- status: applied
+- summary: The draft had the right shapes, but not enough binding rules to make fixture-driven implementation unambiguous. Schema version examples were also inconsistent.
+- action taken: Normalized examples to `schema_version: 0.3`, added concrete channel and action enums, added signer-binding and delegation-purpose constraints, required verification context in envelopes, and mapped the first demo to a specific communication object plus required fixture set.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`
+- notes: The next best move is to turn these docs into actual JSON fixtures and a tiny verifier pipeline.

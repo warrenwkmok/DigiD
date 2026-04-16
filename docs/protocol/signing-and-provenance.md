@@ -32,7 +32,7 @@ Issuers should preserve historical key records so past events remain independent
 
 ## Canonicalization requirement
 
-To keep cross-platform verification stable, DigiD v0.2 should assume:
+To keep cross-platform verification stable, DigiD v0.3 should assume:
 - JSON wire format
 - JSON Canonicalization Scheme (`JCS`) for signing input
 - detached payloads represented by digests when the payload is large or binary

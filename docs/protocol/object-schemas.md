@@ -19,7 +19,7 @@ Every DigiD object shares these fields.
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `object_type` | string | yes | Stable namespaced type like `dgd.identity` |
-| `schema_version` | string | yes | Current draft: `0.2` |
+| `schema_version` | string | yes | Current draft: `0.3` |
 | `object_id` | string | yes | Global DigiD identifier |
 | `created_at` | RFC3339 UTC string | yes | Creation time |
 | `updated_at` | RFC3339 UTC string | no | Last mutation time for mutable records |
@@ -28,6 +28,14 @@ Every DigiD object shares these fields.
 | `critical_extensions` | string[] | no | Unknown listed values must cause rejection |
 | `evidence` | object | no | Optional references to off-chain or off-protocol evidence |
 | `proof` | object | no | Signature proof block when the object is signed |
+
+### Common identifier conventions
+
+For the first implementation profile:
+- `object_id` SHOULD use a family-scoped prefix like `dgd:identity:` or `dgd:delegation:`
+- referenced ids MUST be exact strings, not inferred aliases
+- ids MUST be immutable after issuance
+- a verifier MUST treat unknown referenced ids as trust-incomplete, not silently absent
 
 ## Enumerations
 
@@ -69,6 +77,21 @@ Every DigiD object shares these fields.
 - `unknown`
 - `revoked`
 
+### Channels
+- `voice`
+- `messaging`
+- `email`
+- `video`
+- `document`
+
+### Delegation actions
+- `communicate`
+- `identify`
+- `sign-session`
+- `sign-message`
+- `issue-artifact`
+- `request-response`
+
 ## Shared proof block
 
 All signed DigiD objects should use the same proof structure.
@@ -97,7 +120,7 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 ```json
 {
   "object_type": "dgd.identity",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:identity:agent_01JABC...",
   "identity_class": "agent",
   "display_name": "Acme Support Agent 01",
@@ -146,6 +169,7 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - `controller.relationship` should be one of `self-controlled`, `organization-issued`, `delegated-service`, `custodial`
 - key records should include `not_before` and may include `expires_at`
 - if all keys are stale, expired, suspended, or revoked, the identity must not be treated as active for signing
+- `display_name` is required for end-user rendered identities unless the identity class is intentionally pseudonymous
 
 ## 2. Attestation object
 
@@ -154,7 +178,7 @@ Represents a signed statement by an issuer about a subject.
 ```json
 {
   "object_type": "dgd.attestation",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:attestation:01JXYZ...",
   "issuer_id": "dgd:identity:org_acme",
   "subject_id": "dgd:identity:agent_01JABC...",
@@ -193,6 +217,7 @@ Represents a signed statement by an issuer about a subject.
 - expired or revoked attestations must not satisfy a high-trust verification path
 - attestation type is machine-readable, not display text
 - verifier should treat missing or stale `revocation_check` posture as degraded trust, not silent success
+- `verification_state` and `attestation_type` MUST agree, for example `organization-issued-agent` cannot resolve to `verified-human`
 
 ## 3. Delegation object
 
@@ -201,7 +226,7 @@ Defines authority for one subject to act on behalf of another.
 ```json
 {
   "object_type": "dgd.delegation",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:delegation:01JKLM...",
   "issuer_id": "dgd:identity:org_acme",
   "delegate_id": "dgd:identity:agent_01JABC...",
@@ -236,6 +261,8 @@ Defines authority for one subject to act on behalf of another.
 - verifier must check requested channel and action against `authority`
 - expired delegation cannot be revived without a new object
 - delegations used for live high-trust communication should require fresher revocation data than static attestations
+- `authority.channels` and `authority.actions` MUST be non-empty arrays
+- if `purpose_bindings` are present, the communication or event using the delegation MUST declare one matching purpose
 
 ## 4. Signed communication object
 
@@ -244,7 +271,7 @@ A normalized high-level communication object for completed or in-progress exchan
 ```json
 {
   "object_type": "dgd.communication",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:communication:01JCOMM...",
   "status": "active",
   "channel": "voice",
@@ -257,6 +284,7 @@ A normalized high-level communication object for completed or in-progress exchan
   },
   "operator_id": "dgd:identity:org_acme",
   "delegation_id": "dgd:delegation:01JKLM...",
+  "purpose": "support-follow-up",
   "payload": {
     "content_type": "session-manifest",
     "content_digest": "sha256:...",
@@ -283,6 +311,13 @@ A normalized high-level communication object for completed or in-progress exchan
 }
 ```
 
+### Communication constraints
+- `sender.identity_id` MUST be the same signer identity resolved from `proof.kid`
+- `operator_id` MUST be present when `sender.verification_state` is delegated or organization-issued in a live communication flow
+- `delegation_id` MUST be present when the communication claims operator-backed authority
+- `purpose` SHOULD match an allowed delegation purpose when a delegation exists
+- `timestamps.created_at` MUST be less than or equal to `session_started_at` when both are present
+
 ## 5. Verification result object
 
 Represents a portable verifier output that downstream UIs can render without repeating the full trust evaluation logic.
@@ -290,7 +325,7 @@ Represents a portable verifier output that downstream UIs can render without rep
 ```json
 {
   "object_type": "dgd.verification_result",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:verification:01JVERIFY...",
   "subject_id": "dgd:communication:01JCOMM...",
   "status": "active",
@@ -322,6 +357,11 @@ Represents a portable verifier output that downstream UIs can render without rep
 - `degraded-trust`
 - `reject`
 
+### Verification result constraints
+- `verification_mode: dual` MUST include both `event_time_valid` and `current_time_valid`
+- `warnings` MUST explain every downgrade that still results in non-reject output
+- `display_summary` SHOULD be short enough to fit a compact trust banner without truncation
+
 ## 6. Revocation object
 
 Represents an explicit revocation for an identity, key, attestation, delegation, or communication object.
@@ -329,7 +369,7 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
 ```json
 {
   "object_type": "dgd.revocation",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "object_id": "dgd:revocation:01JREV...",
   "issuer_id": "dgd:identity:org_acme",
   "target_object_id": "dgd:delegation:01JKLM...",
@@ -348,10 +388,15 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
 }
 ```
 
+### Revocation constraints
+- `target_object_type` MUST match the referenced object's family
+- the revocation issuer MUST be authorized to revoke the target family
+- once active, a revocation object MUST be treated as append-only
+
 ## Resolution order for the first implementation
 
 A reference verifier should resolve DigiD objects in this order:
-1. determine signer identity and required issuer/delegator references
+1. determine signer identity and required issuer or delegator references
 2. validate object shape and required fields for `object_type`
 3. verify signature and canonicalization rules
 4. resolve active key on the signer identity
