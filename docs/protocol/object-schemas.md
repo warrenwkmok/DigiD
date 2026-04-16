@@ -1,6 +1,7 @@
-# DigiD object schemas v0.2
+# DigiD object schemas v0.3
 
 This document tightens the first protocol draft into a more implementation-ready object model.
+It should be read together with `docs/protocol/normative-protocol-draft.md`, which defines required vs optional behavior and verifier resolution order.
 
 ## Design goals
 
@@ -24,6 +25,7 @@ Every DigiD object shares these fields.
 | `updated_at` | RFC3339 UTC string | no | Last mutation time for mutable records |
 | `issuer_id` | string | sometimes | Required when an issuer distinct from the subject creates the object |
 | `status` | string | yes | Lifecycle state specific to object family |
+| `critical_extensions` | string[] | no | Unknown listed values must cause rejection |
 | `evidence` | object | no | Optional references to off-chain or off-protocol evidence |
 | `proof` | object | no | Signature proof block when the object is signed |
 
@@ -55,6 +57,18 @@ Every DigiD object shares these fields.
 - `revoked`
 - `expired`
 
+### Key statuses
+- `active`
+- `suspended`
+- `revoked`
+- `expired`
+
+### Revocation freshness states
+- `clear`
+- `stale`
+- `unknown`
+- `revoked`
+
 ## Shared proof block
 
 All signed DigiD objects should use the same proof structure.
@@ -73,6 +87,8 @@ Notes:
 - `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
 - the signature is calculated over the object with `proof` removed
 - verifiers should reject unknown critical proof parameters
+- the first implementation profile should only accept `Ed25519`
+- `proof.kid` must resolve unambiguously to the signing identity during verification
 
 ## 1. Identity object
 
@@ -97,7 +113,9 @@ Represents a persistent subject capable of holding keys and appearing in trust d
       "status": "active",
       "purposes": ["assertion", "authentication"],
       "created_at": "2026-04-15T00:00:00Z",
-      "expires_at": null
+      "not_before": "2026-04-15T00:00:00Z",
+      "expires_at": null,
+      "revocation_checked_at": null
     }
   ],
   "controller": {
@@ -126,6 +144,8 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - at least one active key must exist for an `active` identity
 - `verification_state` is user-facing interpretation, not raw evidence
 - `controller.relationship` should be one of `self-controlled`, `organization-issued`, `delegated-service`, `custodial`
+- key records should include `not_before` and may include `expires_at`
+- if all keys are stale, expired, suspended, or revoked, the identity must not be treated as active for signing
 
 ## 2. Attestation object
 
@@ -144,6 +164,11 @@ Represents a signed statement by an issuer about a subject.
   "issued_at": "2026-04-15T00:00:00Z",
   "valid_from": "2026-04-15T00:00:00Z",
   "valid_until": "2026-10-15T00:00:00Z",
+  "revocation_check": {
+    "mode": "online-or-cached",
+    "max_age_seconds": 3600,
+    "status": "clear"
+  },
   "claims": {
     "authorized_channels": ["voice", "messaging", "email"],
     "organization_display_name": "Acme Support",
@@ -167,6 +192,7 @@ Represents a signed statement by an issuer about a subject.
 - `issuer_id` and `subject_id` must be different unless the type explicitly allows self-attestation
 - expired or revoked attestations must not satisfy a high-trust verification path
 - attestation type is machine-readable, not display text
+- verifier should treat missing or stale `revocation_check` posture as degraded trust, not silent success
 
 ## 3. Delegation object
 
@@ -190,6 +216,11 @@ Defines authority for one subject to act on behalf of another.
   "valid_from": "2026-04-15T00:00:00Z",
   "valid_until": "2026-10-15T00:00:00Z",
   "revocation_endpoint": "https://verify.example.com/digid/revocations/01JKLM",
+  "revocation_check": {
+    "mode": "online-required",
+    "max_age_seconds": 300,
+    "status": "clear"
+  },
   "proof": {
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
@@ -204,6 +235,7 @@ Defines authority for one subject to act on behalf of another.
 - verifier must check that the delegate identity is active
 - verifier must check requested channel and action against `authority`
 - expired delegation cannot be revived without a new object
+- delegations used for live high-trust communication should require fresher revocation data than static attestations
 
 ## 4. Signed communication object
 
@@ -264,14 +296,18 @@ Represents a portable verifier output that downstream UIs can render without rep
   "status": "active",
   "verified_at": "2026-04-15T00:05:00Z",
   "decision": "allow-with-trust-indicator",
+  "verification_mode": "dual",
   "checks": {
     "signature_valid": true,
     "signer_status": "active",
     "attestation_status": "active",
     "delegation_status": "active",
     "revocation_status": "clear",
+    "freshness_status": "fresh",
     "payload_integrity": "intact",
-    "time_valid": true
+    "time_valid": true,
+    "event_time_valid": true,
+    "current_time_valid": true
   },
   "resolved_trust_state": "delegated-agent",
   "display_summary": "Verified agent acting for Acme Support",
@@ -311,6 +347,18 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
   }
 }
 ```
+
+## Resolution order for the first implementation
+
+A reference verifier should resolve DigiD objects in this order:
+1. determine signer identity and required issuer/delegator references
+2. validate object shape and required fields for `object_type`
+3. verify signature and canonicalization rules
+4. resolve active key on the signer identity
+5. resolve issuer attestation path if the trust state depends on it
+6. resolve delegation scope if operator-backed authority is claimed
+7. resolve revocation and freshness posture for all trust-bearing objects
+8. derive both event-time and current-time trust conclusions when they differ
 
 ## Validation guidance for the first implementation
 

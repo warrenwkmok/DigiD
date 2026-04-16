@@ -1,4 +1,4 @@
-# DigiD signed message and event formats v0.2
+# DigiD signed message and event formats v0.3
 
 This document defines the first portable envelope model for DigiD.
 
@@ -23,6 +23,12 @@ All envelopes should include:
 - a payload digest or embedded minimal payload
 - a proof block
 
+For v0.3:
+- envelopes SHOULD include explicit signer fields (`sender_id` or `actor_id`)
+- envelopes MAY include `critical_extensions`
+- verifiers MUST reject unsupported critical extensions
+- envelopes tied to live communications SHOULD include enough context for event-time and current-time verification
+
 ## 1. Base message envelope
 
 Use this for signed payload-bearing communications across messaging, email, voice session manifests, video manifests, and documents.
@@ -40,6 +46,10 @@ Use this for signed payload-bearing communications across messaging, email, voic
   "delegation_id": null,
   "conversation_id": "thread_01J...",
   "created_at": "2026-04-15T00:00:00Z",
+  "verification_context": {
+    "verification_mode": "current_time",
+    "revocation_max_age_seconds": 3600
+  },
   "payload": {
     "content_type": "text/plain",
     "content_digest": "sha256:...",
@@ -72,6 +82,10 @@ Use this for protocol lifecycle events and verification-audit events.
   "delegation_id": "dgd:delegation:01JKLM...",
   "created_at": "2026-04-15T00:00:10Z",
   "sequence": 1,
+  "verification_context": {
+    "verification_mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
   "payload": {
     "purpose": "support-follow-up",
     "direction": "outbound"
@@ -241,6 +255,12 @@ Created when a recording, transcript, or summary manifest is generated.
 ### `verification.performed`
 Created when a verifier resolves trust state for a subject.
 
+### `key.revoked`
+Created when a signing key becomes invalid before its scheduled expiry.
+
+### `attestation.revoked`
+Created when an attestation can no longer support trust resolution.
+
 ### `delegation.revoked`
 Created when a delegation is no longer valid.
 
@@ -255,6 +275,46 @@ Created when a delegation is no longer valid.
 7. optional `artifact.recorded`
 8. `voice.session.ended`
 
+## Envelope invariants
+
+### Message invariants
+- `message_type` MUST be compatible with `channel`
+- `payload.content_digest` MUST be present when content is detached
+- if `operator_id` is present and differs from `sender_id`, `delegation_id` SHOULD be present unless the message type is issuer-authored
+
+### Event invariants
+- `sequence` MUST increase monotonically within the same session or stream
+- `voice.session.started` SHOULD be the first ordered event in a voice session stream
+- `verification.performed` SHOULD record whether the result reflects `event_time`, `current_time`, or `dual` evaluation
+
+## Signed verification event example
+
+```json
+{
+  "envelope_type": "dgd.event",
+  "schema_version": "0.3",
+  "envelope_id": "dgd:envelope:event_verify_01J...",
+  "event_type": "verification.performed",
+  "subject_id": "dgd:communication:01JCOMM...",
+  "actor_id": "dgd:identity:verifier_service_01J...",
+  "created_at": "2026-04-15T00:05:00Z",
+  "payload": {
+    "decision": "allow-with-warning",
+    "resolved_trust_state": "delegated-agent",
+    "verification_mode": "dual",
+    "revocation_status": "stale"
+  },
+  "payload_digest": "sha256:...",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:verifier_service:key-2026-04",
+    "created_at": "2026-04-15T00:05:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
 ## Verification rules for envelopes
 
 A reference verifier should:
@@ -263,7 +323,8 @@ A reference verifier should:
 3. resolve the signer identity and ensure it is active
 4. if `delegation_id` exists, verify authority for the channel and action
 5. ensure `message_type` or `event_type` is consistent with the channel
-6. surface downgrade warnings for valid signatures paired with expired or revoked trust objects
+6. evaluate revocation freshness against the envelope's verification context or verifier defaults
+7. surface downgrade warnings for valid signatures paired with expired, revoked, stale, or unknown trust objects
 
 ## Serialization guidance
 

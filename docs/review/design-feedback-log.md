@@ -32,22 +32,33 @@ Every meaningful critique should end up in one of these states:
 - date: 2026-04-15
 - area: protocol
 - severity: high
-- status: planned
+- status: applied
 - summary: The object model needs a more normative structure so verifiers know how objects relate and in what order they should be resolved.
-- action taken: Marked as a next-step protocol refinement item for the next design slice.
-- linked docs: `docs/protocol/object-schemas.md`
-- notes: This should likely produce a new protocol draft doc rather than only editing conceptual docs.
+- action taken: Added a normative protocol draft with conformance language, required field posture, extension handling, rejection rules, and verifier resolution order. Updated object schemas to align with the resolution model.
+- linked docs: `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/architecture/reference-verifier.md`
+- notes: The next critique should test whether the current mandatory rules are sufficient for fixture-driven implementation.
 
 ## DF-002 — Add key lifecycle and revocation freshness model
 - source: `review/first-critique.md`
 - date: 2026-04-15
 - area: security
 - severity: high
-- status: planned
+- status: applied
 - summary: Key compromise, rotation, and revocation freshness are underdefined.
-- action taken: Marked as a priority follow-on design item.
-- linked docs: `docs/protocol/object-schemas.md`, `docs/threat-model/threat-model.md`
-- notes: This should define both object fields and verification-time behavior.
+- action taken: Added explicit key lifecycle posture, freshness states, revocation-check metadata, and verifier guidance distinguishing event-time validity from current-time trust.
+- linked docs: `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/signing-and-provenance.md`, `docs/architecture/reference-verifier.md`
+- notes: Threat-model follow-through is still worth doing, but the protocol layer is now concrete enough to build fixtures against.
+
+## DF-005 — Make the first demo prove historical vs current authority cleanly
+- source: `review/first-critique.md`
+- date: 2026-04-15
+- area: protocol
+- severity: medium
+- status: applied
+- summary: A verifier can mislead users if it collapses old valid signatures and live current authority into one trust claim.
+- action taken: Updated the first demo flow and verifier concept to require dual evaluation mode and at least one stale-or-revoked comparison case.
+- linked docs: `docs/mvp/first-demo-flow.md`, `docs/architecture/reference-verifier.md`, `docs/protocol/message-formats.md`
+- notes: This reduces trust overstatement risk before any UI gets built.
 
 ## DF-003 — Add verifier UX guidance to prevent trust overstatement
 - source: `review/first-critique.md`

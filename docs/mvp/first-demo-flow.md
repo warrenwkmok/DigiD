@@ -1,4 +1,4 @@
-# DigiD first demo flow v0.2
+# DigiD first demo flow v0.3
 
 ## Recommended first demo
 
@@ -16,6 +16,7 @@ Show, in one coherent flow:
 - delegation issuance
 - signed voice-session announcement
 - receiver-side verification
+- dual evaluation of event-time validity and current-time validity
 - trust-state rendering that distinguishes delegated agent from verified human and unverified caller
 
 ## Demo actors
@@ -81,6 +82,8 @@ The verifier checks:
 - delegation status and scope
 - time validity
 - revocation state
+- freshness posture for revocation data
+- whether event-time and current-time conclusions differ
 
 ### 7. UI renders trust state
 Compact state:
@@ -93,6 +96,7 @@ Expanded state:
 - authority: delegated by verified organization
 - channel authorization: voice
 - signature status: valid
+- verification mode: dual
 - trust note: verifies sender authenticity, not truth of message content
 
 ### 8. Optional post-call artifacts
@@ -113,6 +117,17 @@ If the demo includes persistence, emit:
 | 6 | `voice.session.announcement` message | agent key | powers UI trust banner |
 | 7 | verification result | verifier key or unsigned local result | shows resolved trust state |
 | 8 | optional recording manifest | agent key or service key | preserves provenance after call |
+
+## Demo verifier decision matrix
+
+The first demo should render at least these four outcomes from the same fixture family:
+
+| Scenario | Event-time result | Current-time result | Expected UI posture |
+| --- | --- | --- | --- |
+| happy path | valid | valid | Verified agent for Acme Support |
+| delegation revoked after call | valid | degraded or reject | Delegation no longer active |
+| stale revocation data | valid | warning | Verification stale, re-check recommended |
+| missing delegation | degraded | degraded | Signature valid, authority not proven |
 
 ## Contrast cases the demo should also render
 
@@ -137,6 +152,7 @@ For the first implementation, one repo slice is enough:
 - static JSON fixtures for demo objects and envelopes
 - small verifier library that resolves trust state from fixture inputs
 - tiny UI or CLI output that renders compact and expanded trust views
+- at least one fixture showing the difference between historical validity and present authority state
 
 ## Product decision already implied by this flow
 

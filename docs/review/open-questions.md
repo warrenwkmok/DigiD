@@ -24,3 +24,9 @@ How do we keep pseudonymous identities legitimate without misleading receivers i
 
 ## OQ-006 — How should DigiD relate to existing standards?
 Should it wrap, extend, or bridge into things like verifiable credentials and media provenance standards later, or stay fully independent at first?
+
+## OQ-007 — What should the first verifier do when event-time and current-time disagree?
+Should the default UX be warning-first, hard-fail for live surfaces, or context-dependent by channel and risk level?
+
+## OQ-008 — How opinionated should revocation freshness policy be in v1?
+Should DigiD standardize concrete freshness windows by interaction class, or leave them to verifier policy profiles?

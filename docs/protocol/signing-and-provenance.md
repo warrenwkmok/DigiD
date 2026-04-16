@@ -1,4 +1,4 @@
-# DigiD signing and provenance model v0.2
+# DigiD signing and provenance model v0.3
 
 ## Goal
 
@@ -28,6 +28,8 @@ At a high level:
 4. a `proof` block is attached to the object or envelope
 5. verifiers resolve the key, then validate signature, status, authority, and time
 
+Issuers should preserve historical key records so past events remain independently verifiable after later rotations.
+
 ## Canonicalization requirement
 
 To keep cross-platform verification stable, DigiD v0.2 should assume:
@@ -54,6 +56,21 @@ Recommended verifier posture:
 - reject signatures from revoked keys
 - downgrade trust on expired keys even if the math verifies
 - require proof `kid` to resolve to the signer identity unless the protocol explicitly allows delegated custodianship
+- distinguish event-time validity from current-time operational validity
+
+## Key lifecycle and recovery posture
+
+For the first implementation, DigiD should explicitly model:
+- key activation (`not_before`)
+- scheduled expiry (`expires_at`)
+- emergency revocation (`revoked_at` via `dgd.revocation` or `key.revoked` event)
+- rotation overlap, where old and new keys may both verify during a bounded transition window
+
+Verifier guidance:
+- revoked keys MUST fail current-time trust resolution
+- expired keys SHOULD fail current-time trust resolution and MAY remain historically valid for event-time review
+- suspended keys SHOULD produce degraded trust unless the verifier profile requires hard reject
+- recovery after key compromise MUST use a new key identifier, not silent key replacement
 
 ## What gets signed
 
@@ -151,6 +168,10 @@ A reference verifier should perform checks in this order:
    - object is within validity window
    - key, attestation, delegation, and target are not revoked
 
+5a. **freshness evaluation**
+   - determine whether revocation data is fresh enough for the verifier profile
+   - downgrade to `stale` or `unknown` when freshness cannot be shown
+
 6. **trust-state resolution**
    - derive the display trust state
    - generate warnings if mathematically valid but operationally unsafe
@@ -169,6 +190,12 @@ These should not all collapse into one red X.
 - signer key valid
 - delegation revoked after issuance
 - result: warning or reject depending on the use case and event time
+
+### Valid signature, stale revocation view
+- signer key valid
+- delegation appears active in cache
+- verifier freshness window exceeded
+- result: `allow-with-warning` or `degraded-trust` depending on the product surface
 
 ### Unsignable host platform wrapper
 - host transport strips some metadata
