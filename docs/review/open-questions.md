@@ -51,6 +51,14 @@ Resolved for the first implementation slice: the live-session verifier policy sh
 The repo now has a normalized payload profile in `docs/protocol/message-formats.md`, which is enough for a first typed registry in code.
 Still open: whether to publish separate JSON Schema files immediately or let the first `packages/protocol` implementation generate them from typed source definitions.
 
+## OQ-020 — Should top-level delegated `purpose` become universal across all DigiD envelopes or stay limited to live delegated profiles?
+Working resolution for the first delegated live slice: top-level `purpose` is required so communication, session, and envelope lineage compare cleanly without digging into channel-specific payloads.
+Still open: whether low-risk non-live channels should also promote purpose to a top-level field, or whether they can safely leave purpose inside signed payloads only.
+
+## OQ-021 — Should warning and reason codes live in the core protocol package or in verifier-policy profiles?
+Working resolution for the first slice: normalize a small shared set in protocol docs so adapters and fixtures stop drifting.
+Still open: whether later profiles should treat the code list as core protocol, policy-profile defaults, or generated constants from implementation source.
+
 ## OQ-015 — How should DigiD handle recorded and published social media artifacts?
 DigiD now has a deliberate same-repo future track for media provenance profiles covering recorded and published media such as YouTube, Instagram, TikTok, prerecorded podcasts, and similar non-live artifacts.
 Still open: which core primitives should be reused unchanged from the live communication model, which media-specific objects must be introduced, how edit and repost lineage should degrade across surfaces, and what the first narrow media wedge should be without diluting the live communication build loop.

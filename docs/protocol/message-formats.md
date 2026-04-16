@@ -23,6 +23,11 @@ All envelopes should include:
 - payload metadata that supports detached-content verification
 - a proof block
 
+For the first delegated live profile, envelopes should be thought of as carrying three signed contracts at once:
+- authority lineage, who is speaking and under whose authority
+- session lineage, which ordered interaction scope this belongs to
+- payload binding, what bytes or structured payload the signature actually covers
+
 For v0.3:
 - envelopes MUST include explicit signer fields (`sender_id` or `actor_id`)
 - envelopes MAY include `critical_extensions`
@@ -44,6 +49,7 @@ For v0.3:
 | `delegation_id` | all | no | Required when delegated authority is claimed |
 | `conversation_id` | all live-session envelopes | yes | Stable lineage scope for ordered session envelopes |
 | `created_at` | all | yes | Envelope creation time |
+| `purpose` | delegated live message and event envelopes | yes | MUST match the bound communication object when delegated authority is claimed |
 | `verification_context` | all | yes | Verification mode and freshness posture |
 | `payload` | all | yes | Minimal payload or payload descriptor |
 | `payload_digest` | event | yes | Digest over canonical event payload bytes |
@@ -70,6 +76,7 @@ The first verifier slice should treat envelope fields in three buckets.
 - `delegation_id`
 - `conversation_id`
 - `created_at`
+- top-level `purpose` for delegated live envelopes
 - `verification_context`
 - `payload.summary` when shown directly to users
 - payload fields used to compare channel, purpose, sequence, or authority scope
@@ -154,6 +161,8 @@ Use this for protocol lifecycle events and verification-audit events.
   "operator_id": "dgd:identity:org_acme",
   "delegation_id": "dgd:delegation:01JKLM...",
   "created_at": "2026-04-15T00:00:10Z",
+  "conversation_id": "dgd:session:voice_01JSESSION...",
+  "purpose": "support-follow-up",
   "sequence": 1,
   "verification_context": {
     "verification_mode": "dual",
@@ -179,7 +188,7 @@ Use this for protocol lifecycle events and verification-audit events.
 To keep envelopes meaningful instead of merely signed blobs:
 - `subject_id` MUST reference a concrete DigiD object, session, or artifact record
 - if `operator_id` is present and differs from the signer, `delegation_id` MUST be present unless the issuer is authoring the envelope directly
-- if `delegation_id` is present, the payload SHOULD carry a purpose or action hint that the verifier can compare against delegation scope
+- if `delegation_id` is present, the envelope MUST carry a top-level `purpose` that the verifier can compare against delegation scope
 - every live-session message or event MUST include `conversation_id`
 - event and message envelopes for the same live session MUST share the same session or conversation id lineage
 - a verifier SHOULD reject a live-session envelope that references a delegation lineage inconsistent with the bound `dgd.communication` object
@@ -209,6 +218,7 @@ Signed object that a verifier UI can render at call start.
   "delegation_id": "dgd:delegation:01JKLM...",
   "conversation_id": "dgd:session:voice_01JSESSION...",
   "created_at": "2026-04-15T00:00:10Z",
+  "purpose": "support-follow-up",
   "verification_context": {
     "verification_mode": "dual",
     "revocation_max_age_seconds": 300
@@ -353,10 +363,10 @@ Unless an event type says otherwise:
 | `identity.issued` | `issued_object_id`, `identity_class`, `verification_state` | `controller_id` | `issued_object_id` SHOULD equal the identity object id in scope |
 | `attestation.issued` | `issued_object_id`, `attestation_type`, `subject_id` | `verification_state`, `valid_until` | `subject_id` MUST match the attested subject |
 | `delegation.issued` | `issued_object_id`, `delegate_id`, `channels`, `actions`, `purpose_bindings` | `valid_until`, `restrictions` | `channels` and `actions` MUST mirror the delegation object used for trust evaluation |
-| `voice.session.started` | `purpose`, `direction`, `channel_subtype` | `session_started_at`, `announcement_expected` | `purpose` MUST match the bound communication object and delegation purpose when present |
+| `voice.session.started` | `direction`, `channel_subtype` | `session_started_at`, `announcement_expected` | delegated live envelopes now carry canonical `purpose` at the top level rather than only in payload |
 | `voice.session.ended` | `reason`, `duration_ms` | `session_ended_at` | `duration_ms` SHOULD agree with communication timestamps when both exist |
 | `artifact.recorded` | `artifact_id`, `artifact_type`, `content_digest` | `content_length`, `codec`, `duration_ms` | `artifact_id` SHOULD resolve to the recorded artifact or manifest object |
-| `verification.performed` | `decision`, `resolved_trust_state`, `verification_mode`, `revocation_status` | `freshness_status`, `replay_status`, `warning_codes` | This event records verifier output, not signer authority |
+| `verification.performed` | `decision`, `resolved_trust_state`, `verification_mode`, `revocation_status`, `warning_codes` | `freshness_status`, `replay_status` | This event records verifier output, not signer authority |
 | `key.revoked` | `revoked_kid`, `reason_code`, `revoked_at` | `replacement_kid` | `revoked_kid` MUST identify the specific signing key |
 | `attestation.revoked` | `revoked_object_id`, `reason_code`, `revoked_at` | `subject_id` | `revoked_object_id` MUST resolve to a `dgd.attestation` |
 | `delegation.revoked` | `revoked_object_id`, `reason_code`, `revoked_at` | `delegate_id` | `revoked_object_id` MUST resolve to a `dgd.delegation` |
@@ -416,6 +426,7 @@ Created when a delegation is no longer valid.
 - `sequence` MUST increase monotonically within the same session or stream
 - `conversation_id` MUST be the primary ordered-event scope for live-session events in v0.3
 - `voice.session.started` SHOULD be the first ordered event in a voice session stream
+- delegated live events and messages MUST keep `purpose` identical to the bound communication object unless a later signed narrowing profile explicitly permits a more specific child purpose
 - `verification.performed` SHOULD record whether the result reflects `event_time`, `current_time`, or `dual` evaluation
 - revocation events SHOULD identify the revoked object in payload fields even when `subject_id` is the broader session or communication object
 - payload fields that restate signer, operator, or delegation lineage MUST exactly match the top-level envelope ids when included
@@ -440,7 +451,8 @@ Created when a delegation is no longer valid.
     "decision": "allow-with-warning",
     "resolved_trust_state": "delegated-agent",
     "verification_mode": "dual",
-    "revocation_status": "stale"
+    "revocation_status": "stale",
+    "warning_codes": ["revocation-stale"]
   },
   "payload_digest": "sha256:...",
   "proof": {
@@ -461,6 +473,33 @@ Created when a delegation is no longer valid.
 | trust banner | `voice.session.announcement` | agent key | `subject_id`, `conversation_id`, `delegation_id` | same signer and session lineage as start event |
 | verifier output | `verification.performed` | verifier key or local unsigned result | `subject_id`, `conversation_id` | decision matches checks and evaluation mode |
 | post-call artifact | `artifact.recorded` or recording manifest | agent or service key | artifact id, conversation id | artifact lineage matches session and communication |
+
+## Warning and reason code profile
+
+To keep verifier output portable across adapters, the first profile should normalize a small machine-readable warning and reason-code set.
+
+### Warning codes
+- `revocation-stale`
+- `revocation-unknown`
+- `delegation-expired-current-time`
+- `key-expired-current-time`
+- `lineage-conflict`
+- `replay-suspected`
+- `authority-incomplete`
+
+### Reason codes for session end or revocation-adjacent events
+- `completed`
+- `caller-ended`
+- `receiver-ended`
+- `network-failure`
+- `policy-blocked`
+- `authorization-ended`
+- `superseded`
+
+Rules:
+- verifier-produced `warning_codes` MUST use stable slugs from this list unless declared as non-critical extensions
+- user-facing warning copy MAY vary by adapter, but SHOULD map back to these stable codes
+- event payload `reason` fields SHOULD use the reason-code profile instead of free text when an exact code exists
 
 ## Verification rules for envelopes
 

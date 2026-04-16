@@ -93,6 +93,15 @@ For the first implementation profile:
 - `video`
 - `document`
 
+### Channel subtypes
+- `outbound-call`
+- `inbound-call`
+- `thread-message`
+- `direct-message`
+- `email-thread`
+- `video-meeting`
+- `document-share`
+
 ### Delegation actions
 - `communicate`
 - `identify`
@@ -100,6 +109,39 @@ For the first implementation profile:
 - `sign-message`
 - `issue-artifact`
 - `request-response`
+
+### Purpose profile
+- purpose values SHOULD be stable machine-readable slugs such as `support-follow-up`, `billing-notice`, or `claims-update`
+- a verifier MUST compare exact purpose strings, not fuzzy text similarity
+- human-readable purpose labels MAY be rendered by adapters, but trust evaluation MUST use the canonical slug
+- the first delegated live profile SHOULD reject envelopes that omit a purpose when the bound delegation has `purpose_bindings`
+
+## Shared lineage blocks
+
+The first fixture and implementation profile should normalize repeated trust-lineage fields into conceptual blocks even when the JSON remains flattened.
+
+### Delegated authority lineage
+- `sender.identity_id` or envelope `sender_id` / `actor_id`
+- `operator_id`
+- `delegation_id`
+- `purpose`
+- `channel`
+- `channel_subtype`
+
+### Session lineage
+- `communication_id`
+- `session_id` or envelope `conversation_id`
+- sequence scope metadata when events are ordered
+
+### Artifact lineage
+- `artifact_type`
+- `communication_id`
+- `session_id`
+- `derived_from`
+- detached payload digest and length
+
+Verifier note:
+- a live delegated flow MUST fail lineage validation when these blocks disagree across signed objects unless an explicit future rotation or transfer profile permits the change
 
 ## Shared proof block
 

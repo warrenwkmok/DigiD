@@ -224,3 +224,14 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added a third critique pass covering the latest UX, Slack, and scaffold work. Updated the roadmap and review workflow so active DigiD work now prefers a lightweight hourly build loop with critique coverage instead of waiting for larger, slower cycles.
 - linked docs: `docs/review/third-critique.md`, `docs/review/review-workflow.md`, `docs/mvp/repo-roadmap.md`
 - notes: The next risk is process bloat, so the hourly loop should stay lightweight and biased toward real build progress.
+
+## DF-019 — Normalize delegated live-envelope purpose and portable warning codes
+- source: `2026-04-16 DigiD focused build loop`
+- date: 2026-04-16
+- area: protocol
+- severity: high
+- status: applied
+- summary: Delegated live flows still allowed purpose to drift between payloads and lineage docs, and verifier warnings were not yet normalized enough for adapter portability.
+- action taken: Added a top-level `purpose` contract for delegated live envelopes, introduced shared lineage blocks, added a portable warning and reason-code profile, aligned the normative draft with `dgd.session` and `dgd.artifact`, and updated the first demo flow to validate lineage before verifier rendering.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/normative-protocol-draft.md`, `docs/mvp/first-demo-flow.md`
+- notes: This makes the next honest slice more clearly about producing fixtures and validators instead of revisiting envelope semantics again.

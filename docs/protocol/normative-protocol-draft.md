@@ -15,6 +15,8 @@ The first verifier profile supports these object families:
 - `dgd.attestation`
 - `dgd.delegation`
 - `dgd.communication`
+- `dgd.session`
+- `dgd.artifact`
 - `dgd.verification_result`
 - `dgd.revocation`
 - `dgd.message`
@@ -105,9 +107,19 @@ If signer identity resolution is ambiguous, verification MUST fail.
 ### `dgd.delegation`
 - MUST reference delegator in `issuer_id`
 - MUST reference delegate in `delegate_id`
-- MUST include explicit `channels` and `actions`
+- MUST include `authority.channels` and `authority.actions`
 - MUST include `valid_from`
 - SHOULD include `valid_until`
+
+### `dgd.session`
+- MUST reference one `communication_id`
+- MUST define one ordered interaction scope
+- MUST align `object_id` with live envelope `conversation_id` in the first delegated live profile
+
+### `dgd.artifact`
+- MUST reference the communication lineage it was derived from
+- MUST include payload digest metadata for detached content
+- MUST keep `session_id` aligned when the artifact came from a live session
 
 ### `dgd.message`
 - MUST include `message_type`
@@ -121,6 +133,7 @@ If signer identity resolution is ambiguous, verification MUST fail.
 - MUST include `subject_id`
 - MUST include actor identity field
 - MUST include monotonic `sequence` within the scoped stream if the event belongs to an ordered session
+- MUST include `purpose` when delegated authority is claimed in the first live delegated profile
 
 ## Trust path requirements
 
@@ -182,6 +195,7 @@ The verifier MUST reject when:
 - a listed critical extension is unsupported
 - delegation is required but missing
 - channel or action is out of scope for delegation
+- delegated live lineage conflicts across communication, session, and envelope objects
 
 ## Minimum downgrade cases
 
@@ -189,6 +203,20 @@ The verifier SHOULD downgrade instead of hard reject when:
 - signature is mathematically valid but revocation freshness is stale
 - event-time validity succeeds but current-time authority has expired
 - signer identity is active but attestation evidence is incomplete
+
+## Warning code portability
+
+The first verifier profile SHOULD emit stable machine-readable warning codes alongside user-facing warning strings.
+At minimum, the profile should support:
+- `revocation-stale`
+- `revocation-unknown`
+- `delegation-expired-current-time`
+- `key-expired-current-time`
+- `lineage-conflict`
+- `replay-suspected`
+- `authority-incomplete`
+
+Adapters MAY rephrase warning text, but SHOULD preserve the underlying code so downstream analytics, audits, and UI tests can compare outcomes consistently.
 
 ## First implementation note
 

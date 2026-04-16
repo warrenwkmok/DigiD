@@ -93,9 +93,15 @@ The voice adapter emits:
 Both are signed with the agent key and reference the same communication object plus the active delegation.
 For the first fixture profile they must also share:
 - the same `conversation_id` as the signed session `object_id`
-- the same `purpose` value as the communication object and delegation purpose binding
+- the same top-level `purpose` value as the communication object and delegation purpose binding
 - identical signer, operator, delegation, and session lineage
 - no unsigned trust-facing fields beyond what can be deterministically derived from signed payload fields
+
+For this slice, delegated live envelopes should carry purpose twice only when necessary:
+- canonical trust-bearing purpose at the envelope top level
+- optional payload-local restatement only when it helps rendering or detached payload validation
+
+If both are present, they must be identical.
 
 ### 8. Receiver-side verifier resolves trust
 The verifier checks:
@@ -124,6 +130,7 @@ Expanded state:
 - signature status: valid
 - verification mode: dual
 - trust note: verifies sender authenticity, not truth of message content
+- warning codes: stable machine-readable slugs such as `revocation-stale` or `delegation-expired-current-time` back any warning UI
 
 ### 10. Optional post-call artifacts
 If the demo includes persistence, emit:
@@ -265,10 +272,11 @@ Suggested compact outputs:
 1. fixture schema validation for the object and envelope family
 2. typed event-payload validation for the happy-path event set
 3. signed-versus-referenced field validation for trust-facing message and event payloads
-4. verifier pipeline over the happy-path fixture set
-5. trust-state renderer for compact and expanded views
-6. degraded comparison fixtures for revoked and stale outcomes
-7. optional recording and transcript provenance fixtures
+4. lineage validation for communication, session, delegated authority, and artifact bindings
+5. verifier pipeline over the happy-path fixture set
+6. trust-state renderer for compact and expanded views
+7. degraded comparison fixtures for revoked and stale outcomes
+8. optional recording and transcript provenance fixtures
 
 ## Architecture note carried forward
 
