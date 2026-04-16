@@ -24,3 +24,8 @@
 ## Threat model
 - `threat-model/threat-model.md`
 - `threat-model/privacy-position.md`
+
+## Review
+- `review/critic-brief.md`
+- `review/review-workflow.md`
+- `review/first-critique.md`
