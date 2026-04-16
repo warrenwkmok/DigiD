@@ -28,4 +28,7 @@
 ## Review
 - `review/critic-brief.md`
 - `review/review-workflow.md`
+- `review/assimilation-rules.md`
+- `review/design-feedback-log.md`
+- `review/open-questions.md`
 - `review/first-critique.md`

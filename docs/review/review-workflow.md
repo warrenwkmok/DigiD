@@ -81,9 +81,20 @@ Run a critique pass:
 - low:
 ```
 
+## Critique assimilation step
+
+A critique pass is not complete until it feeds back into the repo.
+
+After each meaningful critique:
+1. log the resulting items in `design-feedback-log.md` when needed
+2. add unresolved strategic questions to `open-questions.md`
+3. apply immediate doc changes where the critique clearly improves the design
+4. record whether recommendations were applied, planned, deferred, rejected, or escalated for decision
+
 ## Operating principle
 
 The project should not blindly accept every critique, but every critique should be taken seriously enough to either:
 - incorporate the change
 - explicitly reject it with reasoning
-- or defer it with a known tradeoff
+- defer it with a known tradeoff
+- or mark it as needing Master Warren's decision
