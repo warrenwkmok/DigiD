@@ -1,100 +1,144 @@
-# DigiD first demo flow
+# DigiD first demo flow v0.2
 
 ## Recommended first demo
 
 The first strong DigiD demo should be:
 
-**A verified organization-issued agent initiates a voice communication, and the receiver can clearly see that the caller is a verified agent acting under a verified organization rather than an unknown human or spoofed bot.**
+**A verified organization-issued agent initiates a voice communication, and the receiver can clearly see that the caller is a verified delegated agent acting for a verified organization.**
 
-This captures the heart of the product.
+That is the smallest compelling proof that DigiD solves a real AI-era trust problem.
 
-## Why this demo first
+## Demo goal
 
-It demonstrates:
-- human vs agent distinction
-- organization-backed delegation
-- real communications trust problem
-- visible trust UX
-- a timely AI-era use case
+Show, in one coherent flow:
+- identity issuance
+- organization-backed attestation
+- delegation issuance
+- signed voice-session announcement
+- receiver-side verification
+- trust-state rendering that distinguishes delegated agent from verified human and unverified caller
 
 ## Demo actors
 
 ### Organization
-- Acme Support
-- DigiD class: organization
-- trust state: verified organization
+- display name: Acme Support
+- identity class: organization
+- verification state: verified organization
+- role: issuer and delegator
 
 ### Agent
-- Acme Support Agent 01
-- DigiD class: agent
-- trust state: verified agent
-- delegated by Acme Support
+- display name: Acme Support Agent 01
+- identity class: agent
+- verification state: verified agent
+- controller relationship: organization-issued
 
 ### Receiver
-- ordinary user receiving a call or viewing a call detail screen
+- ordinary person receiving a support call
+- no DigiD expertise required
 
-## Demo sequence
+## Demo objects
 
-### Step 1: Organization creates agent identity
-The organization issues an agent identity and signs an attestation and delegation object.
+The first demo should include these canonical artifacts:
+1. organization identity object
+2. agent identity object
+3. agent attestation object
+4. delegation object
+5. `voice.session.started` event envelope
+6. `voice.session.announcement` message envelope
+7. verification result object
+8. optional recording manifest and session-ended event
 
-### Step 2: Agent initiates communication
-The agent starts an outbound voice session.
-A DigiD voice session start envelope is created and signed.
+## End-to-end sequence
 
-### Step 3: Receiver sees trust indicator
-Before or during the call, the receiver sees something like:
-- Verified agent
-- Acting for Acme Support
-- Identity verified
-- Delegation active
+### 1. Organization identity exists
+Acme Support publishes an active organization identity with an active signing key.
 
-### Step 4: Receiver inspects details
-If expanded, the receiver can inspect:
-- sender class: agent
-- operator: Acme Support
-- verification state: verified organization-backed agent
-- signature status: valid
-- authority status: active
+### 2. Agent identity is issued
+Acme Support issues `Acme Support Agent 01` as an agent identity controlled by the organization.
 
-### Step 5: Optional post-call recording manifest
-If the system stores a recording or transcript, it also carries DigiD provenance.
+### 3. Attestation is issued
+Acme Support signs an attestation confirming the agent identity is a verified organization-issued agent.
 
-## Demo UX concept
+### 4. Delegation is issued
+Acme Support signs a delegation authorizing the agent for:
+- channel: voice
+- actions: `communicate`, `sign-session`
+- purpose: `support-follow-up`
 
-### Compact state
-- purple or blue indicator
-- label: Verified agent for Acme Support
+### 5. Agent starts the call
+The voice adapter emits:
+- `voice.session.started` event
+- `voice.session.announcement` message
 
-### Expanded details
+Both are signed with the agent key and reference the active delegation.
+
+### 6. Receiver-side verifier resolves trust
+The verifier checks:
+- signature validity
+- agent identity status
+- organization identity status
+- attestation status
+- delegation status and scope
+- time validity
+- revocation state
+
+### 7. UI renders trust state
+Compact state:
+- **Verified agent for Acme Support**
+
+Expanded state:
 - sender: Acme Support Agent 01
 - sender class: agent
-- organization: Acme Support
-- signed by: active DigiD key
-- delegation: valid until Oct 15, 2026
+- operator: Acme Support
+- authority: delegated by verified organization
+- channel authorization: voice
+- signature status: valid
 - trust note: verifies sender authenticity, not truth of message content
 
-## Contrast cases the demo should also show
+### 8. Optional post-call artifacts
+If the demo includes persistence, emit:
+- `voice.session.ended` event
+- `voice.recording.manifest` message
+- optional transcript artifact with provenance
 
-### Case A: Verified human
-A verified human sender appears differently from the verified agent.
+## Example event chain
 
-### Case B: Unverified caller
-An unverified sender appears gray and warns the receiver that no verified DigiD trust chain exists.
+| Seq | Artifact | Who signs it | Why it matters |
+| --- | --- | --- | --- |
+| 1 | organization identity | org key | anchor trust root for demo |
+| 2 | agent identity | org key or identity service key | establishes agent subject |
+| 3 | attestation | org key | marks agent as organization-backed |
+| 4 | delegation | org key | grants voice authority |
+| 5 | `voice.session.started` event | agent key | proves session initiation |
+| 6 | `voice.session.announcement` message | agent key | powers UI trust banner |
+| 7 | verification result | verifier key or unsigned local result | shows resolved trust state |
+| 8 | optional recording manifest | agent key or service key | preserves provenance after call |
 
-### Case C: Revoked agent
-A previously valid agent shows a red or warning state because delegation is no longer active.
+## Contrast cases the demo should also render
 
-## Demo output artifacts
+### A. Verified human
+- no operator
+- no delegation
+- trust chip: `Verified human`
 
-The first demo could be represented with:
-- identity object JSON
-- attestation object JSON
-- delegation object JSON
-- voice session envelope JSON
-- verification result JSON
-- a simple UI mock or verifier output page
+### B. Unverified caller
+- no valid DigiD trust chain
+- trust chip: `Unverified sender`
+- warning copy: `No verifiable DigiD signature or delegation found`
 
-## Why this is the right first proof
+### C. Revoked agent delegation
+- signature may still verify mathematically
+- trust chip: `Delegation revoked`
+- details explain that sender authority is no longer active
 
-If DigiD can make this one experience obvious and compelling, it proves the product can solve a modern trust problem that people increasingly care about.
+## Suggested demo architecture slice
+
+For the first implementation, one repo slice is enough:
+- static JSON fixtures for demo objects and envelopes
+- small verifier library that resolves trust state from fixture inputs
+- tiny UI or CLI output that renders compact and expanded trust views
+
+## Product decision already implied by this flow
+
+The first demo should optimize for **verified agent/human communications**, not generic media provenance alone.
+That is the sharper wedge and the clearest immediate trust problem.

@@ -1,79 +1,192 @@
-# DigiD signing and provenance model
+# DigiD signing and provenance model v0.2
 
 ## Goal
 
-DigiD should allow communications and media to carry verifiable provenance.
+DigiD should let a receiver verify three different things cleanly:
+- **origin**: who signed the object
+- **authority**: whether that signer was allowed to act in that role
+- **integrity**: whether the signed payload changed after signing
 
-That means a receiver should be able to tell:
-- who signed the communication
-- what kind of identity signed it
-- whether the signer was delegated
-- whether the payload has been modified since signing
+It should not pretend to prove content truth.
+
+## Trust assertions DigiD can support
+
+A verifier should be able to render statements like:
+- signed by verified human
+- signed by verified agent
+- signed by agent delegated by verified organization
+- signed by service acting under delegated authority
+- signature valid but delegation expired
+- unsigned or unverifiable
 
 ## Signing model
 
 At a high level:
-- each DigiD identity owns one or more private signing keys
-- the corresponding public keys are published in the identity record
-- messages, sessions, or media manifests are signed with the private key
-- receivers verify the signature using the published public key
+1. each DigiD identity holds one or more signing keys
+2. public keys are published in the identity object
+3. protocol objects are canonicalized before signing
+4. a `proof` block is attached to the object or envelope
+5. verifiers resolve the key, then validate signature, status, authority, and time
+
+## Canonicalization requirement
+
+To keep cross-platform verification stable, DigiD v0.2 should assume:
+- JSON wire format
+- JSON Canonicalization Scheme (`JCS`) for signing input
+- detached payloads represented by digests when the payload is large or binary
+
+Signing target:
+- remove the `proof` field from the object
+- canonicalize the remaining JSON
+- sign the canonical bytes with the signer private key
+- place the resulting proof in `proof`
+
+## Key requirements
+
+For the first implementation, keys should support:
+- algorithm: `Ed25519`
+- explicit `kid`
+- status: `active`, `suspended`, `revoked`, `expired`
+- purpose list such as `assertion`, `authentication`
+- creation time and optional expiry time
+
+Recommended verifier posture:
+- reject signatures from revoked keys
+- downgrade trust on expired keys even if the math verifies
+- require proof `kid` to resolve to the signer identity unless the protocol explicitly allows delegated custodianship
 
 ## What gets signed
 
-Potential signed objects include:
-- email metadata and body digest
-- messaging payloads
-- call session manifests
-- voice recording manifests
-- video recording manifests
-- document manifests
-- event logs for communication flows
+### Primary signed objects
+- identity objects when issued or rotated
+- attestation objects
+- delegation objects
+- message envelopes
+- event envelopes
+- verification result objects when a verifier service wants portable signed output
+- revocation objects
 
-## Call/session signing concept
+### Optional later signed objects
+- chunk manifests for long media streams
+- transcript manifests
+- structured document bundles
+- redaction manifests and derived artifact chains
 
-For real-time channels like voice and video, DigiD may sign:
-- session start metadata
-- participant identity claims
-- delegation chain
-- media stream fingerprints or periodic chunks
-- call-end summary manifest
+## Provenance model
 
-This gives a basis for later verification without requiring every channel to natively understand DigiD from day one.
+Provenance should be explicit, not inferred from vibes.
 
-## Media provenance concept
-
-For voice or video, DigiD should be able to represent:
-- who created the original asset
-- whether it was AI-generated, human-recorded, or hybrid
+A provenance-capable object should be able to state:
+- who created the original asset or message
+- whether the content was human-created, agent-generated, service-generated, human-recorded, AI-generated, or hybrid
 - whether it was edited after initial creation
-- what software or trusted pipeline signed it
+- what pipeline or software emitted the signed object
+- which upstream subject or session the artifact came from
+
+Suggested provenance fields:
+
+```json
+{
+  "source_type": "agent-generated",
+  "capture_method": "live-session",
+  "edited": false,
+  "generator": {
+    "software": "DigiD Voice Adapter",
+    "version": "0.1.0"
+  },
+  "derived_from": [
+    "dgd:session:voice_01JSESSION..."
+  ]
+}
+```
 
 ## Human vs agent provenance
 
-This is a core DigiD distinction.
+This distinction is the product, not a side note.
 
-Example interpretation:
-- signed by verified human
-- signed by verified agent
-- signed by agent delegated by verified organization
-- unsigned or unverifiable
+DigiD should explicitly model whether the signer is:
+- a human identity
+- an agent identity
+- an organization identity
+- a service identity
 
-## Verification output
+And separately whether the signer is:
+- self-controlled
+- organization-issued
+- delegated
+- pseudonymous
 
-A verifier should ideally produce a result like:
-- signature valid: yes
-- signer class: verified agent
-- delegation: authorized by Company X
-- payload integrity: intact
-- revocation status: active
-- trust summary: trusted for sender authenticity
+That lets the UI say things like:
+- Verified human
+- Verified agent
+- Verified agent for Acme Support
+- Verified service for Acme Support
+- Signature valid, authority no longer active
 
-## Important principle
+## Verification pipeline
 
-DigiD should separate:
-- proof that a message came from a claimed sender
-from:
-- proof that the content is true
+A reference verifier should perform checks in this order:
 
-A verified liar is still possible.
-DigiD proves origin and trust status, not universal truth.
+1. **shape validation**
+   - correct object type
+   - required fields present
+   - timestamps parse
+
+2. **proof validation**
+   - canonicalization method supported
+   - signature algorithm supported
+   - signature bytes verify against resolved public key
+
+3. **signer resolution**
+   - signing key exists on signer identity
+   - key status is acceptable
+   - signer identity status is acceptable
+
+4. **authority resolution**
+   - attestation path exists if required
+   - delegation exists if the signer is acting for another party
+   - channel and action are in scope
+
+5. **time and revocation checks**
+   - object is within validity window
+   - key, attestation, delegation, and target are not revoked
+
+6. **trust-state resolution**
+   - derive the display trust state
+   - generate warnings if mathematically valid but operationally unsafe
+
+## Degraded trust examples
+
+These should not all collapse into one red X.
+
+### Valid signature, no authority
+- signer key valid
+- signer identity active
+- delegation missing or out of scope
+- result: `degraded-trust`
+
+### Valid signature, revoked delegation
+- signer key valid
+- delegation revoked after issuance
+- result: warning or reject depending on the use case and event time
+
+### Unsignable host platform wrapper
+- host transport strips some metadata
+- DigiD verifier still works if it can access the envelope via URL, QR, attachment, or sidecar object
+
+## Event and message provenance interplay
+
+Messages provide the user-facing communication object.
+Events provide the reconstruction trail.
+
+Example for the first demo:
+- a `voice.session.started` event proves the session began
+- a `voice.session.announcement` message is what the UI displays
+- a `verification.performed` event explains how the trust state was determined
+- a `voice.recording.manifest` message preserves post-call provenance
+
+## Product principle
+
+DigiD proves sender authenticity and authority state.
+It does not prove that the sender is honest, competent, or factually correct.
+A verified liar is still possible, and the protocol should say that plainly.

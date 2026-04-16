@@ -1,210 +1,328 @@
-# DigiD object schemas v0
+# DigiD object schemas v0.2
 
-This document turns the earlier conceptual model into a first structured protocol draft.
+This document tightens the first protocol draft into a more implementation-ready object model.
 
-## Schema goals
+## Design goals
 
-The first object layer should be:
-- understandable
-- signable
+The first schema layer should be:
+- signable with a deterministic canonical form
+- strict enough for verifier implementation
 - portable across channels
-- explicit about trust class and delegation
-- easy to verify by software and understandable by humans
+- explicit about delegation and lifecycle state
+- compact enough to fit into envelopes, manifests, and APIs
 
-## Core object families
+## Common object rules
 
-DigiD v0 should define at least these core objects:
-- Identity Object
-- Attestation Object
-- Delegation Object
-- Signed Communication Object
-- Verification Result Object
-- Revocation Object
+Every DigiD object shares these fields.
 
-## 1. Identity Object
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `object_type` | string | yes | Stable namespaced type like `dgd.identity` |
+| `schema_version` | string | yes | Current draft: `0.2` |
+| `object_id` | string | yes | Global DigiD identifier |
+| `created_at` | RFC3339 UTC string | yes | Creation time |
+| `updated_at` | RFC3339 UTC string | no | Last mutation time for mutable records |
+| `issuer_id` | string | sometimes | Required when an issuer distinct from the subject creates the object |
+| `status` | string | yes | Lifecycle state specific to object family |
+| `evidence` | object | no | Optional references to off-chain or off-protocol evidence |
+| `proof` | object | no | Signature proof block when the object is signed |
+
+## Enumerations
+
+### Identity classes
+- `human`
+- `agent`
+- `organization`
+- `service`
+- `pseudonymous`
+- `unverified`
+
+### Verification states
+- `unverified`
+- `self-asserted`
+- `verified-human`
+- `verified-agent`
+- `verified-organization`
+- `delegated-agent`
+- `delegated-service`
+- `revoked`
+- `suspended`
+
+### Lifecycle statuses
+- `draft`
+- `active`
+- `suspended`
+- `revoked`
+- `expired`
+
+## Shared proof block
+
+All signed DigiD objects should use the same proof structure.
+
+```json
+{
+  "type": "ed25519-2020",
+  "kid": "dgd:key:agent_01:key-2026-04",
+  "created_at": "2026-04-15T00:00:00Z",
+  "canonicalization": "JCS",
+  "signature": "zBase64OrMultibaseSignature"
+}
+```
+
+Notes:
+- `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
+- the signature is calculated over the object with `proof` removed
+- verifiers should reject unknown critical proof parameters
+
+## 1. Identity object
+
+Represents a persistent subject capable of holding keys and appearing in trust decisions.
 
 ```json
 {
   "object_type": "dgd.identity",
-  "version": "0.1",
-  "id": "dgd:agent:01JABC...",
+  "schema_version": "0.2",
+  "object_id": "dgd:identity:agent_01JABC...",
   "identity_class": "agent",
   "display_name": "Acme Support Agent 01",
+  "legal_name": null,
   "verification_state": "verified-agent",
-  "subject_status": "active",
-  "public_keys": [
+  "status": "active",
+  "primary_handle": "acme-support-agent-01",
+  "keys": [
     {
-      "kid": "key-2026-04",
-      "algorithm": "ed25519",
-      "public_key": "base64-or-multibase-value",
+      "kid": "dgd:key:agent_01:key-2026-04",
+      "algorithm": "Ed25519",
+      "public_key": "z6Mk...",
       "status": "active",
-      "created_at": "2026-04-15T00:00:00Z"
+      "purposes": ["assertion", "authentication"],
+      "created_at": "2026-04-15T00:00:00Z",
+      "expires_at": null
     }
   ],
-  "operator": {
-    "identity_id": "dgd:org:acme",
+  "controller": {
+    "controller_id": "dgd:identity:org_acme",
     "relationship": "organization-issued"
   },
   "disclosure": {
     "display_level": "standard",
-    "real_world_identity_disclosed": false
+    "real_world_identity_disclosed": false,
+    "supports_selective_disclosure": false
   },
+  "service_endpoints": [
+    {
+      "type": "verification-api",
+      "url": "https://verify.example.com/digid/identities/agent_01JABC"
+    }
+  ],
   "created_at": "2026-04-15T00:00:00Z",
-  "updated_at": "2026-04-15T00:00:00Z"
+  "updated_at": "2026-04-15T00:00:00Z",
+  "status_reason": null
 }
 ```
 
-### Notes
-- `identity_class` should support: `human`, `agent`, `organization`, `pseudonymous`, `unverified`
-- `verification_state` is the user-facing trust interpretation
-- `subject_status` should support: `active`, `revoked`, `suspended`, `expired`
+### Identity constraints
+- `object_id` must be immutable
+- at least one active key must exist for an `active` identity
+- `verification_state` is user-facing interpretation, not raw evidence
+- `controller.relationship` should be one of `self-controlled`, `organization-issued`, `delegated-service`, `custodial`
 
-## 2. Attestation Object
+## 2. Attestation object
+
+Represents a signed statement by an issuer about a subject.
 
 ```json
 {
   "object_type": "dgd.attestation",
-  "version": "0.1",
-  "id": "dgd:att:01JXYZ...",
-  "subject_id": "dgd:agent:01JABC...",
-  "issuer_id": "dgd:org:acme",
+  "schema_version": "0.2",
+  "object_id": "dgd:attestation:01JXYZ...",
+  "issuer_id": "dgd:identity:org_acme",
+  "subject_id": "dgd:identity:agent_01JABC...",
   "attestation_type": "organization-issued-agent",
-  "trust_level": "high",
+  "verification_state": "verified-agent",
+  "status": "active",
   "issued_at": "2026-04-15T00:00:00Z",
-  "expires_at": "2026-10-15T00:00:00Z",
-  "revocation": null,
+  "valid_from": "2026-04-15T00:00:00Z",
+  "valid_until": "2026-10-15T00:00:00Z",
   "claims": {
-    "authorized_for": ["voice", "messaging", "email"],
-    "brand": "Acme Support"
+    "authorized_channels": ["voice", "messaging", "email"],
+    "organization_display_name": "Acme Support",
+    "role": "support-agent"
   },
-  "signature": {
-    "kid": "org-key-2026-01",
-    "algorithm": "ed25519",
-    "value": "signature-by-issuer"
+  "evidence": {
+    "method": "internal-hr-and-admin-approval",
+    "reference": "att-evidence-2026-04-15-001"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-04-15T00:00:01Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## 3. Delegation Object
+### Attestation constraints
+- `issuer_id` and `subject_id` must be different unless the type explicitly allows self-attestation
+- expired or revoked attestations must not satisfy a high-trust verification path
+- attestation type is machine-readable, not display text
+
+## 3. Delegation object
+
+Defines authority for one subject to act on behalf of another.
 
 ```json
 {
   "object_type": "dgd.delegation",
-  "version": "0.1",
-  "id": "dgd:del:01JKLM...",
-  "issuer_id": "dgd:org:acme",
-  "delegate_id": "dgd:agent:01JABC...",
+  "schema_version": "0.2",
+  "object_id": "dgd:delegation:01JKLM...",
+  "issuer_id": "dgd:identity:org_acme",
+  "delegate_id": "dgd:identity:agent_01JABC...",
   "delegate_class": "agent",
-  "scope": {
-    "channels": ["voice", "video", "email"],
-    "actions": ["communicate", "identify", "sign-session"],
-    "restrictions": ["no-financial-approval", "no-legal-commitment"]
+  "status": "active",
+  "authority": {
+    "channels": ["voice", "email"],
+    "actions": ["communicate", "identify", "sign-session", "sign-message"],
+    "restrictions": ["no-financial-approval", "no-legal-commitment"],
+    "purpose_bindings": ["support-follow-up", "account-notice"]
   },
   "valid_from": "2026-04-15T00:00:00Z",
   "valid_until": "2026-10-15T00:00:00Z",
-  "status": "active",
-  "signature": {
-    "kid": "org-key-2026-01",
-    "algorithm": "ed25519",
-    "value": "delegation-signature"
+  "revocation_endpoint": "https://verify.example.com/digid/revocations/01JKLM",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-04-15T00:00:01Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## 4. Signed Communication Object
+### Delegation constraints
+- verifier must check that the delegate identity is active
+- verifier must check requested channel and action against `authority`
+- expired delegation cannot be revived without a new object
 
-This is the key product object.
+## 4. Signed communication object
+
+A normalized high-level communication object for completed or in-progress exchanges.
 
 ```json
 {
   "object_type": "dgd.communication",
-  "version": "0.1",
-  "id": "dgd:comm:01JCOMM...",
+  "schema_version": "0.2",
+  "object_id": "dgd:communication:01JCOMM...",
+  "status": "active",
   "channel": "voice",
   "channel_subtype": "outbound-call",
+  "session_id": "dgd:session:voice_01JSESSION...",
   "sender": {
-    "identity_id": "dgd:agent:01JABC...",
+    "identity_id": "dgd:identity:agent_01JABC...",
     "identity_class": "agent",
-    "verification_state": "verified-agent"
+    "verification_state": "delegated-agent"
   },
-  "operator": {
-    "identity_id": "dgd:org:acme",
-    "verification_state": "verified-organization"
-  },
-  "delegation_id": "dgd:del:01JKLM...",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:01JKLM...",
   "payload": {
     "content_type": "session-manifest",
     "content_digest": "sha256:...",
-    "created_by": "agent",
+    "content_length": 1842,
     "media_mode": "real-time-voice"
   },
   "timestamps": {
     "created_at": "2026-04-15T00:00:00Z",
-    "session_started_at": "2026-04-15T00:00:10Z"
+    "session_started_at": "2026-04-15T00:00:10Z",
+    "session_ended_at": null
   },
-  "signature": {
-    "kid": "agent-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature-by-sender"
+  "provenance": {
+    "source_type": "agent-generated",
+    "capture_method": "live-session",
+    "edited": false
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:10Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## 5. Verification Result Object
+## 5. Verification result object
+
+Represents a portable verifier output that downstream UIs can render without repeating the full trust evaluation logic.
 
 ```json
 {
   "object_type": "dgd.verification_result",
-  "version": "0.1",
+  "schema_version": "0.2",
+  "object_id": "dgd:verification:01JVERIFY...",
+  "subject_id": "dgd:communication:01JCOMM...",
+  "status": "active",
   "verified_at": "2026-04-15T00:05:00Z",
-  "subject_id": "dgd:comm:01JCOMM...",
-  "signature_valid": true,
-  "signer_status": "active",
-  "delegation_status": "active",
-  "revocation_status": "clear",
-  "trust_state": "delegated-agent",
+  "decision": "allow-with-trust-indicator",
+  "checks": {
+    "signature_valid": true,
+    "signer_status": "active",
+    "attestation_status": "active",
+    "delegation_status": "active",
+    "revocation_status": "clear",
+    "payload_integrity": "intact",
+    "time_valid": true
+  },
+  "resolved_trust_state": "delegated-agent",
   "display_summary": "Verified agent acting for Acme Support",
   "warnings": [],
   "errors": []
 }
 ```
 
-## 6. Revocation Object
+### Verification result decisions
+- `allow-with-trust-indicator`
+- `allow-with-warning`
+- `degraded-trust`
+- `reject`
+
+## 6. Revocation object
+
+Represents an explicit revocation for an identity, key, attestation, delegation, or communication object.
 
 ```json
 {
   "object_type": "dgd.revocation",
-  "version": "0.1",
-  "id": "dgd:rev:01JREV...",
-  "target_object_id": "dgd:del:01JKLM...",
+  "schema_version": "0.2",
+  "object_id": "dgd:revocation:01JREV...",
+  "issuer_id": "dgd:identity:org_acme",
+  "target_object_id": "dgd:delegation:01JKLM...",
   "target_object_type": "dgd.delegation",
-  "reason": "authorization-ended",
+  "status": "active",
+  "reason_code": "authorization-ended",
+  "reason_detail": "Agent contract terminated",
   "revoked_at": "2026-05-01T00:00:00Z",
-  "issuer_id": "dgd:org:acme",
-  "signature": {
-    "kid": "org-key-2026-01",
-    "algorithm": "ed25519",
-    "value": "revocation-signature"
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-05-01T00:00:01Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## Early design choices
+## Validation guidance for the first implementation
 
-### Identity ids
-Use a DigiD-prefixed identifier format such as:
-- `dgd:human:<id>`
-- `dgd:agent:<id>`
-- `dgd:org:<id>`
+A reference verifier should at minimum enforce:
+1. required field presence by `object_type`
+2. canonical signature verification using the referenced key
+3. key status, identity status, attestation status, and delegation status
+4. channel and action authorization for delegated actors
+5. timestamp validity and revocation checks
+6. clear downgrade behavior when an object is syntactically valid but trust-incomplete
 
-### Signatures
-Keep the first draft algorithm-agnostic but opinionated enough to prototype quickly.
-A good early default is Ed25519.
-
-### Verification states vs identity classes
-Keep them separate.
-
-- `identity_class` answers: what kind of thing is this?
-- `verification_state` answers: how should a receiver interpret its trust level?
-
-This matters because a pseudonymous identity can still be persistent and signed, while an agent can be either verified or unverified.
+## Open questions still worth deciding later
+- whether identity and key documents should fully align with W3C DID conventions or stay DigiD-native
+- whether selective disclosure should be in v1 or treated as a later privacy upgrade
+- whether revocation should be pull-based only, push-based, or both

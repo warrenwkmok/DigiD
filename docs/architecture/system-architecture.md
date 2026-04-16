@@ -1,23 +1,23 @@
-# DigiD system architecture
+# DigiD system architecture v0.2
 
 ## High-level layers
 
-DigiD should be thought of as a stack.
+DigiD should be designed as a portable trust stack.
 
 ### 1. Identity layer
-Stores identity records, public keys, trust class, and lifecycle state.
+Stores identity records, keys, controller relationships, and lifecycle state.
 
-### 2. Attestation layer
-Represents who verified or authorized whom, with signatures and expiry rules.
+### 2. Attestation and delegation layer
+Stores signed attestations and delegations that explain why a verifier should trust a signer and what authority they hold.
 
 ### 3. Signing layer
-Signs communications, media manifests, and session objects.
+Creates signed DigiD objects, message envelopes, and event envelopes using canonicalized payloads.
 
 ### 4. Verification layer
-Resolves identity records, checks signatures, checks attestations, and evaluates trust state.
+Resolves identity records, checks signatures, checks authority chains, resolves revocation state, and produces a final trust decision.
 
 ### 5. Adapter layer
-Connects DigiD concepts to actual channels:
+Maps DigiD objects into real communication channels:
 - voice
 - video
 - email
@@ -26,31 +26,72 @@ Connects DigiD concepts to actual channels:
 - enterprise systems
 
 ### 6. UX layer
-Displays trust state in a way ordinary people can interpret quickly.
+Displays trust state in a form normal people can interpret quickly and safely.
 
-## Core architectural objects
+## Core architectural services
 
 - identity registry
 - public key directory
 - attestation store
-- revocation list or revocation service
+- delegation store
+- revocation service
 - verification service
 - channel adapters
 - verifier UI kit / trust indicator spec
 
-## Possible deployment shape
+## First implementation deployment shape
 
-The first implementation does not need to solve everything in a decentralized way.
-A practical first system may include:
-- central verification services
-- signed identity objects
-- revocation endpoints
-- channel SDKs
-- verifier APIs
+The first implementation does not need decentralized purity.
+A practical v0 can use:
+- a central registry API for identities, attestations, and delegations
+- a verifier service API that returns `dgd.verification_result`
+- a thin voice adapter that emits signed events and messages
+- a simple UI surface or CLI that renders trust state
 
-Later versions can decide how decentralized the identity directory should become.
+## Minimum reference-verifier responsibilities
+
+A reference verifier should be able to:
+1. ingest DigiD objects, messages, and events
+2. validate schema by type
+3. verify object proofs using resolved keys
+4. resolve signer identity and status
+5. resolve attestation and delegation chains
+6. check revocations and validity windows
+7. return a stable verification result object for UIs and logs
+
+## Demo-oriented architecture slice
+
+For the first verified agent-human flow, the architecture can stay very small.
+
+### Inputs
+- organization identity
+- agent identity
+- attestation
+- delegation
+- `voice.session.started` event
+- `voice.session.announcement` message
+
+### Processing
+- verifier loads all referenced objects
+- verifier validates signatures and authority chain
+- verifier computes trust state and warnings
+
+### Outputs
+- `dgd.verification_result`
+- compact trust banner text
+- expanded trust details payload for UI
 
 ## Architectural principle
 
-Make the trust model portable.
-Do not hard-code the system to one app or one communication surface.
+Keep the trust model portable.
+Do not hard-code DigiD to one app, one vendor, or one transport.
+The core should work the same whether the envelope arrives by API, attachment, QR code, header, or sidecar URL.
+
+## Implementation note
+
+The cleanest next code scaffold is probably:
+- `packages/protocol` for types and validation
+- `packages/verifier` for trust resolution
+- `fixtures/demo/` for the first voice flow artifacts
+
+But that code should only begin after the object and envelope definitions are stable enough to stop thrashing.

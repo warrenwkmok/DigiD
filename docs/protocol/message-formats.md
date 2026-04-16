@@ -1,163 +1,278 @@
-# DigiD signed message formats v0
+# DigiD signed message and event formats v0.2
 
-This document maps DigiD into concrete communication objects the product can eventually sign and verify.
+This document defines the first portable envelope model for DigiD.
 
-## Objective
+## Why split messages from events
 
-DigiD should define a common envelope that works across channels, even if the payload format differs.
+DigiD needs two adjacent but distinct signed shapes:
+- **message envelopes** for user-visible communications or media artifacts
+- **event envelopes** for lifecycle events that help verifiers reconstruct what happened
 
-## Common envelope
+A message says, "this communication object exists."
+An event says, "this protocol-relevant step happened."
 
-A channel-specific DigiD message should have:
-- sender identity
-- optional operator identity
-- optional delegation identity
-- channel type
-- content digest
-- timestamp
-- signature
-- optional provenance metadata
+## Shared envelope rules
 
-## Base envelope
+All envelopes should include:
+- a stable type name
+- a schema version
+- an envelope id
+- a subject id for the thing being described
+- a sender or actor id
+- a created timestamp
+- a payload digest or embedded minimal payload
+- a proof block
+
+## 1. Base message envelope
+
+Use this for signed payload-bearing communications across messaging, email, voice session manifests, video manifests, and documents.
 
 ```json
 {
-  "envelope_type": "dgd.envelope",
-  "version": "0.1",
-  "message_id": "msg_01J...",
+  "envelope_type": "dgd.message",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:msg_01J...",
+  "message_type": "messaging.text",
+  "subject_id": "dgd:communication:chat_01J...",
   "channel": "messaging",
-  "sender_id": "dgd:human:01J...",
+  "sender_id": "dgd:identity:human_01J...",
   "operator_id": null,
   "delegation_id": null,
-  "created_at": "2026-04-15T00:00:00Z",
-  "payload_digest": "sha256:...",
-  "signature": {
-    "kid": "key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
-  }
-}
-```
-
-## Voice call start envelope
-
-```json
-{
-  "envelope_type": "dgd.voice_session_start",
-  "version": "0.1",
-  "session_id": "call_01J...",
-  "channel": "voice",
-  "sender_id": "dgd:agent:01J...",
-  "operator_id": "dgd:org:acme",
-  "delegation_id": "dgd:del:01J...",
-  "created_at": "2026-04-15T00:00:00Z",
-  "call_direction": "outbound",
-  "claimed_purpose": "support-follow-up",
-  "signature": {
-    "kid": "agent-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
-  }
-}
-```
-
-## Voice recording manifest
-
-```json
-{
-  "envelope_type": "dgd.voice_recording_manifest",
-  "version": "0.1",
-  "recording_id": "rec_01J...",
-  "session_id": "call_01J...",
-  "sender_id": "dgd:agent:01J...",
-  "media": {
-    "codec": "opus",
-    "duration_ms": 48321,
-    "content_digest": "sha256:..."
-  },
-  "created_at": "2026-04-15T00:10:00Z",
-  "signature": {
-    "kid": "agent-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
-  }
-}
-```
-
-## Video artifact envelope
-
-```json
-{
-  "envelope_type": "dgd.video_artifact",
-  "version": "0.1",
-  "artifact_id": "vid_01J...",
-  "sender_id": "dgd:human:01J...",
-  "created_at": "2026-04-15T00:00:00Z",
-  "provenance": {
-    "capture_mode": "human-recorded",
-    "edited": false,
-    "content_digest": "sha256:..."
-  },
-  "signature": {
-    "kid": "human-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
-  }
-}
-```
-
-## Messaging envelope
-
-```json
-{
-  "envelope_type": "dgd.messaging_message",
-  "version": "0.1",
-  "message_id": "chat_01J...",
-  "sender_id": "dgd:human:01J...",
+  "conversation_id": "thread_01J...",
   "created_at": "2026-04-15T00:00:00Z",
   "payload": {
     "content_type": "text/plain",
-    "content_digest": "sha256:..."
+    "content_digest": "sha256:...",
+    "content_length": 124,
+    "encoding": "utf-8"
   },
-  "signature": {
-    "kid": "human-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:human_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## Email envelope
+## 2. Base event envelope
+
+Use this for protocol lifecycle events and verification-audit events.
 
 ```json
 {
-  "envelope_type": "dgd.email_message",
-  "version": "0.1",
-  "message_id": "mail_01J...",
-  "sender_id": "dgd:agent:01J...",
-  "operator_id": "dgd:org:acme",
-  "delegation_id": "dgd:del:01J...",
-  "created_at": "2026-04-15T00:00:00Z",
+  "envelope_type": "dgd.event",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:event_01J...",
+  "event_type": "voice.session.started",
+  "subject_id": "dgd:session:voice_01JSESSION...",
+  "actor_id": "dgd:identity:agent_01JABC...",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:01JKLM...",
+  "created_at": "2026-04-15T00:00:10Z",
+  "sequence": 1,
   "payload": {
-    "subject_digest": "sha256:...",
-    "body_digest": "sha256:..."
+    "purpose": "support-follow-up",
+    "direction": "outbound"
   },
-  "signature": {
-    "kid": "agent-key-2026-04",
-    "algorithm": "ed25519",
-    "value": "signature"
+  "payload_digest": "sha256:...",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:10Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
   }
 }
 ```
 
-## Interpretation rule
+## Core message types for the first prototype
 
-The DigiD envelope should make verification portable even if the host platform does not natively understand DigiD.
-That means:
-- a verifier can check the signature and trust chain externally
-- a UI can still render trust state from the envelope and related objects
+### Voice session announcement message
 
-## First implementation note
+Signed object that a verifier UI can render at call start.
 
-For the first prototype, it is enough to define these as JSON reference objects and build a verifier against them.
-The protocol does not need full RFC-grade serialization before the first proof of concept.
+```json
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:msg_voice_start_01J...",
+  "message_type": "voice.session.announcement",
+  "subject_id": "dgd:communication:01JCOMM...",
+  "channel": "voice",
+  "sender_id": "dgd:identity:agent_01JABC...",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:01JKLM...",
+  "conversation_id": "dgd:session:voice_01JSESSION...",
+  "created_at": "2026-04-15T00:00:10Z",
+  "payload": {
+    "content_type": "application/dgd+json",
+    "content_digest": "sha256:...",
+    "content_length": 902,
+    "summary": "Verified agent for Acme Support"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:10Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Voice recording manifest message
+
+```json
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:msg_recording_01J...",
+  "message_type": "voice.recording.manifest",
+  "subject_id": "dgd:artifact:recording_01J...",
+  "channel": "voice",
+  "sender_id": "dgd:identity:agent_01JABC...",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:01JKLM...",
+  "conversation_id": "dgd:session:voice_01JSESSION...",
+  "created_at": "2026-04-15T00:10:00Z",
+  "payload": {
+    "content_type": "audio/opus",
+    "content_digest": "sha256:...",
+    "content_length": 483210,
+    "codec": "opus",
+    "duration_ms": 48321
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:10:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Messaging text message
+
+```json
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:msg_chat_01J...",
+  "message_type": "messaging.text",
+  "subject_id": "dgd:communication:chat_01J...",
+  "channel": "messaging",
+  "sender_id": "dgd:identity:human_01J...",
+  "operator_id": null,
+  "delegation_id": null,
+  "conversation_id": "thread_01J...",
+  "created_at": "2026-04-15T00:00:00Z",
+  "payload": {
+    "content_type": "text/plain",
+    "content_digest": "sha256:...",
+    "content_length": 124,
+    "encoding": "utf-8"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:human_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Email message
+
+```json
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.2",
+  "envelope_id": "dgd:envelope:msg_mail_01J...",
+  "message_type": "email.message",
+  "subject_id": "dgd:communication:mail_01J...",
+  "channel": "email",
+  "sender_id": "dgd:identity:agent_01J...",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:01JKLM...",
+  "conversation_id": "mail-thread-01J...",
+  "created_at": "2026-04-15T00:00:00Z",
+  "payload": {
+    "content_type": "message/rfc822",
+    "content_digest": "sha256:...",
+    "content_length": 4120,
+    "subject_digest": "sha256:..."
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+## Core event types for the first prototype
+
+These events are enough to power the first verified agent-human demo flow.
+
+### `identity.issued`
+Created when an identity record becomes active.
+
+### `attestation.issued`
+Created when an issuer signs an attestation.
+
+### `delegation.issued`
+Created when an issuer signs a delegation.
+
+### `voice.session.started`
+Created when an outbound or inbound voice session is initiated.
+
+### `voice.session.ended`
+Created when the live session finishes.
+
+### `artifact.recorded`
+Created when a recording, transcript, or summary manifest is generated.
+
+### `verification.performed`
+Created when a verifier resolves trust state for a subject.
+
+### `delegation.revoked`
+Created when a delegation is no longer valid.
+
+## First demo event sequence
+
+1. `identity.issued` for organization
+2. `identity.issued` for agent
+3. `attestation.issued` binding org to agent identity state
+4. `delegation.issued` granting communication authority
+5. `voice.session.started` for the outbound call
+6. `verification.performed` by the receiver-side verifier
+7. optional `artifact.recorded`
+8. `voice.session.ended`
+
+## Verification rules for envelopes
+
+A reference verifier should:
+1. validate envelope shape by `envelope_type`
+2. verify the `proof` against the signing key
+3. resolve the signer identity and ensure it is active
+4. if `delegation_id` exists, verify authority for the channel and action
+5. ensure `message_type` or `event_type` is consistent with the channel
+6. surface downgrade warnings for valid signatures paired with expired or revoked trust objects
+
+## Serialization guidance
+
+For v0.2, keep transport simple:
+- primary wire format: JSON
+- canonical signing form: JCS
+- binary payloads should be referenced by digest, not inlined
+- host platforms can carry the envelope as metadata, attachment, header, QR payload, or verifier URL param
+
+## Implementation note
+
+The first code slice should treat `dgd.message` and `dgd.event` as two discriminated unions in a signing library. That will keep the prototype small while leaving room for channel-specific adapters later.
