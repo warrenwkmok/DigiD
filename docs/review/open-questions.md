@@ -40,7 +40,7 @@ The current v0.3 draft prefers detached content with digests, but the implementa
 The current repo increasingly treats it as the anchor object for live delegated communication. That seems good, but the protocol should decide whether this is a permanent rule for live profiles or just the first implementation choice.
 
 ## OQ-012 — What is the fixture manifest contract?
-Should the first verifier consume a manifest file with dependency order, scenario metadata, and stable-id assertions, or should directory conventions be the only contract?
+Resolved for the first implementation slice: the verifier should consume a manifest file with dependency order, scenario metadata, and stable-id assertions. Directory conventions may still help humans browse fixtures, but they are not the trust contract.
 
 ## OQ-013 — What replay protections are mandatory in the first live-session profile?
-The current docs mention ordered events and session lineage, but they still need an explicit rule for duplicate envelopes, sequence scope, and verifier behavior when an event is re-presented.
+Resolved for the first implementation slice: the live-session verifier policy should treat duplicate envelope ids, duplicate sequence numbers within the same scope, sequence regression, and conflicting signer or delegation lineage as replay-sensitive. The exact transport-layer mitigation can evolve later, but verifier behavior is now opinionated enough to implement.

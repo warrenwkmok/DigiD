@@ -16,10 +16,12 @@ The verifier's job is to take DigiD objects and answer:
 ## Inputs
 
 The verifier should be able to consume:
-- identity object
+- a `dgd.fixture_manifest` plus referenced files, or an equivalent explicit manifest-like input contract
+- identity objects
 - attestation objects
-- delegation object
-- signed communication envelope
+- delegation objects
+- a signed communication object
+- signed message and event envelopes
 - revocation objects if any
 
 ## Outputs
@@ -34,14 +36,15 @@ The verifier should produce:
 
 ## Minimal verification pipeline
 
-1. parse object structure
-2. verify sender signature
-3. resolve sender identity
-4. verify issuer and attestation signatures
-5. verify delegation if present
-6. check revocation status and freshness posture
-7. calculate both historical and current trust state when needed
-8. render final summary
+1. load fixture manifest or equivalent dependency contract
+2. parse object structure
+3. verify sender signature
+4. resolve sender identity
+5. verify issuer and attestation signatures
+6. verify delegation if present
+7. check revocation status, freshness posture, and replay policy
+8. calculate both historical and current trust state when needed
+9. render final summary
 
 ## Example user-facing output
 
@@ -60,7 +63,7 @@ It turns protocol theory into a testable product experience.
 
 ## Likely first implementation shape
 
-A small service or CLI that accepts JSON objects and returns a verification result would be enough for the first technical proof of concept.
+A small service or CLI that accepts a fixture manifest plus JSON objects and returns a verification result would be enough for the first technical proof of concept.
 
 ## Reference verifier modes
 
@@ -70,3 +73,8 @@ The first verifier should support:
 - `dual` mode for UX surfaces that need both
 
 That matters for DigiD because a mathematically valid old signature should not silently imply present authority.
+
+## Policy companion
+
+The reference verifier should externalize policy rather than bury it inside ad hoc code paths.
+For the first slice, the operative policy contract is `docs/architecture/verifier-policy-profile.md`, and the operative fixture intake contract is `docs/protocol/fixture-manifest-profile.md`.

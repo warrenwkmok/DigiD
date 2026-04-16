@@ -453,6 +453,22 @@ The first signing library should expose two deterministic helpers:
 
 That keeps message verification and event verification reproducible with the same canonicalization rules.
 
+For the first implementation profile:
+- `payload_digest` for `dgd.event` MUST be computed over the JCS-canonicalized JSON bytes of the `payload` object only
+- `payload.content_digest` for detached message or artifact content MUST be computed over the raw detached content bytes, not over the enclosing envelope JSON
+- if a message includes user-visible fields such as `summary` or `purpose` that a verifier UI renders directly, those fields MUST live inside the signed `payload` object, not in unsigned side metadata
+- a verifier SHOULD treat any unsigned UI-facing detached metadata as advisory only, never trust-bearing
+
+## Fixture-manifest integration note
+
+When envelopes are consumed through a fixture manifest:
+- the manifest order defines dependency resolution order
+- `voice.session.started` and `voice.session.announcement` SHOULD each declare the same lineage through `subject_id`, `conversation_id`, `sender_id`, `operator_id`, and `delegation_id`
+- duplicate `envelope_id` values with non-identical signed bytes MUST be treated as invalid
+- duplicate `sequence` values in the same declared scope SHOULD be treated as replay-suspicious under the verifier policy profile
+
+See `docs/protocol/fixture-manifest-profile.md` and `docs/architecture/verifier-policy-profile.md`.
+
 ## Serialization guidance
 
 For v0.3, keep transport simple:

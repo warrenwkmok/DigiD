@@ -1,4 +1,4 @@
-# DigiD system architecture v0.2
+# DigiD system architecture v0.3
 
 ## High-level layers
 
@@ -97,12 +97,13 @@ The first implementation should keep these responsibilities separate:
 - id graph resolution
 - attestation and delegation lookup
 - revocation freshness policy
+- replay and duplicate-envelope policy
 - trust-state derivation
 
 ### `fixtures/demo`
 - happy-path artifacts
 - revoked and stale comparison artifacts
-- manifest file describing dependency order
+- manifest files describing dependency order, lineage stability, and expected outcomes
 
 ### `apps/demo-cli` or equivalent
 - compact trust banner rendering
@@ -116,6 +117,14 @@ This keeps the protocol reusable even if the first UI is only a CLI.
 Keep the trust model portable.
 Do not hard-code DigiD to one app, one vendor, or one transport.
 The core should work the same whether the envelope arrives by API, attachment, QR code, header, or sidecar URL.
+
+## Architecture notes now made explicit
+
+The first reference implementation should treat two docs as hard companions to the core protocol:
+- `docs/protocol/fixture-manifest-profile.md` for fixture intake, dependency order, and lineage stability
+- `docs/architecture/verifier-policy-profile.md` for freshness, replay, and duplicate-envelope decisions
+
+That keeps protocol meaning separate from verifier policy while still making the first demo reproducible.
 
 ## Implementation note
 

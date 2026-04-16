@@ -10,11 +10,13 @@
 - `protocol/signing-and-provenance.md`
 - `protocol/object-schemas.md`
 - `protocol/message-formats.md`
+- `protocol/fixture-manifest-profile.md`
 
 ## Architecture
 - `architecture/system-architecture.md`
 - `architecture/trust-states.md`
 - `architecture/reference-verifier.md`
+- `architecture/verifier-policy-profile.md`
 
 ## MVP
 - `mvp/mvp-definition.md`

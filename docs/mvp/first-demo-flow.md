@@ -134,8 +134,10 @@ If the demo includes persistence, emit:
 ## Fixture set for the first demo
 
 The fixture family should be small but opinionated.
+Each scenario should be rooted in an explicit manifest file so the verifier does not infer trust graphs from directory conventions.
 
 ### Required happy-path fixtures
+- `fixtures/demo/manifests/voice.happy-path.manifest.json`
 - `fixtures/demo/org.identity.json`
 - `fixtures/demo/agent.identity.json`
 - `fixtures/demo/agent.attestation.json`
@@ -146,8 +148,8 @@ The fixture family should be small but opinionated.
 - `fixtures/demo/results/verification.happy-path.json`
 
 ### Required contrast fixtures
-- same artifacts, but delegation later revoked
-- same artifacts, but revocation freshness stale
+- same artifacts, but delegation later revoked, with `fixtures/demo/manifests/voice.delegation-revoked.manifest.json`
+- same artifacts, but revocation freshness stale, with `fixtures/demo/manifests/voice.revocation-stale.manifest.json`
 - same artifacts, but delegation removed
 - verified human direct message flow with no operator
 - unverified sender flow with no DigiD trust chain
@@ -160,6 +162,7 @@ Every delegated-agent voice fixture in the first slice should share:
 - one clearly documented change per contrast scenario
 
 That keeps the demo honest by proving that verifier output changes because trust state changed, not because the scenario quietly swapped half the graph.
+The manifest should declare any allowed variation explicitly.
 
 ## Demo verifier decision matrix
 
@@ -201,7 +204,7 @@ For the first implementation, one repo slice is enough:
 
 The first verifier slice should accept either:
 - one manifest listing fixture paths in dependency order, or
-- one directory containing the full fixture family with conventional filenames
+- one directory containing the full fixture family with a conventional manifest filename inside it
 
 Recommended dependency order:
 1. organization identity
@@ -211,8 +214,10 @@ Recommended dependency order:
 5. communication object
 6. ordered events and messages
 7. optional revocations
+8. optional expected verification result
 
-The verifier should not infer missing trust links from filenames alone. It should resolve every id from the signed object graph.
+The verifier should not infer missing trust links from filenames alone. It should resolve every id from the signed object graph and prefer the manifest contract when one is present.
+See `docs/protocol/fixture-manifest-profile.md`.
 
 ## Trust rendering contract for the demo
 

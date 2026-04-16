@@ -125,3 +125,14 @@ Every meaningful critique should end up in one of these states:
 - action taken: Logged for a dedicated UX guidance doc covering compact labels, expanded details, warnings, and forbidden claims.
 - linked docs: `docs/architecture/trust-states.md`, `docs/architecture/reference-verifier.md`, `docs/mvp/first-demo-flow.md`
 - notes: This overlaps with DF-003 and should probably be resolved in the same document.
+
+## DF-010 — Add fixture manifest and verifier policy profiles before code scaffolding
+- source: `docs/review/second-critique.md`
+- date: 2026-04-16
+- area: architecture
+- severity: high
+- status: applied
+- summary: The repo needed one explicit contract for fixture intake and one explicit contract for verifier replay and freshness policy before a first CLI or API could be built cleanly.
+- action taken: Added a fixture manifest profile defining dependency order, scenario metadata, lineage stability, and expected outcomes. Added a verifier policy profile centralizing interaction-class defaults, replay checks, duplicate-envelope handling, freshness posture, and downgrade rules. Updated the demo, protocol, and architecture docs to point at both contracts.
+- linked docs: `docs/protocol/fixture-manifest-profile.md`, `docs/architecture/verifier-policy-profile.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`, `docs/architecture/system-architecture.md`, `docs/architecture/reference-verifier.md`
+- notes: This closes two high-value critique gaps and makes the next meaningful slice actual JSON fixtures plus a minimal verifier runner.

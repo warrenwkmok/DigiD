@@ -31,8 +31,8 @@
 - enterprise and developer integrations
 
 ## Immediate next steps
-- turn the v0.3 docs into actual demo fixture JSON files plus a fixture manifest contract
-- centralize verifier policy for freshness, replay handling, and duplicate-envelope posture
+- turn the v0.3 docs into actual demo fixture JSON files using the fixture manifest contract
+- apply the verifier policy profile in the first CLI or API implementation
 - add verifier UX guidance so trust banners and warnings do not overstate what DigiD proves
 - decide whether `dgd.communication` is mandatory for all live profiles or only for the first demo profile
 - choose whether the first code should be a verifier API or signing SDK after the fixture contract is stable
