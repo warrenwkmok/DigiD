@@ -32,6 +32,10 @@ Recommended early channels:
 - video artifacts
 - messaging or email
 
+Note on repo direction:
+- keep live communication as the primary MVP wedge
+- keep recorded and published media, including social-media-style artifacts, as a separate profile-family track inside the same repo for a later build loop rather than a separate repo
+
 ## First user stories
 
 ### Receiver story

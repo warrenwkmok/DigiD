@@ -191,3 +191,36 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added first-class session and artifact object schemas, tightened envelope rules to resolve signed session lineage for live flows, updated the first demo to require an explicit session object, and extended the architecture notes so protocol and verifier packages treat session and artifact lineage as part of the core contract.
 - linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`, `docs/architecture/system-architecture.md`
 - notes: This makes the next fixture slice more honest because replay scope and recording provenance are now modeled objects instead of hidden assumptions.
+
+## DF-016 — Add verifier UX guardrails and a first concrete Slack adapter concept
+- source: `2026-04-16 DigiD resumed build`
+- date: 2026-04-16
+- area: adoption
+- severity: high
+- status: applied
+- summary: DigiD still needed explicit UX guardrails to prevent trust overstatement and a real adapter concept to keep adoption work grounded instead of abstract.
+- action taken: Added a verifier UX guidance doc covering compact banners, expanded trust details, warning language, mismatch states, historical-versus-current posture, and forbidden trust claims. Added a Slack adapter concept document that treats Slack as a sidecar verifier surface for org-authorized agent communications rather than a native trust root.
+- linked docs: `docs/architecture/verifier-ux-guidance.md`, `docs/architecture/slack-adapter-concept.md`, `docs/mvp/repo-roadmap.md`
+- notes: This closes one planned UX gap and gives the adoption loop a concrete platform surface to keep testing against in future DigiD slices.
+
+## DF-017 — Turn the first code path into an explicit scaffold plan
+- source: `2026-04-16 DigiD resumed build`
+- date: 2026-04-16
+- area: architecture
+- severity: high
+- status: applied
+- summary: The repo had enough protocol detail to start talking vaguely about code, but still needed one concrete scaffold plan so the first implementation does not blur protocol, verifier, fixtures, and rendering responsibilities.
+- action taken: Added an implementation scaffold plan that defines the first repo/package layout, package responsibilities, fixture layout, CLI responsibilities, build order, and initial non-goals for the first honest verifier slice.
+- linked docs: `docs/mvp/implementation-scaffold-plan.md`, `docs/mvp/repo-roadmap.md`, `docs/architecture/system-architecture.md`
+- notes: This gives the next build loop a cleaner handoff into actual code creation instead of more abstract implementation talk.
+
+## DF-018 — Add an explicit critique pass for the latest DigiD slice and tighten loop cadence
+- source: `docs/review/third-critique.md`
+- date: 2026-04-16
+- area: architecture
+- severity: medium
+- status: applied
+- summary: The latest DigiD slice needed an explicit critique artifact, and the current loop cadence was too loose for a fast-moving design/build project.
+- action taken: Added a third critique pass covering the latest UX, Slack, and scaffold work. Updated the roadmap and review workflow so active DigiD work now prefers a lightweight hourly build loop with critique coverage instead of waiting for larger, slower cycles.
+- linked docs: `docs/review/third-critique.md`, `docs/review/review-workflow.md`, `docs/mvp/repo-roadmap.md`
+- notes: The next risk is process bloat, so the hourly loop should stay lightweight and biased toward real build progress.
