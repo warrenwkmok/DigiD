@@ -331,12 +331,130 @@ A normalized high-level communication object for completed or in-progress exchan
 - `sender.identity_id` MUST be the same signer identity resolved from `proof.kid`
 - `operator_id` MUST be present when `sender.verification_state` is delegated or organization-issued in a live communication flow
 - `delegation_id` MUST be present when the communication claims operator-backed authority
+- `session_id` MUST be stable for the lifetime of the live communication flow and SHOULD equal envelope `conversation_id` in the first live profile
 - `purpose` SHOULD match an allowed delegation purpose when a delegation exists
 - `timestamps.created_at` MUST be less than or equal to `session_started_at` when both are present
 - `payload.content_digest` MUST bind the signed communication object to the first announced session or artifact payload
 - the first demo profile SHOULD treat `dgd.communication` as the anchor object for all live-session envelopes in the same flow
+- for live delegated flows, `dgd.communication` SHOULD be treated as mandatory protocol profile input, not optional metadata
+- if `operator_id` is present, the communication MUST be treated as the authoritative lineage source for later envelope `sender_id`, `operator_id`, `delegation_id`, `conversation_id`, and `purpose` checks
+- a verifier MUST treat an envelope as lineage-conflicting if it claims delegated authority that does not match the bound communication object, unless a future signed rotation profile explicitly permits the change
 
-## 5. Verification result object
+### Communication signing boundary profile
+
+For the first live communication profile, these fields are trust-bearing and therefore MUST live inside the signed communication object body, not unsigned adapter metadata:
+- `sender.identity_id`
+- `operator_id`
+- `delegation_id`
+- `session_id`
+- `purpose`
+- `payload.content_digest`
+- `payload.media_mode`
+
+These fields MAY remain unsigned operational metadata in adapter-specific systems if they are not rendered as trust claims and do not affect trust evaluation:
+- local transport ids
+- retry counters
+- queue timestamps after signed issuance
+- vendor-specific delivery metadata
+
+If an adapter renders any unsigned field as if DigiD verified it, the verifier UI SHOULD treat that presentation as out of profile.
+## 5. Session object
+
+Represents the ordered interaction scope for a live communication flow.
+
+```json
+{
+  "object_type": "dgd.session",
+  "schema_version": "0.3",
+  "object_id": "dgd:session:voice_01JSESSION...",
+  "status": "active",
+  "session_type": "voice.live",
+  "communication_id": "dgd:communication:01JCOMM...",
+  "channel": "voice",
+  "operator_id": "dgd:identity:org_acme",
+  "counterparty": {
+    "role": "receiver",
+    "display_label": "Customer endpoint"
+  },
+  "sequence_scope": {
+    "scope_type": "conversation",
+    "scope_id": "dgd:session:voice_01JSESSION...",
+    "next_expected_sequence": 2
+  },
+  "timestamps": {
+    "created_at": "2026-04-15T00:00:00Z",
+    "started_at": "2026-04-15T00:00:10Z",
+    "ended_at": null
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:10Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Session constraints
+- `communication_id` MUST resolve to one active `dgd.communication` object
+- `object_id` SHOULD equal envelope `conversation_id` for the first live-session profile
+- `session_type` MUST be compatible with the communication channel
+- `sequence_scope.scope_id` MUST equal `object_id` in the first live delegated profile
+- `timestamps.started_at` MUST be greater than or equal to the communication `timestamps.session_started_at` when both exist
+- if `operator_id` is present, it MUST match the bound communication lineage
+- the first demo profile SHOULD require one signed `dgd.session` object so replay checks and ordered-event scope are explicit instead of inferred from envelopes alone
+
+## 6. Artifact object
+
+Represents a detached recording, transcript, summary, or exported media artifact that is trust-bound to a communication flow.
+
+```json
+{
+  "object_type": "dgd.artifact",
+  "schema_version": "0.3",
+  "object_id": "dgd:artifact:recording_01J...",
+  "status": "active",
+  "artifact_type": "voice.recording",
+  "communication_id": "dgd:communication:01JCOMM...",
+  "session_id": "dgd:session:voice_01JSESSION...",
+  "derived_from": [
+    "dgd:envelope:msg_voice_start_01J..."
+  ],
+  "payload": {
+    "content_type": "audio/opus",
+    "content_digest": "sha256:...",
+    "content_length": 483210,
+    "codec": "opus",
+    "duration_ms": 48321
+  },
+  "provenance": {
+    "capture_method": "native-call-recording",
+    "transformation_state": "original",
+    "edited": false,
+    "published": false
+  },
+  "created_at": "2026-04-15T00:10:00Z",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:10:00Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Artifact constraints
+- `artifact_type` MUST determine the allowed payload descriptor fields
+- `communication_id` MUST resolve to the same communication lineage used by any related message envelopes
+- if `session_id` is present, it MUST match the communication `session_id`
+- `payload.content_digest` MUST be computed over the detached raw bytes, not over the artifact object JSON
+- `derived_from` SHOULD reference the signed communication or envelope lineage that made the artifact possible
+- a verifier SHOULD degrade trust when an artifact claims `edited: false` but the provenance chain is incomplete or conflicting
+- the first demo profile MAY keep artifacts optional, but any recording or transcript fixture SHOULD use `dgd.artifact` instead of leaving artifact identity implicit in message envelopes alone
+
+## 7. Verification result object
 
 Represents a portable verifier output that downstream UIs can render without repeating the full trust evaluation logic.
 
@@ -380,7 +498,7 @@ Represents a portable verifier output that downstream UIs can render without rep
 - `warnings` MUST explain every downgrade that still results in non-reject output
 - `display_summary` SHOULD be short enough to fit a compact trust banner without truncation
 
-## 6. Revocation object
+## 8. Revocation object
 
 Represents an explicit revocation for an identity, key, attestation, delegation, or communication object.
 
@@ -441,8 +559,10 @@ The first fixture-driven implementation should treat these objects as required f
 3. one active `dgd.attestation` from organization to agent
 4. one active `dgd.delegation` from organization to agent with `voice` scope
 5. one `dgd.communication` object signed by the agent
-6. one or more envelopes referencing the same communication and delegation lineage
-7. zero or more `dgd.revocation` objects for degraded comparison cases
+6. one signed `dgd.session` object aligned to the communication `session_id`
+7. one or more envelopes referencing the same communication, session, and delegation lineage
+8. zero or more `dgd.artifact` objects for recording or transcript comparisons
+9. zero or more `dgd.revocation` objects for degraded comparison cases
 
 This profile gives the verifier a stable graph instead of letting demo fixtures omit trust-bearing links opportunistically.
 

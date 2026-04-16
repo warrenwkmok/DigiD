@@ -69,13 +69,16 @@ For the first verified agent-human flow, the architecture can stay very small.
 - attestation
 - delegation
 - `dgd.communication`
+- `dgd.session`
 - `voice.session.started` event
 - `voice.session.announcement` message
+- optional `dgd.artifact`
 
 ### Processing
 - verifier loads all referenced objects
 - verifier validates signatures and authority chain
 - verifier resolves the communication anchor before evaluating envelopes
+- verifier resolves the signed session object before sequence and replay checks
 - verifier computes trust state and warnings
 
 ### Outputs
@@ -92,6 +95,7 @@ The first implementation should keep these responsibilities separate:
 - required-field validation
 - canonicalization helpers
 - event payload digest helpers
+- session and artifact lineage validation helpers
 
 ### `packages/verifier`
 - id graph resolution

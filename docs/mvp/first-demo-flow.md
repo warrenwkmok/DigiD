@@ -45,10 +45,11 @@ The first demo should include these canonical artifacts:
 3. agent attestation object
 4. delegation object
 5. communication object for the live call
-6. `voice.session.started` event envelope
-7. `voice.session.announcement` message envelope
-8. verification result object
-9. optional recording manifest and session-ended event
+6. session object for ordered live-call scope
+7. `voice.session.started` event envelope
+8. `voice.session.announcement` message envelope
+9. verification result object
+10. optional artifact object, recording manifest, and session-ended event
 
 ## End-to-end sequence
 
@@ -76,14 +77,27 @@ The voice adapter creates a `dgd.communication` object that binds:
 - purpose
 - initial payload digest for the session manifest
 
-### 6. Agent starts the call
+### 6. Session object is created
+The adapter creates one signed `dgd.session` object that fixes:
+- the ordered event scope for the call
+- the exact `conversation_id` carried by live envelopes
+- the binding back to the active `dgd.communication` object
+
+For the first fixture profile, the session object should be explicit rather than inferred so replay and duplicate-envelope checks have one signed scope.
+
+### 7. Agent starts the call
 The voice adapter emits:
 - `voice.session.started` event
 - `voice.session.announcement` message
 
 Both are signed with the agent key and reference the same communication object plus the active delegation.
+For the first fixture profile they must also share:
+- the same `conversation_id` as the signed session `object_id`
+- the same `purpose` value as the communication object and delegation purpose binding
+- identical signer, operator, delegation, and session lineage
+- no unsigned trust-facing fields beyond what can be deterministically derived from signed payload fields
 
-### 7. Receiver-side verifier resolves trust
+### 8. Receiver-side verifier resolves trust
 The verifier checks:
 - signature validity
 - agent identity status
@@ -96,7 +110,7 @@ The verifier checks:
 - freshness posture for revocation data
 - whether event-time and current-time conclusions differ
 
-### 8. UI renders trust state
+### 9. UI renders trust state
 Compact state:
 - **Verified agent for Acme Support**
 
@@ -111,11 +125,14 @@ Expanded state:
 - verification mode: dual
 - trust note: verifies sender authenticity, not truth of message content
 
-### 9. Optional post-call artifacts
+### 10. Optional post-call artifacts
 If the demo includes persistence, emit:
+- `dgd.artifact` for the recording or transcript
 - `voice.session.ended` event
 - `voice.recording.manifest` message
 - optional transcript artifact with provenance
+
+Any post-call artifact fixture should preserve the same communication and session lineage instead of inventing a detached artifact scope.
 
 ## Example event chain
 
@@ -126,10 +143,11 @@ If the demo includes persistence, emit:
 | 3 | attestation | org key | marks agent as organization-backed |
 | 4 | delegation | org key | grants voice authority |
 | 5 | communication object | agent key | binds signer, operator, purpose, and session ids |
-| 6 | `voice.session.started` event | agent key | proves session initiation |
-| 7 | `voice.session.announcement` message | agent key | powers UI trust banner |
-| 8 | verification result | verifier key or unsigned local result | shows resolved trust state |
-| 9 | optional recording manifest | agent key or service key | preserves provenance after call |
+| 6 | session object | agent key | fixes ordered live-session scope and replay boundary |
+| 7 | `voice.session.started` event | agent key | proves session initiation |
+| 8 | `voice.session.announcement` message | agent key | powers UI trust banner |
+| 9 | verification result | verifier key or unsigned local result | shows resolved trust state |
+| 10 | optional artifact object or recording manifest | agent key or service key | preserves provenance after call |
 
 ## Fixture set for the first demo
 
@@ -143,6 +161,7 @@ Each scenario should be rooted in an explicit manifest file so the verifier does
 - `fixtures/demo/agent.attestation.json`
 - `fixtures/demo/agent.delegation.json`
 - `fixtures/demo/voice.communication.json`
+- `fixtures/demo/voice.session.json`
 - `fixtures/demo/events/voice.session.started.json`
 - `fixtures/demo/messages/voice.session.announcement.json`
 - `fixtures/demo/results/verification.happy-path.json`
@@ -159,6 +178,7 @@ Every delegated-agent voice fixture in the first slice should share:
 - the same organization identity lineage
 - the same agent identity lineage
 - the same `dgd.communication` anchor object
+- the same signed `dgd.session` lineage object
 - one clearly documented change per contrast scenario
 
 That keeps the demo honest by proving that verifier output changes because trust state changed, not because the scenario quietly swapped half the graph.
@@ -212,9 +232,10 @@ Recommended dependency order:
 3. attestation
 4. delegation
 5. communication object
-6. ordered events and messages
-7. optional revocations
-8. optional expected verification result
+6. session object
+7. ordered events and messages
+8. optional revocations or artifacts
+9. optional expected verification result
 
 The verifier should not infer missing trust links from filenames alone. It should resolve every id from the signed object graph and prefer the manifest contract when one is present.
 See `docs/protocol/fixture-manifest-profile.md`.
@@ -225,6 +246,14 @@ The first UI or CLI renderer should output both:
 - compact: one trust banner line
 - expanded: signer, operator, authority scope, purpose, verification mode, freshness, warnings
 
+The renderer should only treat these as trust-proven inputs:
+- signed identity display fields
+- signed operator and delegation lineage
+- signed or digest-bound payload fields
+- verifier-derived trust labels computed from signed inputs
+
+Unsigned adapter metadata may be shown as operational context, but not inside the core trust banner or compact trust chip.
+
 Suggested compact outputs:
 - `Verified agent for Acme Support`
 - `Delegation no longer active`
@@ -234,10 +263,12 @@ Suggested compact outputs:
 ## Demo build order
 
 1. fixture schema validation for the object and envelope family
-2. verifier pipeline over the happy-path fixture set
-3. trust-state renderer for compact and expanded views
-4. degraded comparison fixtures for revoked and stale outcomes
-5. optional recording and transcript provenance fixtures
+2. typed event-payload validation for the happy-path event set
+3. signed-versus-referenced field validation for trust-facing message and event payloads
+4. verifier pipeline over the happy-path fixture set
+5. trust-state renderer for compact and expanded views
+6. degraded comparison fixtures for revoked and stale outcomes
+7. optional recording and transcript provenance fixtures
 
 ## Architecture note carried forward
 

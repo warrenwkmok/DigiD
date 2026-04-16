@@ -136,3 +136,58 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added a fixture manifest profile defining dependency order, scenario metadata, lineage stability, and expected outcomes. Added a verifier policy profile centralizing interaction-class defaults, replay checks, duplicate-envelope handling, freshness posture, and downgrade rules. Updated the demo, protocol, and architecture docs to point at both contracts.
 - linked docs: `docs/protocol/fixture-manifest-profile.md`, `docs/architecture/verifier-policy-profile.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`, `docs/architecture/system-architecture.md`, `docs/architecture/reference-verifier.md`
 - notes: This closes two high-value critique gaps and makes the next meaningful slice actual JSON fixtures plus a minimal verifier runner.
+
+## DF-011 — Normalize event payload schemas and live-session lineage fields
+- source: `2026-04-16 DigiD focused build loop`
+- date: 2026-04-16
+- area: protocol
+- severity: medium
+- status: applied
+- summary: Event payload requirements were still prose-heavy, and live-session lineage rules were split across docs, which would make fixture validation and early verifier code drift-prone.
+- action taken: Added a machine-readable event payload schema profile, made `conversation_id` mandatory for live-session envelopes, tightened lineage-conflict rules, clarified that `session_id` should align with `conversation_id`, and updated the first demo build order to include typed event-payload validation.
+- linked docs: `docs/protocol/message-formats.md`, `docs/protocol/object-schemas.md`, `docs/mvp/first-demo-flow.md`
+- notes: This makes the next slice more obviously about actual fixtures and validators instead of more prose tightening.
+
+## DF-012 — Add a standing adversarial red-team reviewer into the DigiD build loop
+- source: `2026-04-16 strategy discussion`
+- date: 2026-04-16
+- area: security
+- severity: high
+- status: applied
+- summary: Normal critique alone is not enough for DigiD. The project needs a recurring red-team role that tries to break trust claims, platform assumptions, delegation boundaries, and verifier UX on every meaningful iteration.
+- action taken: Added a dedicated red-team brief and updated the review workflow and roadmap so each meaningful design/build slice now expects both a critique pass and an adversarial red-team pass.
+- linked docs: `docs/review/red-team-brief.md`, `docs/review/review-workflow.md`, `docs/mvp/repo-roadmap.md`
+- notes: Early on, this can remain a doc-defined role. Once the first verifier exists, this should likely become a dedicated agent or workflow with concrete attack-scenario fixtures.
+
+## DF-013 — Add a standing adoption loop into the DigiD build loop
+- source: `2026-04-16 strategy discussion`
+- date: 2026-04-16
+- area: adoption
+- severity: high
+- status: applied
+- summary: DigiD needs a recurring adoption loop that tests every meaningful slice against real-world platforms, domain wedges, adapter strategies, and rollout constraints so the design does not drift into demo-only thinking.
+- action taken: Added a dedicated adoption-loop brief and updated the review workflow, assimilation rules, and roadmap so each meaningful design/build slice now expects critique, red-team review, and adoption-loop review.
+- linked docs: `docs/review/adoption-loop-brief.md`, `docs/review/review-workflow.md`, `docs/review/assimilation-rules.md`, `docs/mvp/repo-roadmap.md`
+- notes: This should keep surfaces like Slack, email, voice systems, messaging apps, and media platforms in the active design loop instead of treating them as later speculation.
+
+## DF-014 — Make signable versus digest-bound trust fields explicit
+- source: `2026-04-16 DigiD focused build loop`
+- date: 2026-04-16
+- area: protocol
+- severity: high
+- status: applied
+- summary: The v0.3 draft still left too much room for adapters or UIs to blur signed trust-bearing fields with unsigned operational metadata.
+- action taken: Added a signed-versus-referenced field contract for envelopes, a communication signing-boundary profile, stronger lineage inheritance rules from `dgd.communication`, and demo guidance that limits the trust banner to signed or verifier-derived fields.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`
+- notes: This closes a real ambiguity before fixtures and validators get built, and it sharpens what the first protocol package must enforce.
+
+## DF-015 — Make live-session scope and artifact lineage first-class objects
+- source: `2026-04-16 DigiD focused build loop`
+- date: 2026-04-16
+- area: protocol
+- severity: high
+- status: applied
+- summary: The draft used session ids and artifact ids across envelopes and demo docs, but did not yet define signed `dgd.session` and `dgd.artifact` objects, which left replay scope and post-call provenance too implicit.
+- action taken: Added first-class session and artifact object schemas, tightened envelope rules to resolve signed session lineage for live flows, updated the first demo to require an explicit session object, and extended the architecture notes so protocol and verifier packages treat session and artifact lineage as part of the core contract.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`, `docs/architecture/system-architecture.md`
+- notes: This makes the next fixture slice more honest because replay scope and recording provenance are now modeled objects instead of hidden assumptions.
