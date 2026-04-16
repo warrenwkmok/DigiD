@@ -32,3 +32,4 @@
 - `review/design-feedback-log.md`
 - `review/open-questions.md`
 - `review/first-critique.md`
+- `review/second-critique.md`

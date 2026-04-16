@@ -35,3 +35,12 @@ The current docs now lean yes because it cleanly binds signer, operator, delegat
 
 ## OQ-010 — Which payload fields must be signable versus merely referenced by digest?
 The current v0.3 draft prefers detached content with digests, but the implementation wedge still needs a crisp rule for when summary fields, purpose strings, and UI-rendered trust text are inside or outside the signed payload.
+
+## OQ-011 — Is `dgd.communication` a universal live-flow requirement or only a demo-profile requirement?
+The current repo increasingly treats it as the anchor object for live delegated communication. That seems good, but the protocol should decide whether this is a permanent rule for live profiles or just the first implementation choice.
+
+## OQ-012 — What is the fixture manifest contract?
+Should the first verifier consume a manifest file with dependency order, scenario metadata, and stable-id assertions, or should directory conventions be the only contract?
+
+## OQ-013 — What replay protections are mandatory in the first live-session profile?
+The current docs mention ordered events and session lineage, but they still need an explicit rule for duplicate envelopes, sequence scope, and verifier behavior when an event is re-presented.

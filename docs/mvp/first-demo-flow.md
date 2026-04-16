@@ -136,14 +136,14 @@ If the demo includes persistence, emit:
 The fixture family should be small but opinionated.
 
 ### Required happy-path fixtures
-- verified organization identity
-- verified agent identity
-- active attestation
-- active delegation with `voice` and `sign-session`
-- communication object with `purpose: support-follow-up`
-- session start event
-- session announcement message
-- verification result
+- `fixtures/demo/org.identity.json`
+- `fixtures/demo/agent.identity.json`
+- `fixtures/demo/agent.attestation.json`
+- `fixtures/demo/agent.delegation.json`
+- `fixtures/demo/voice.communication.json`
+- `fixtures/demo/events/voice.session.started.json`
+- `fixtures/demo/messages/voice.session.announcement.json`
+- `fixtures/demo/results/verification.happy-path.json`
 
 ### Required contrast fixtures
 - same artifacts, but delegation later revoked
@@ -151,6 +151,15 @@ The fixture family should be small but opinionated.
 - same artifacts, but delegation removed
 - verified human direct message flow with no operator
 - unverified sender flow with no DigiD trust chain
+
+### Fixture lineage rule
+Every delegated-agent voice fixture in the first slice should share:
+- the same organization identity lineage
+- the same agent identity lineage
+- the same `dgd.communication` anchor object
+- one clearly documented change per contrast scenario
+
+That keeps the demo honest by proving that verifier output changes because trust state changed, not because the scenario quietly swapped half the graph.
 
 ## Demo verifier decision matrix
 
@@ -188,6 +197,35 @@ For the first implementation, one repo slice is enough:
 - tiny UI or CLI output that renders compact and expanded trust views
 - at least one fixture showing the difference between historical validity and present authority state
 
+## Verifier input contract for the demo
+
+The first verifier slice should accept either:
+- one manifest listing fixture paths in dependency order, or
+- one directory containing the full fixture family with conventional filenames
+
+Recommended dependency order:
+1. organization identity
+2. agent identity
+3. attestation
+4. delegation
+5. communication object
+6. ordered events and messages
+7. optional revocations
+
+The verifier should not infer missing trust links from filenames alone. It should resolve every id from the signed object graph.
+
+## Trust rendering contract for the demo
+
+The first UI or CLI renderer should output both:
+- compact: one trust banner line
+- expanded: signer, operator, authority scope, purpose, verification mode, freshness, warnings
+
+Suggested compact outputs:
+- `Verified agent for Acme Support`
+- `Delegation no longer active`
+- `Verification stale, re-check recommended`
+- `Unverified sender`
+
 ## Demo build order
 
 1. fixture schema validation for the object and envelope family
@@ -195,6 +233,15 @@ For the first implementation, one repo slice is enough:
 3. trust-state renderer for compact and expanded views
 4. degraded comparison fixtures for revoked and stale outcomes
 5. optional recording and transcript provenance fixtures
+
+## Architecture note carried forward
+
+The first demo is now opinionated enough that the implementation slice should preserve three boundaries:
+- `packages/protocol` owns type guards, schema validation, canonicalization helpers, and digest helpers
+- `packages/verifier` owns graph resolution and trust decisions
+- `fixtures/demo/` owns canonical examples and comparison scenarios
+
+If code scaffolding starts before those boundaries are respected, the first prototype will likely blur protocol rules with demo-specific shortcuts.
 
 ## Product decision already implied by this flow
 

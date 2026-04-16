@@ -29,6 +29,15 @@ Every DigiD object shares these fields.
 | `evidence` | object | no | Optional references to off-chain or off-protocol evidence |
 | `proof` | object | no | Signature proof block when the object is signed |
 
+### Common object invariants
+
+For v0.3, every signed DigiD object should also follow these rules:
+- top-level identifiers MUST be stable and immutable after issuance
+- mutable operational state should be represented by a new signed object or explicit revocation, not silent in-place edits
+- any field rendered to a receiver as trust-relevant should either be signed directly or derived from signed fields
+- unknown top-level fields are allowed unless listed in `critical_extensions`
+- if `proof` exists, the object MUST be verifiable without fetching unsigned side metadata
+
 ### Common identifier conventions
 
 For the first implementation profile:
@@ -170,6 +179,9 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - key records should include `not_before` and may include `expires_at`
 - if all keys are stale, expired, suspended, or revoked, the identity must not be treated as active for signing
 - `display_name` is required for end-user rendered identities unless the identity class is intentionally pseudonymous
+- `keys[].kid` values MUST be unique within the identity object
+- `keys[].purposes` MUST include `assertion` for any key used to sign DigiD objects or envelopes
+- if `controller.controller_id` differs from `object_id`, verifier UX SHOULD avoid presenting the identity as self-controlled
 
 ## 2. Attestation object
 
@@ -218,6 +230,8 @@ Represents a signed statement by an issuer about a subject.
 - attestation type is machine-readable, not display text
 - verifier should treat missing or stale `revocation_check` posture as degraded trust, not silent success
 - `verification_state` and `attestation_type` MUST agree, for example `organization-issued-agent` cannot resolve to `verified-human`
+- `claims.authorized_channels` SHOULD be treated as issuer intent, not direct delegation authority
+- if `valid_until` is absent, verifier policy SHOULD treat the attestation as long-lived but still revocation-sensitive
 
 ## 3. Delegation object
 
@@ -263,6 +277,8 @@ Defines authority for one subject to act on behalf of another.
 - delegations used for live high-trust communication should require fresher revocation data than static attestations
 - `authority.channels` and `authority.actions` MUST be non-empty arrays
 - if `purpose_bindings` are present, the communication or event using the delegation MUST declare one matching purpose
+- the first live-communication profile SHOULD require `valid_until` so delegated authority cannot drift into effectively permanent access
+- if `authority.restrictions` are present, verifier output SHOULD surface them when rendering expanded trust details
 
 ## 4. Signed communication object
 
@@ -317,6 +333,8 @@ A normalized high-level communication object for completed or in-progress exchan
 - `delegation_id` MUST be present when the communication claims operator-backed authority
 - `purpose` SHOULD match an allowed delegation purpose when a delegation exists
 - `timestamps.created_at` MUST be less than or equal to `session_started_at` when both are present
+- `payload.content_digest` MUST bind the signed communication object to the first announced session or artifact payload
+- the first demo profile SHOULD treat `dgd.communication` as the anchor object for all live-session envelopes in the same flow
 
 ## 5. Verification result object
 
@@ -414,6 +432,19 @@ A reference verifier should at minimum enforce:
 4. channel and action authorization for delegated actors
 5. timestamp validity and revocation checks
 6. clear downgrade behavior when an object is syntactically valid but trust-incomplete
+
+## Minimal fixture profile for v0.3
+
+The first fixture-driven implementation should treat these objects as required for a delegated-agent voice flow:
+1. one active `dgd.identity` for the organization
+2. one active `dgd.identity` for the agent
+3. one active `dgd.attestation` from organization to agent
+4. one active `dgd.delegation` from organization to agent with `voice` scope
+5. one `dgd.communication` object signed by the agent
+6. one or more envelopes referencing the same communication and delegation lineage
+7. zero or more `dgd.revocation` objects for degraded comparison cases
+
+This profile gives the verifier a stable graph instead of letting demo fixtures omit trust-bearing links opportunistically.
 
 ## Open questions still worth deciding later
 - whether identity and key documents should fully align with W3C DID conventions or stay DigiD-native

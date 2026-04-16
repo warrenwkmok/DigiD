@@ -48,6 +48,15 @@ For v0.3:
 | `payload_digest` | event | yes | Digest over canonical event payload bytes |
 | `proof` | all | yes | Signature proof block |
 
+## Envelope binding profile
+
+For the first implementation profile:
+- every live-session envelope MUST reference the same `dgd.communication` anchor in `subject_id`, or explicitly reference an artifact derived from that communication
+- `conversation_id` SHOULD carry the session lineage id used across messages and events
+- signer identity fields, `operator_id`, and `delegation_id` are trust-bearing fields and therefore MUST be inside the signed envelope body
+- any receiver-visible summary such as trust-banner copy SHOULD either be signed directly in `payload.summary` or deterministically derived from signed fields
+- event payloads MUST be canonicalized before digesting so independent verifiers can reproduce `payload_digest`
+
 ## Verification context profile
 
 ```json
@@ -142,6 +151,8 @@ To keep envelopes meaningful instead of merely signed blobs:
 - if `operator_id` is present and differs from the signer, `delegation_id` MUST be present unless the issuer is authoring the envelope directly
 - if `delegation_id` is present, the payload SHOULD carry a purpose or action hint that the verifier can compare against delegation scope
 - event and message envelopes for the same live session SHOULD share the same session or conversation id lineage
+- a verifier SHOULD reject a live-session envelope that references a delegation lineage inconsistent with the bound `dgd.communication` object
+- the first demo profile SHOULD require `voice.session.started` and `voice.session.announcement` to reference the same `subject_id` and `conversation_id`
 
 ## Core message types for the first prototype
 
@@ -295,24 +306,54 @@ These events are enough to power the first verified agent-human demo flow.
 
 ### `identity.issued`
 Created when an identity record becomes active.
+Required payload keys for the fixture profile:
+- `issued_object_id`
+- `identity_class`
+- `verification_state`
 
 ### `attestation.issued`
 Created when an issuer signs an attestation.
+Required payload keys:
+- `issued_object_id`
+- `attestation_type`
+- `subject_id`
 
 ### `delegation.issued`
 Created when an issuer signs a delegation.
+Required payload keys:
+- `issued_object_id`
+- `delegate_id`
+- `channels`
+- `actions`
+- `purpose_bindings`
 
 ### `voice.session.started`
 Created when an outbound or inbound voice session is initiated.
+Required payload keys:
+- `purpose`
+- `direction`
+- `channel_subtype`
 
 ### `voice.session.ended`
 Created when the live session finishes.
+Required payload keys:
+- `reason`
+- `duration_ms`
 
 ### `artifact.recorded`
 Created when a recording, transcript, or summary manifest is generated.
+Required payload keys:
+- `artifact_id`
+- `artifact_type`
+- `content_digest`
 
 ### `verification.performed`
 Created when a verifier resolves trust state for a subject.
+Required payload keys:
+- `decision`
+- `resolved_trust_state`
+- `verification_mode`
+- `revocation_status`
 
 ### `key.revoked`
 Created when a signing key becomes invalid before its scheduled expiry.
@@ -400,8 +441,17 @@ A reference verifier should:
 3. resolve the signer identity and ensure it is active
 4. if `delegation_id` exists, verify authority for the channel and action
 5. ensure `message_type` or `event_type` is consistent with the channel
-6. evaluate revocation freshness against the envelope's verification context or verifier defaults
-7. surface downgrade warnings for valid signatures paired with expired, revoked, stale, or unknown trust objects
+6. resolve the referenced `dgd.communication` object when the envelope participates in a live session flow
+7. evaluate revocation freshness against the envelope's verification context or verifier defaults
+8. surface downgrade warnings for valid signatures paired with expired, revoked, stale, or unknown trust objects
+
+## Implementation note for digest reproducibility
+
+The first signing library should expose two deterministic helpers:
+1. canonicalize-and-sign for the full envelope with `proof` removed
+2. canonicalize-and-digest for event `payload` bytes before filling `payload_digest`
+
+That keeps message verification and event verification reproducible with the same canonicalization rules.
 
 ## Serialization guidance
 

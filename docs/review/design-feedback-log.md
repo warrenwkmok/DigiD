@@ -92,3 +92,36 @@ Every meaningful critique should end up in one of these states:
 - action taken: Normalized examples to `schema_version: 0.3`, added concrete channel and action enums, added signer-binding and delegation-purpose constraints, required verification context in envelopes, and mapped the first demo to a specific communication object plus required fixture set.
 - linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`
 - notes: The next best move is to turn these docs into actual JSON fixtures and a tiny verifier pipeline.
+
+## DF-007 — Make the delegated voice demo fixture-driven and lineage-stable
+- source: `docs/review/second-critique.md`
+- date: 2026-04-16
+- area: protocol
+- severity: high
+- status: applied
+- summary: The delegated voice flow needed stronger lineage rules so comparison scenarios prove trust-state changes instead of quietly swapping the whole object graph.
+- action taken: Added common object invariants, a minimal fixture profile, stronger envelope binding rules, explicit event payload requirements, fixture filename conventions, and a demo lineage rule centered on a shared `dgd.communication` anchor.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/mvp/first-demo-flow.md`, `docs/architecture/system-architecture.md`
+- notes: This slice still needs actual JSON fixtures, but the repo now has a clearer contract for what those fixtures must preserve.
+
+## DF-008 — Centralize verifier policy and replay posture
+- source: `docs/review/second-critique.md`
+- date: 2026-04-16
+- area: security
+- severity: high
+- status: planned
+- summary: Freshness defaults exist, but replay handling, duplicate-envelope behavior, and policy profiles by interaction class are still scattered.
+- action taken: Logged for the next design slice.
+- linked docs: `docs/protocol/normative-protocol-draft.md`, `docs/protocol/message-formats.md`, `docs/architecture/reference-verifier.md`
+- notes: This likely wants a dedicated verifier-policy profile document before code scaffolding starts.
+
+## DF-009 — Add verifier UX guidance that limits trust overstatement
+- source: `docs/review/second-critique.md`
+- date: 2026-04-16
+- area: trust-state UX
+- severity: medium
+- status: planned
+- summary: The protocol is tightening faster than the user-facing trust language, which risks badges saying more than DigiD can truly prove.
+- action taken: Logged for a dedicated UX guidance doc covering compact labels, expanded details, warnings, and forbidden claims.
+- linked docs: `docs/architecture/trust-states.md`, `docs/architecture/reference-verifier.md`, `docs/mvp/first-demo-flow.md`
+- notes: This overlaps with DF-003 and should probably be resolved in the same document.

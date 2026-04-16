@@ -31,8 +31,8 @@
 - enterprise and developer integrations
 
 ## Immediate next steps
-- turn these docs into a tighter protocol draft
-- define the exact identity object schema
-- define the exact signed event schema
-- decide the first demo channel
-- choose whether the first code should be a verifier API or signing SDK
+- turn the v0.3 docs into actual demo fixture JSON files plus a fixture manifest contract
+- centralize verifier policy for freshness, replay handling, and duplicate-envelope posture
+- add verifier UX guidance so trust banners and warnings do not overstate what DigiD proves
+- decide whether `dgd.communication` is mandatory for all live profiles or only for the first demo profile
+- choose whether the first code should be a verifier API or signing SDK after the fixture contract is stable

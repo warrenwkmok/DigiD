@@ -68,18 +68,48 @@ For the first verified agent-human flow, the architecture can stay very small.
 - agent identity
 - attestation
 - delegation
+- `dgd.communication`
 - `voice.session.started` event
 - `voice.session.announcement` message
 
 ### Processing
 - verifier loads all referenced objects
 - verifier validates signatures and authority chain
+- verifier resolves the communication anchor before evaluating envelopes
 - verifier computes trust state and warnings
 
 ### Outputs
 - `dgd.verification_result`
 - compact trust banner text
 - expanded trust details payload for UI
+
+## Reference package split for the first code slice
+
+The first implementation should keep these responsibilities separate:
+
+### `packages/protocol`
+- object and envelope discriminated unions
+- required-field validation
+- canonicalization helpers
+- event payload digest helpers
+
+### `packages/verifier`
+- id graph resolution
+- attestation and delegation lookup
+- revocation freshness policy
+- trust-state derivation
+
+### `fixtures/demo`
+- happy-path artifacts
+- revoked and stale comparison artifacts
+- manifest file describing dependency order
+
+### `apps/demo-cli` or equivalent
+- compact trust banner rendering
+- expanded trust detail rendering
+- scenario selection for comparison fixtures
+
+This keeps the protocol reusable even if the first UI is only a CLI.
 
 ## Architectural principle
 
@@ -93,5 +123,6 @@ The cleanest next code scaffold is probably:
 - `packages/protocol` for types and validation
 - `packages/verifier` for trust resolution
 - `fixtures/demo/` for the first voice flow artifacts
+- `apps/demo-cli/` for renderer experiments
 
 But that code should only begin after the object and envelope definitions are stable enough to stop thrashing.
