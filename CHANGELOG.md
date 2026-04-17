@@ -12,6 +12,7 @@ Format notes:
 
 ## Iteration 11 — Tighten live delegated envelope lineage and warning portability
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:51 America/Vancouver
 - commit: `422c942`
 - summary:
   - tightened delegated live-envelope rules so `purpose` becomes a first-class trust-bearing field
@@ -33,6 +34,7 @@ Format notes:
 
 ## Iteration 10 — Expand review loop and implementation planning
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:20 America/Vancouver
 - commit: `20ff198`
 - summary:
   - added verifier UX guidance to reduce trust overstatement
@@ -55,6 +57,7 @@ Format notes:
 
 ## Iteration 09 — Specify session and artifact lineage as first-class protocol objects
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:55 America/Vancouver
 - commit: `a2d9c02`
 - summary:
   - added explicit `dgd.session` and `dgd.artifact` object schemas
@@ -74,6 +77,7 @@ Format notes:
 
 ## Iteration 08 — Add fixture manifest and verifier policy profiles
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:35 America/Vancouver
 - commit: `edc350c`
 - summary:
   - created an explicit fixture manifest profile for dependency order, scenario metadata, and lineage stability
@@ -95,6 +99,7 @@ Format notes:
 
 ## Iteration 07 — Tighten fixture and envelope profile toward machine-readable validation
 - date: 2026-04-16
+- timestamp: 2026-04-16 14:55 America/Vancouver
 - commit: `2e76088`
 - summary:
   - normalized event payload requirements into a clearer schema-like profile
@@ -113,6 +118,7 @@ Format notes:
 
 ## Iteration 06 — Tighten protocol schemas and demo bindings
 - date: 2026-04-16
+- timestamp: 2026-04-16 14:25 America/Vancouver
 - commit: `434765e`
 - summary:
   - normalized schema examples around v0.3
@@ -131,6 +137,7 @@ Format notes:
 
 ## Iteration 05 — Tighten protocol resolution and freshness rules
 - date: 2026-04-15
+- timestamp: 2026-04-15 22:10 America/Vancouver
 - commit: `053c1ef`
 - summary:
   - added a normative protocol draft with conformance language and resolution order
@@ -151,6 +158,7 @@ Format notes:
 
 ## Iteration 04 — Add critique assimilation loop
 - date: 2026-04-16
+- timestamp: 2026-04-16 11:10 America/Vancouver
 - commit: `86f390c`
 - summary:
   - added explicit assimilation rules so review findings are not lost as passive commentary
@@ -166,6 +174,7 @@ Format notes:
 
 ## Iteration 03 — Add critique roles and review workflow
 - date: 2026-04-16
+- timestamp: 2026-04-16 10:40 America/Vancouver
 - commit: `84c698b`
 - summary:
   - added standing red-team and adoption-loop reviewer roles
@@ -183,6 +192,7 @@ Format notes:
 
 ## Iteration 02 — Add protocol schemas and first demo flow
 - date: 2026-04-15
+- timestamp: 2026-04-15 20:45 America/Vancouver
 - commit: `cc0212e`
 - summary:
   - added the first substantial object-schema draft
@@ -200,6 +210,7 @@ Format notes:
 
 ## Iteration 01 — Scaffold product and protocol foundation
 - date: 2026-04-15
+- timestamp: 2026-04-15 18:30 America/Vancouver
 - commit: `bc78508`
 - summary:
   - created the initial DigiD repo structure and core concept docs

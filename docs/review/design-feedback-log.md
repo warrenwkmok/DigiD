@@ -30,6 +30,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-001 — Add normative protocol draft and object resolution order
 - source: `review/first-critique.md`
 - date: 2026-04-15
+- timestamp: 2026-04-15 22:10 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied
@@ -41,6 +42,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-002 — Add key lifecycle and revocation freshness model
 - source: `review/first-critique.md`
 - date: 2026-04-15
+- timestamp: 2026-04-15 22:10 America/Vancouver
 - area: security
 - severity: high
 - status: applied
@@ -52,6 +54,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-005 — Make the first demo prove historical vs current authority cleanly
 - source: `review/first-critique.md`
 - date: 2026-04-15
+- timestamp: 2026-04-15 22:10 America/Vancouver
 - area: protocol
 - severity: medium
 - status: applied
@@ -63,6 +66,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-003 — Add verifier UX guidance to prevent trust overstatement
 - source: `review/first-critique.md`
 - date: 2026-04-15
+- timestamp: 2026-04-15 20:45 America/Vancouver
 - area: trust-state UX
 - severity: medium
 - status: planned
@@ -74,6 +78,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-004 — Keep first wedge narrow enough for adoption
 - source: `review/first-critique.md`
 - date: 2026-04-15
+- timestamp: 2026-04-15 20:45 America/Vancouver
 - area: adoption
 - severity: medium
 - status: applied
@@ -85,6 +90,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-006 — Tighten schema binding between objects, envelopes, and the demo fixture set
 - source: `2026-04-15 DigiD focused build loop`
 - date: 2026-04-15
+- timestamp: 2026-04-15 22:10 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied
@@ -96,6 +102,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-007 — Make the delegated voice demo fixture-driven and lineage-stable
 - source: `docs/review/second-critique.md`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:35 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied
@@ -107,6 +114,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-008 — Centralize verifier policy and replay posture
 - source: `docs/review/second-critique.md`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:35 America/Vancouver
 - area: security
 - severity: high
 - status: planned
@@ -118,6 +126,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-009 — Add verifier UX guidance that limits trust overstatement
 - source: `docs/review/second-critique.md`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:35 America/Vancouver
 - area: trust-state UX
 - severity: medium
 - status: planned
@@ -129,6 +138,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-010 — Add fixture manifest and verifier policy profiles before code scaffolding
 - source: `docs/review/second-critique.md`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:35 America/Vancouver
 - area: architecture
 - severity: high
 - status: applied
@@ -140,6 +150,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-011 — Normalize event payload schemas and live-session lineage fields
 - source: `2026-04-16 DigiD focused build loop`
 - date: 2026-04-16
+- timestamp: 2026-04-16 14:55 America/Vancouver
 - area: protocol
 - severity: medium
 - status: applied
@@ -151,6 +162,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-012 — Add a standing adversarial red-team reviewer into the DigiD build loop
 - source: `2026-04-16 strategy discussion`
 - date: 2026-04-16
+- timestamp: 2026-04-16 10:40 America/Vancouver
 - area: security
 - severity: high
 - status: applied
@@ -162,6 +174,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-013 — Add a standing adoption loop into the DigiD build loop
 - source: `2026-04-16 strategy discussion`
 - date: 2026-04-16
+- timestamp: 2026-04-16 10:40 America/Vancouver
 - area: adoption
 - severity: high
 - status: applied
@@ -173,6 +186,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-014 — Make signable versus digest-bound trust fields explicit
 - source: `2026-04-16 DigiD focused build loop`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:55 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied
@@ -184,6 +198,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-015 — Make live-session scope and artifact lineage first-class objects
 - source: `2026-04-16 DigiD focused build loop`
 - date: 2026-04-16
+- timestamp: 2026-04-16 15:55 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied
@@ -195,6 +210,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-016 — Add verifier UX guardrails and a first concrete Slack adapter concept
 - source: `2026-04-16 DigiD resumed build`
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:20 America/Vancouver
 - area: adoption
 - severity: high
 - status: applied
@@ -206,6 +222,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-017 — Turn the first code path into an explicit scaffold plan
 - source: `2026-04-16 DigiD resumed build`
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:20 America/Vancouver
 - area: architecture
 - severity: high
 - status: applied
@@ -217,6 +234,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-018 — Add an explicit critique pass for the latest DigiD slice and tighten loop cadence
 - source: `docs/review/third-critique.md`
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:20 America/Vancouver
 - area: architecture
 - severity: medium
 - status: applied
@@ -228,6 +246,7 @@ Every meaningful critique should end up in one of these states:
 ## DF-019 — Normalize delegated live-envelope purpose and portable warning codes
 - source: `2026-04-16 DigiD focused build loop`
 - date: 2026-04-16
+- timestamp: 2026-04-16 16:51 America/Vancouver
 - area: protocol
 - severity: high
 - status: applied

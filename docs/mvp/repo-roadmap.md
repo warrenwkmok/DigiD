@@ -32,6 +32,7 @@
 
 ## Immediate next steps
 - treat the happy-path fixture family as the next mandatory build slice, using the v0.3 docs to produce actual demo JSON files with explicit `dgd.session` and optional `dgd.artifact` objects
+- use `docs/mvp/current-build-target.md` as the blunt orientation doc for what DigiD is building now versus what is explicitly later
 - apply the verifier policy profile in the first CLI or API implementation, with session-scope replay checks resolved from signed session lineage
 - add verifier UX guidance so trust banners and warnings do not overstate what DigiD proves (initial doc now added; next step is to bind the guidance into fixtures and renderer outputs)
 - decide whether `dgd.communication` is mandatory for all live profiles or only for the first demo profile
