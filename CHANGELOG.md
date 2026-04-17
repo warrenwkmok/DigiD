@@ -5,11 +5,13 @@ This changelog tracks meaningful DigiD repo iterations so Master Warren can quic
 Format notes:
 - newest entries first
 - each entry maps to one meaningful repo slice
+- headings use iteration labels instead of dates
 - critique-only observations should be reflected through follow-up design changes, not listed as standalone noise unless they materially changed repo direction
 
 ---
 
-## 2026-04-16 — Tighten live delegated envelope lineage and warning portability
+## Iteration 11 — Tighten live delegated envelope lineage and warning portability
+- date: 2026-04-16
 - commit: `422c942`
 - summary:
   - tightened delegated live-envelope rules so `purpose` becomes a first-class trust-bearing field
@@ -29,7 +31,8 @@ Format notes:
 - next likely step at the time:
   - create actual happy-path and degraded JSON fixtures plus lineage validators
 
-## 2026-04-16 — Expand review loop and implementation planning
+## Iteration 10 — Expand review loop and implementation planning
+- date: 2026-04-16
 - commit: `20ff198`
 - summary:
   - added verifier UX guidance to reduce trust overstatement
@@ -50,7 +53,8 @@ Format notes:
 - next likely step at the time:
   - stop adding prose dependencies and produce the first honest fixture family
 
-## 2026-04-16 — Specify session and artifact lineage as first-class protocol objects
+## Iteration 09 — Specify session and artifact lineage as first-class protocol objects
+- date: 2026-04-16
 - commit: `a2d9c02`
 - summary:
   - added explicit `dgd.session` and `dgd.artifact` object schemas
@@ -68,7 +72,8 @@ Format notes:
 - next likely step at the time:
   - align the normative draft and fixture plans around the new lineage objects
 
-## 2026-04-16 — Add fixture manifest and verifier policy profiles
+## Iteration 08 — Add fixture manifest and verifier policy profiles
+- date: 2026-04-16
 - commit: `edc350c`
 - summary:
   - created an explicit fixture manifest profile for dependency order, scenario metadata, and lineage stability
@@ -88,7 +93,8 @@ Format notes:
 - next likely step at the time:
   - normalize event payloads and live-session lineage more tightly so fixtures can be validated machine-readably
 
-## 2026-04-16 — Tighten fixture and envelope profile toward machine-readable validation
+## Iteration 07 — Tighten fixture and envelope profile toward machine-readable validation
+- date: 2026-04-16
 - commit: `2e76088`
 - summary:
   - normalized event payload requirements into a clearer schema-like profile
@@ -105,7 +111,8 @@ Format notes:
 - next likely step at the time:
   - add standing review loops and keep feeding critique back into concrete repo changes
 
-## 2026-04-16 — Tighten protocol schemas and demo bindings
+## Iteration 06 — Tighten protocol schemas and demo bindings
+- date: 2026-04-16
 - commit: `434765e`
 - summary:
   - normalized schema examples around v0.3
@@ -122,7 +129,8 @@ Format notes:
 - next likely step at the time:
   - add manifest and policy profile contracts, then create real fixtures
 
-## 2026-04-15 — Tighten protocol resolution and freshness rules
+## Iteration 05 — Tighten protocol resolution and freshness rules
+- date: 2026-04-15
 - commit: `053c1ef`
 - summary:
   - added a normative protocol draft with conformance language and resolution order
@@ -141,7 +149,8 @@ Format notes:
 - next likely step at the time:
   - tighten object, envelope, and demo bindings so fixture-driven implementation becomes unambiguous
 
-## 2026-04-16 — Add critique assimilation loop
+## Iteration 04 — Add critique assimilation loop
+- date: 2026-04-16
 - commit: `86f390c`
 - summary:
   - added explicit assimilation rules so review findings are not lost as passive commentary
@@ -155,7 +164,8 @@ Format notes:
 - next likely step at the time:
   - add standing reviewer roles and workflow structure around the loop
 
-## 2026-04-16 — Add critique roles and review workflow
+## Iteration 03 — Add critique roles and review workflow
+- date: 2026-04-16
 - commit: `84c698b`
 - summary:
   - added standing red-team and adoption-loop reviewer roles
@@ -171,21 +181,8 @@ Format notes:
 - next likely step at the time:
   - continue protocol tightening while avoiding process bloat
 
-## 2026-04-15 — Tighten protocol and demo flow from first critique
-- commit: `cfd54d8`
-- summary:
-  - incorporated the first critique into stronger protocol and demo-flow direction
-  - reinforced the verifier-first wedge and narrowed the initial product story around verified communications
-- changed files:
-  - `docs/mvp/first-demo-flow.md`
-  - `docs/architecture/reference-verifier.md`
-  - related protocol docs
-- why it mattered:
-  - kept the wedge focused and prevented the repo from drifting into broad identity-infrastructure claims too early
-- next likely step at the time:
-  - introduce explicit schemas and a clearer first demo contract
-
-## 2026-04-15 — Add protocol schemas and first demo flow
+## Iteration 02 — Add protocol schemas and first demo flow
+- date: 2026-04-15
 - commit: `cc0212e`
 - summary:
   - added the first substantial object-schema draft
@@ -201,7 +198,8 @@ Format notes:
 - next likely step at the time:
   - make the protocol normative, define trust resolution order, and model revocation more concretely
 
-## 2026-04-15 — Scaffold product and protocol foundation
+## Iteration 01 — Scaffold product and protocol foundation
+- date: 2026-04-15
 - commit: `bc78508`
 - summary:
   - created the initial DigiD repo structure and core concept docs
