@@ -10,6 +10,31 @@ Format notes:
 
 ---
 
+## Iteration 15 - Externalize verifier policy and enforce owner binding
+- date: 2026-04-17
+- timestamp: 2026-04-17 00:00 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a dedicated verifier policy module so interaction class, replay posture, freshness defaults, owner-binding checks, and delegation-scope checks are no longer buried in one manifest verifier file
+  - made delegated-agent trust require an explicit owner-binding chain in verifier output before the public demo will render high-trust agent posture
+  - surfaced owner-binding and authority-scope diagnostics in the demo CLI so degraded trust is explained directly instead of implied by a generic warning badge
+  - kept the slice on the public-safe side of the boundary by strengthening reference verifier logic only, while leaving hosted verifier services and operational policy surfaces out of the repo
+- changed files:
+  - `packages/verifier/src/policy.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/index.js`
+  - `apps/demo-cli/src/index.js`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this closes part of the gap between the v0.3 trust model and the runnable verifier by making owner-backed delegated-agent trust explicit instead of mostly documentary
+- next likely step at the time:
+  - decide the last public-safe verifier surface before any API or adapter work crosses into private hosted-service territory
+
 ## Iteration 13 - Ship the verifier-first MVP implementation
 - date: 2026-04-16
 - timestamp: 2026-04-16 20:05 America/Vancouver

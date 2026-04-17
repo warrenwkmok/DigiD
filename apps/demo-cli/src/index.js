@@ -7,6 +7,7 @@ function printResult(result) {
   console.log(`\n${result.compactBanner}`);
   console.log("=".repeat(result.compactBanner.length));
   console.log(`Scenario: ${result.scenario_id}`);
+  console.log(`Policy: ${result.policy.interaction_class} (${result.policy.replay_sensitivity} replay sensitivity)`);
   console.log("");
 
   for (const [label, value] of renderExpandedDetails(result)) {
@@ -57,6 +58,8 @@ async function run() {
   console.log("");
   console.log(`Left warnings : ${left.warnings.map((warning) => warning.code).join(", ") || "none"}`);
   console.log(`Right warnings: ${right.warnings.map((warning) => warning.code).join(", ") || "none"}`);
+  console.log(`Left owner/scope : ${left.checks.owner_binding_status} / ${left.checks.authority_scope_status}`);
+  console.log(`Right owner/scope: ${right.checks.owner_binding_status} / ${right.checks.authority_scope_status}`);
   console.log(`Left errors   : ${left.errors.join("; ") || "none"}`);
   console.log(`Right errors  : ${right.errors.join("; ") || "none"}`);
 }

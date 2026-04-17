@@ -86,3 +86,7 @@ Still open: whether the next build slice should automate those roles as local sc
 ## OQ-023 - Does DigiD need a first-class signed key-binding object for non-self-controlled agents?
 Working resolution for now: the first delegated-agent profile can rely on the signed identity controller binding plus owner-signed attestation and delegation to bind the agent key back to a human or organization.
 Still open: whether later commercial profiles should introduce a dedicated owner-signed key-binding or key-authorization object so agent key issuance, rotation, and emergency revocation are even more explicit.
+
+## OQ-024 - What is the last public-safe verifier surface before DigiD crosses into private commercial infrastructure?
+Working resolution for now: the public repo can keep shipping protocol, trust-model, fixtures, reference verifier logic, and limited local or demo interfaces that expose transparent diagnostics.
+Still open: exactly where to draw the line between a local verifier API that helps adoption and a hosted verifier service, enterprise policy surface, registry operation layer, or other monetizable platform capability that should move to a private repo before implementation.

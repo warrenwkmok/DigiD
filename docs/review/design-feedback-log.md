@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-024 - Externalize verifier policy and make delegated owner binding executable
+- source: `2026-04-17 DigiD 3h loop`
+- date: 2026-04-17
+- timestamp: 2026-04-17 00:00 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: The runnable verifier still carried too much policy inline, and delegated-agent trust was not yet explicitly gated on a full owner-binding chain in executable logic.
+- action taken: Added a dedicated verifier policy module, made owner-binding and delegation-scope checks first-class result diagnostics, and updated the CLI to surface those states directly.
+- linked docs: `packages/verifier/src/policy.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/display.js`, `apps/demo-cli/src/index.js`
+- notes: This remains public-safe reference verifier work. Hosted verifier APIs, trust-registry operations, enterprise policy surfaces, and similar operational layers should stay private-boundary candidates.
+
 ## DF-001 — Add normative protocol draft and object resolution order
 - source: `review/first-critique.md`
 - date: 2026-04-15

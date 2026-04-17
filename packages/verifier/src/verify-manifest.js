@@ -11,6 +11,13 @@ import {
 } from "../../protocol/src/index.js";
 import { deriveCompactBanner } from "./display.js";
 import { loadFixtureManifest } from "./manifest.js";
+import {
+  asInstant,
+  evaluateDelegationScope,
+  evaluateFreshness,
+  evaluateOwnerBinding,
+  resolveVerifierPolicy
+} from "./policy.js";
 
 function resolveSignerId(document, graph) {
   if (document.envelope_type === "dgd.message") {
@@ -39,10 +46,6 @@ function resolveSignerId(document, graph) {
   }
 }
 
-function asInstant(value) {
-  return value ? new Date(value).getTime() : null;
-}
-
 function isActiveInWindow(document, when) {
   if (!document) {
     return false;
@@ -65,18 +68,6 @@ function isActiveInWindow(document, when) {
 
   return true;
 }
-
-function evaluateFreshness(source, verificationTime, maxAgeSeconds) {
-  const checkedAt = source?.revocation_check?.checked_at ?? source?.revocation_checked_at ?? null;
-
-  if (!checkedAt) {
-    return "unknown";
-  }
-
-  const ageSeconds = Math.floor((verificationTime - asInstant(checkedAt)) / 1000);
-  return ageSeconds <= maxAgeSeconds ? "fresh" : "stale";
-}
-
 function checkReplay(envelopes) {
   const seenEnvelopeIds = new Set();
   const seenSequences = new Set();
@@ -122,7 +113,6 @@ function buildWarning(code, message) {
 export async function verifyFixtureManifest(manifestPath, options = {}) {
   const { manifest, repoRoot } = await loadFixtureManifest(manifestPath);
   const verificationTime = asInstant(options.verificationTime ?? manifest.verification_time ?? "2026-04-15T00:05:00Z");
-  const maxAgeSeconds = manifest.verification_defaults?.revocation_max_age_seconds ?? 300;
   const entries = [...manifest.objects, ...(manifest.optional_objects ?? [])];
   const graph = {
     byId: new Map(),
@@ -201,6 +191,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const revocation = graph.objects.find((candidate) => candidate.object_type === "dgd.revocation" && candidate.target_object_id === delegation?.object_id);
   const eventEnvelope = graph.envelopes.find((candidate) => candidate.envelope_type === "dgd.event");
   const eventTime = asInstant(eventEnvelope?.created_at ?? communication?.timestamps?.session_started_at ?? communication?.created_at);
+  const policy = resolveVerifierPolicy(manifest, communication);
+  const maxAgeSeconds = policy.revocation_max_age_seconds;
 
   const signatureValid = errors.filter((entry) => entry.includes("Signature verification failed")).length === 0;
   const signerActiveAtEventTime = signerIdentity ? isActiveInWindow(signerIdentity, eventTime) : false;
@@ -211,6 +203,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const delegationActiveAtEventTime = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, eventTime) && (!revocation || eventTime < asInstant(revocation.revoked_at))) : true;
   const delegationActiveNow = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, verificationTime) && (!revocation || verificationTime < asInstant(revocation.revoked_at))) : true;
   const freshnessStatus = evaluateFreshness(delegation ?? attestation ?? signerIdentity?.keys?.[0], verificationTime, maxAgeSeconds);
+  const ownerBinding = evaluateOwnerBinding({ signerIdentity, operatorIdentity, attestation, delegation, communication });
+  const authorityScope = evaluateDelegationScope({ communication, delegation, envelopes: graph.envelopes });
   const revocationStatus = revocation ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
 
   if (freshnessStatus === "stale") {
@@ -223,17 +217,49 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     warnings.push(buildWarning("authority-incomplete", "Signature valid, authority not proven"));
   }
 
+  if (ownerBinding.status === "missing") {
+    warnings.push(buildWarning("owner-binding-missing", "Agent signature not bound to verified owner"));
+  }
+
+  if (authorityScope.status === "out-of-scope") {
+    warnings.push(buildWarning("delegation-scope-conflict", "Delegated authority does not cover the claimed communication scope"));
+  }
+
   if (delegationRequired && delegation && !delegationActiveNow && delegationActiveAtEventTime) {
     warnings.push(buildWarning("delegation-expired-current-time", "Delegation no longer active"));
   }
 
-  const eventTimeValid = Boolean(signatureValid && signerActiveAtEventTime && attestationActiveAtEventTime && delegationActiveAtEventTime);
-  const currentTimeValid = Boolean(signatureValid && signerActiveNow && attestationActiveNow && delegationActiveNow && freshnessStatus !== "unknown");
+  const ownerBindingValid = ownerBinding.status !== "missing";
+  const authorityScopeValid = !delegationRequired || authorityScope.status === "in-scope";
+  const eventTimeValid = Boolean(
+    signatureValid &&
+      signerActiveAtEventTime &&
+      attestationActiveAtEventTime &&
+      delegationActiveAtEventTime &&
+      ownerBindingValid &&
+      authorityScopeValid
+  );
+  const currentTimeValid = Boolean(
+    signatureValid &&
+      signerActiveNow &&
+      attestationActiveNow &&
+      delegationActiveNow &&
+      ownerBindingValid &&
+      authorityScopeValid &&
+      freshnessStatus !== "unknown"
+  );
 
   let resolvedTrustState = "unverified";
   if (signerIdentity?.identity_class === "human" && attestationActiveAtEventTime) {
     resolvedTrustState = "verified-human";
-  } else if (signerIdentity?.identity_class === "agent" && attestationActiveAtEventTime && delegationRequired && delegationActiveAtEventTime) {
+  } else if (
+    signerIdentity?.identity_class === "agent" &&
+    attestationActiveAtEventTime &&
+    delegationRequired &&
+    delegationActiveAtEventTime &&
+    ownerBindingValid &&
+    authorityScopeValid
+  ) {
     resolvedTrustState = "delegated-agent";
   } else if (signerIdentity?.identity_class === "agent" && attestationActiveAtEventTime) {
     resolvedTrustState = "verified-agent";
@@ -254,7 +280,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     decision,
     resolved_trust_state: resolvedTrustState,
     compact_label: manifest.expected_outcome?.compact_label,
-    verification_mode: manifest.verification_defaults?.mode ?? "dual",
+    verification_mode: policy.verification_mode,
+    policy,
     signer_identity: signerIdentity,
     operator_identity: operatorIdentity,
     communication,
@@ -262,6 +289,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signature_valid: signatureValid,
       event_time_valid: eventTimeValid,
       current_time_valid: currentTimeValid,
+      owner_binding_status: ownerBinding.status,
+      authority_scope_status: authorityScope.status,
       revocation_status: revocationStatus,
       freshness_status: freshnessStatus,
       replay_status: replayStatus
