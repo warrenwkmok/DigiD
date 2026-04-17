@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-027 - Make adapter-facing mismatch and context-loss guardrails executable locally before any public adapter code appears
+- source: `2026-04-17 DigiD 3h loop`
+- date: 2026-04-17
+- timestamp: 2026-04-17 13:35 America/Vancouver
+- area: architecture
+- severity: high
+- status: applied
+- summary: DigiD already documented `platform-identity-mismatch` and `artifact-context-missing`, but they were still advisory prose in the portable contract instead of an executable public-safe demo surface.
+- action taken: Added a local presentation guardrail evaluator over exported verifier contracts, exposed it through a narrow demo CLI `present` mode, and tightened docs so mismatch/context-loss simulation stays local-first rather than drifting into a hosted adapter decision API.
+- linked docs: `packages/verifier/src/presentation.js`, `packages/verifier/src/contract.js`, `packages/verifier/src/index.js`, `apps/demo-cli/src/index.js`, `docs/architecture/verifier-result-contract.md`, `docs/architecture/verifier-ux-guidance.md`, `README.md`
+- notes: This remains public-safe because it is transparent library and CLI logic over already-exported verifier contracts. Hosted adapter runtimes, tenant policy controls, registry operations, and enterprise workflow layers still belong on the private side of the boundary.
+
 ## DF-026 - Make fixture manifests assert runtime verifier behavior instead of loosely describing it
 - source: `2026-04-17 DigiD 3h loop`
 - date: 2026-04-17

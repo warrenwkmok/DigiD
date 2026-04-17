@@ -3,6 +3,40 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-005 - Local presentation guardrail critique
+- date: 2026-04-17
+- timestamp: 2026-04-17 13:35 America/Vancouver
+- reviewed slice:
+  - local presentation guardrail evaluator over portable verifier contracts
+  - demo CLI `present` mode for platform mismatch and context-loss simulation
+  - public/private boundary restatement for adapter-facing warning synthesis
+- strengths:
+  - DigiD now makes adapter-facing honesty checks executable without polluting core signature verification with unsigned presentation metadata
+  - `platform-identity-mismatch` and `artifact-context-missing` are now demoable behaviors instead of only aspirational warning codes in docs
+  - the slice preserves the public moat by staying inside local library and CLI ergonomics rather than adding a hosted adapter decision API
+- concerns:
+  - presentation guardrails still depend on manually supplied mismatch/context inputs rather than a standardized per-adapter evidence contract
+  - compact-label degradation logic is intentionally small and may need profile-specific wording rules later
+  - the public repo should stop before adding multi-tenant presentation services, hosted adapter conformance pipelines, or policy-admin consoles
+- protocol concerns:
+  - the core verifier result remains cleanly separated from unsigned presentation evidence, which is the right architectural split for now
+  - future adapter profiles still need one bounded evidence schema so mismatch states are reproducible across channels
+- adoption concerns:
+  - local presentation simulation makes Slack-, voice-, email-, and transcript-surface experiments more honest before any real adapter code lands
+  - the next public-safe step should be evidence-shape design or a narrow fixture-backed adapter profile, not hosted runtime surfaces
+- recommended changes:
+  1. define a minimal adapter evidence contract before channel-specific simulation gets more complex
+  2. keep presentation guardrail execution local-only in the public repo
+  3. move any hosted adapter decision APIs or enterprise presentation workflows to a private repo before implementation
+
+## Status
+- applied in this iteration:
+  - local presentation guardrail evaluation
+  - executable platform-mismatch and context-loss simulation
+- deferred to next loops:
+  - adapter evidence contract shape
+  - any real hosted adapter runtime
+
 ## CL-003 - Portable verifier contract and isolated owner-binding mismatch critique
 - date: 2026-04-17
 - timestamp: 2026-04-17 10:05 America/Vancouver

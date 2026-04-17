@@ -3,6 +3,35 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-005 - Presentation guardrail red-team pass
+- date: 2026-04-17
+- timestamp: 2026-04-17 13:35 America/Vancouver
+- reviewed slice:
+  - local presentation guardrail evaluator
+  - CLI simulation of platform mismatch and context loss
+- attack scenarios:
+  - a future adapter reuses the positive verifier contract but never applies mismatch or context-loss degradation when the surrounding surface changes
+  - presentation warning synthesis logic quietly migrates into a hosted public API, giving away monetizable adapter decision behavior and tenant-specific UX control
+  - a copied artifact inherits a positive compact label because downstream tooling treats verifier output as screenshot-safe by default
+- integration risks:
+  - the public repo still lacks a standardized evidence shape for platform-native identity binding, so different adapters could simulate mismatch inconsistently
+  - warning synthesis logic could become too channel-specific if it keeps expanding without a bounded adapter profile contract
+- exploitability notes:
+  - this slice materially hardens the current public reference surface by making out-of-context and platform-mismatch degradation executable
+  - the commercial moat still depends on not open-sourcing hosted adapter runtimes, policy administration, or enterprise trust-decision operations
+- recommended mitigations:
+  1. standardize a narrow adapter evidence input before adding more presentation cases
+  2. keep guardrail evaluation local and transparent in the public repo
+  3. move any hosted adapter conformance services, tenant-aware rendering APIs, or enterprise rollout tooling private before implementation
+
+## Status
+- applied in this iteration:
+  - local mismatch/context-loss warning synthesis
+  - demoable guardrail degradation for copied or mismatched surfaces
+- planned:
+  - bounded adapter evidence contract
+  - private-boundary split before any hosted adapter service work
+
 ## RT-003 - Portable verifier contract and context-loss red-team pass
 - date: 2026-04-17
 - timestamp: 2026-04-17 10:05 America/Vancouver

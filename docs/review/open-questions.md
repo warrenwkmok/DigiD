@@ -98,3 +98,7 @@ Still open: which concrete evidence fields each adapter profile must supply to t
 ## OQ-026 - What is the safest public-safe strategy for authoring new signed negative fixtures?
 Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows public so the reference verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure.
 Still open: whether DigiD should use fixed demo-only signing keys, deterministic seeded keys, or full-corpus regeneration as the intended path for adding new signed negative scenarios such as delegation-scope conflict. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
+
+## OQ-027 - What is the minimum public-safe evidence contract for adapter mismatch and context-loss inputs?
+Working resolution for now: the public repo can simulate platform mismatch and context loss through local presentation guardrails over exported verifier contracts, using explicit local flags or demo-supplied evidence rather than a hosted adapter decision service.
+Still open: which evidence fields should eventually be standardized per adapter profile so Slack handles, caller ids, email senders, transcripts, or copied artifacts trigger mismatch/context-loss warnings consistently without turning the public repo into a tenant-aware policy engine.

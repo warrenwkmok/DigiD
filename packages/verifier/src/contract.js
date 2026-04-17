@@ -27,6 +27,8 @@ function deriveContextLossWarnings(interactionClass) {
 export function derivePortableResultContract(result) {
   const warningCodes = result.warnings.map((warning) => warning.code);
   const positiveCompactAllowed = result.decision === "allow-with-trust-indicator" && warningCodes.length === 0;
+  const interactionClass = result.policy.interaction_class;
+  const platformMismatchRelevant = interactionClass?.startsWith("live_") || interactionClass === "async_message" || interactionClass === "async_email";
 
   return {
     contract_version: "0.1",
@@ -35,7 +37,7 @@ export function derivePortableResultContract(result) {
     resolved_trust_state: result.resolved_trust_state,
     compact_label: result.compactBanner ?? deriveCompactBanner(result),
     verification_mode: result.verification_mode,
-    interaction_class: result.policy.interaction_class,
+    interaction_class: interactionClass,
     warning_codes: warningCodes,
     must_preserve_fields: [
       "checks.owner_binding_status",
@@ -51,9 +53,9 @@ export function derivePortableResultContract(result) {
       warning_visibility: warningCodes.length > 0 ? "required" : "available",
       expanded_context: "required",
       positive_compact_label_without_details: positiveCompactAllowed,
-      context_binding: deriveContextBinding(result.policy.interaction_class),
-      synthesize_warning_codes_on_context_loss: deriveContextLossWarnings(result.policy.interaction_class),
-      platform_identity: result.operator_identity
+      context_binding: deriveContextBinding(interactionClass),
+      synthesize_warning_codes_on_context_loss: deriveContextLossWarnings(interactionClass),
+      platform_identity: platformMismatchRelevant
         ? {
             mismatch_state_required: true,
             mismatch_warning_code: "platform-identity-mismatch"

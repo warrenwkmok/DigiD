@@ -2,7 +2,11 @@
 
 import { readdir } from "node:fs/promises";
 import path from "node:path";
-import { renderExpandedDetails, verifyFixtureManifest } from "../../../packages/verifier/src/index.js";
+import {
+  applyPresentationGuardrails,
+  renderExpandedDetails,
+  verifyFixtureManifest
+} from "../../../packages/verifier/src/index.js";
 
 function printResult(result) {
   console.log(`\n${result.compactBanner}`);
@@ -90,11 +94,46 @@ async function runAudit(manifestDirectory) {
   }
 }
 
+function parsePresentationOptions(args) {
+  const options = {
+    platform_identity_status: "matched",
+    verified_context_preserved: true
+  };
+
+  for (const arg of args) {
+    if (arg === "--platform-mismatch") {
+      options.platform_identity_status = "mismatch";
+      continue;
+    }
+
+    if (arg === "--context-loss") {
+      options.verified_context_preserved = false;
+      continue;
+    }
+
+    throw new Error(`Unknown present flag: ${arg}`);
+  }
+
+  return options;
+}
+
+function printPresentation(result) {
+  console.log(`\nBase label: ${result.base_compact_label}`);
+  console.log(`Effective label: ${result.effective_compact_label}`);
+  console.log(`Base decision: ${result.base_decision}`);
+  console.log(`Effective decision: ${result.effective_decision}`);
+  console.log(`Context status: ${result.presentation_context.verified_context_status}`);
+  console.log(`Platform identity: ${result.presentation_context.platform_identity_status}`);
+  console.log(`Base warnings: ${result.base_warning_codes.join(", ") || "none"}`);
+  console.log(`Synthesized warnings: ${result.synthesized_warning_codes.join(", ") || "none"}`);
+  console.log(`Effective warnings: ${result.effective_warning_codes.join(", ") || "none"}`);
+}
+
 async function run() {
   const [, , command, ...args] = process.argv;
 
-  if (!command || !["verify", "compare", "export", "audit"].includes(command)) {
-    console.error("Usage: node apps/demo-cli/src/index.js <verify|compare|export|audit> <manifest|manifest-dir> [other-manifest]");
+  if (!command || !["verify", "compare", "export", "audit", "present"].includes(command)) {
+    console.error("Usage: node apps/demo-cli/src/index.js <verify|compare|export|audit|present> <manifest|manifest-dir> [other-manifest] [--platform-mismatch] [--context-loss]");
     process.exit(1);
   }
 
@@ -115,6 +154,15 @@ async function run() {
     const manifestPath = args[0] ?? "fixtures/demo/manifests/voice.happy-path.manifest.json";
     const result = await verifyFixtureManifest(path.resolve(manifestPath));
     console.log(JSON.stringify(result.portable_result_contract, null, 2));
+    return;
+  }
+
+  if (command === "present") {
+    const manifestPath = args[0] ?? "fixtures/demo/manifests/voice.happy-path.manifest.json";
+    const presentationOptions = parsePresentationOptions(args.slice(1));
+    const result = await verifyFixtureManifest(path.resolve(manifestPath));
+    const presentation = applyPresentationGuardrails(result.portable_result_contract, presentationOptions);
+    printPresentation(presentation);
     return;
   }
 

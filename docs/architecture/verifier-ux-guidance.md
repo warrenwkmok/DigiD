@@ -185,6 +185,9 @@ Adapters SHOULD synthesize a mismatch or context-loss warning rather than silent
 - platform-native identity cannot be bound to the DigiD trust path
 - a live result is copied outside its verified context
 
+For the current public DigiD repo, those warnings should be exercised through local contract-guardrail evaluation and demo tooling only.
+Hosted adapter decision services or tenant-aware presentation layers remain private-boundary candidates.
+
 ## First implementation contract
 
 The first verifier UI or CLI should:

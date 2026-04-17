@@ -16,6 +16,7 @@ Public-safe in this repo:
 - reference verifier logic
 - fixture manifests and demo scenarios
 - local CLI or library exports of verifier result contracts
+- local-only presentation guardrail evaluation over exported contracts for adapter experiments and UX honesty checks
 
 Private-boundary candidates outside this repo:
 - hosted verifier APIs
@@ -71,4 +72,5 @@ This keeps adapters honest about Slack handles, messaging accounts, caller ids, 
 ## Relationship to the reference verifier
 
 The public reference verifier may export this contract through a local CLI or library API.
-That remains public-safe because it exposes transparent diagnostics, not tenant-specific hosted policy or operational infrastructure.
+The public reference verifier may also apply local presentation guardrails over the exported contract to simulate context loss or platform mismatch in demos.
+That remains public-safe because it exposes transparent diagnostics and warning synthesis rules, not tenant-specific hosted policy, adapter orchestration, or operational infrastructure.

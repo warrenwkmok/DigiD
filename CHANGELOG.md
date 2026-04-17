@@ -10,6 +10,33 @@ Format notes:
 
 ---
 
+## Iteration 18 - Make adapter-facing guardrails executable locally
+- date: 2026-04-17
+- timestamp: 2026-04-17 13:35 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a local presentation guardrail evaluator over exported verifier contracts so DigiD can execute `platform-identity-mismatch` and `artifact-context-missing` without polluting core signature verification with unsigned adapter context
+  - exposed the slice through a narrow demo CLI `present` mode that simulates platform mismatch and copied-artifact context loss for the happy-path verifier output
+  - kept the boundary explicit: local contract exports and local guardrail evaluation stay public-safe, while hosted adapter decision services, tenant-aware presentation logic, registry operations, billing, and enterprise workflows remain private-boundary candidates
+- changed files:
+  - `packages/verifier/src/presentation.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/index.js`
+  - `apps/demo-cli/src/index.js`
+  - `package.json`
+  - `README.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this closes the gap where DigiD documented adapter honesty guardrails but could not yet execute them in a local product loop, which is the last public-safe step before real adapter or platform work risks crossing into private commercial territory
+- next likely step at the time:
+  - define a narrow adapter evidence contract or a fixture-backed profile for mismatch/context inputs without building any hosted adapter runtime
+
 ## Iteration 17 - Audit manifest expectations against runtime verifier output
 - date: 2026-04-17
 - timestamp: 2026-04-17 12:43 America/Vancouver
