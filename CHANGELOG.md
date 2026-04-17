@@ -10,6 +10,27 @@ Format notes:
 
 ---
 
+## Iteration 12 — Tighten signer resolution and ordered live-event rules
+- date: 2026-04-16
+- timestamp: 2026-04-16 18:00 America/Vancouver
+- commit: `d251f3f`
+- summary:
+  - added an explicit signer-resolution matrix across DigiD object families so verifiers do not infer different signing identities from the same payload
+  - tightened delegated signer alignment and live artifact derivation constraints
+  - made ordered live-session events contiguous from sequence `1` in the first fixture-driven profile
+  - clarified that `voice.session.announcement` is lineage-bound but intentionally non-sequenced
+  - updated the first demo build order to validate ordered event scope before verifier rendering
+- changed files:
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/message-formats.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/mvp/first-demo-flow.md`
+  - `docs/review/design-feedback-log.md`
+- why it mattered:
+  - removed two major sources of implementation drift right before fixture generation, signer ambiguity and inconsistent event ordering expectations
+- next likely step at the time:
+  - generate the first happy-path and degraded fixture manifests using the stricter signer and sequence rules
+
 ## Iteration 11 — Tighten live delegated envelope lineage and warning portability
 - date: 2026-04-16
 - timestamp: 2026-04-16 16:51 America/Vancouver
