@@ -33,6 +33,36 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - context-loss and platform-mismatch fixture coverage
   - boundary check before service-shaped adapter work
 
+## RT-004 - Manifest-audit and runtime-label red-team pass
+- date: 2026-04-17
+- timestamp: 2026-04-17 12:43 America/Vancouver
+- reviewed slice:
+  - manifest expectation matching
+  - runtime compact-banner derivation
+  - audited owner-binding mismatch coverage
+- attack scenarios:
+  - a verifier regression changes the compact banner or warning set while the fixture metadata still claims the old behavior
+  - the owner-binding mismatch path exists in the repo but quietly drops out of the active demo loop because nobody checks it continuously
+  - local audit tooling slowly expands into a hosted verification or regression service that gives away monetizable operational capability
+- integration risks:
+  - delegation-scope conflict and platform-identity mismatch still do not have equivalent audited negative fixtures
+  - authoring new signed negative cases is still awkward without a clearly public-safe demo-key strategy
+- exploitability notes:
+  - this slice removes an easy way to hide trust-label regressions behind expected fixture text
+  - it is still safe as local reference tooling, but it should not become the seed of a public hosted trust-decision platform
+- recommended mitigations:
+  1. add the next audited negative fixture around delegation-scope conflict once the demo-key strategy is decided
+  2. keep the audit command local-only while the repo remains public
+  3. move any hosted regression dashboards, tenant policy controls, or operational trust pipelines to a private repo before implementation
+
+## Status
+- applied in this iteration:
+  - audited owner-binding mismatch coverage
+  - runtime-derived compact-banner validation
+- planned:
+  - delegation-scope conflict regression coverage
+  - private-boundary split before any hosted regression or verification tooling
+
 ## RT-001 - Verifier-first MVP implementation red-team pass
 - date: 2026-04-16
 - timestamp: 2026-04-16 20:05 America/Vancouver

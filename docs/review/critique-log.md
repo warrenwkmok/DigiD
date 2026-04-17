@@ -38,6 +38,41 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - platform-mismatch fixtures
   - any hosted or tenant-aware verifier surface
 
+## CL-004 - Audited manifest expectations and runtime-banner critique
+- date: 2026-04-17
+- timestamp: 2026-04-17 12:43 America/Vancouver
+- reviewed slice:
+  - runtime compact-banner derivation
+  - manifest expectation matching
+  - local audit command across the demo manifest suite
+  - owner-binding mismatch expectation coverage
+- strengths:
+  - the verifier now derives its own compact banner from runtime warnings and trust state instead of inheriting the answer from fixture metadata
+  - the checked-in manifests became a real regression suite that asserts warning codes and key verifier checks, not just human-readable scenario intent
+  - the owner-binding mismatch path is now continuously audited as part of the public-safe suite
+- concerns:
+  - delegation-scope conflict still lacks equivalent audited negative-fixture coverage
+  - adding new signed negative fixtures still depends on settling a cleaner demo-key authoring strategy
+  - the audit command should stay local tooling rather than drift toward a hosted regression or verification service in the public repo
+- protocol concerns:
+  - manifest expectations are now strong enough to catch verifier drift, but they should stay tied to reference-verifier behavior rather than balloon into adapter- or tenant-specific policy matrices
+  - result-contract and manifest expectations now overlap more deliberately, so both contracts need to stay aligned
+- adoption concerns:
+  - local audit output makes future adapter experiments safer because trust-label drift becomes visible immediately
+  - this still does not prove platform-mismatch or context-loss rendering in any real channel surface
+- recommended changes:
+  1. add a scope-conflict negative fixture once the public-safe signed-fixture authoring path is chosen
+  2. keep portable result contracts and manifest expectations aligned before any adapter-side rendering work
+  3. stop before this audit surface turns into a hosted regression or trust-decision platform
+
+## Status
+- applied in this iteration:
+  - audited manifest suite
+  - runtime-derived compact banner validation
+- deferred to next loops:
+  - scope-conflict fixture coverage
+  - deterministic demo-key strategy for new signed negative variants
+
 ## CL-001 - Verifier-first MVP implementation critique
 - date: 2026-04-16
 - timestamp: 2026-04-16 20:05 America/Vancouver

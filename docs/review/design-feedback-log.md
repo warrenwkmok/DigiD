@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-026 - Make fixture manifests assert runtime verifier behavior instead of loosely describing it
+- source: `2026-04-17 DigiD 3h loop`
+- date: 2026-04-17
+- timestamp: 2026-04-17 12:43 America/Vancouver
+- area: architecture
+- severity: high
+- status: applied
+- summary: The public verifier still let fixture metadata stand in for part of its own displayed answer, and the existing owner-binding mismatch scenario was not yet enforced as part of an audited runtime contract.
+- action taken: Derived compact banners from runtime state, added manifest expectation matching, added a local manifest audit command, expanded manifests with warning and check assertions, and pulled the owner-binding mismatch fixture into the audited suite.
+- linked docs: `packages/verifier/src/display.js`, `packages/verifier/src/expectations.js`, `packages/verifier/src/verify-manifest.js`, `apps/demo-cli/src/index.js`, `fixtures/demo/manifests/*.json`, `fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json`
+- notes: This stays public-safe because it is still reference-verifier and local demo tooling only. Hosted verification APIs, tenant policy management, trust-registry operations, and regression orchestration services remain private-boundary candidates.
+
 ## DF-025 - Add a portable verifier result contract before any adapter or API surface grows
 - source: `2026-04-17 DigiD 3h loop`
 - date: 2026-04-17

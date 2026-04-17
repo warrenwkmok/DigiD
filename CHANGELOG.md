@@ -10,6 +10,38 @@ Format notes:
 
 ---
 
+## Iteration 17 - Audit manifest expectations against runtime verifier output
+- date: 2026-04-17
+- timestamp: 2026-04-17 12:43 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - removed the shortcut where fixture metadata supplied the verifier's compact banner, so runtime trust labels now come from actual warnings and trust state
+  - added manifest expectation matching for compact labels, decisions, warning codes, error counts, and key verifier checks plus a local `audit` command that exercises the full manifest suite
+  - folded the existing owner-binding mismatch scenario into the audited suite so DigiD now continuously checks a public-safe adversarial delegated-agent path
+  - kept the slice public-safe by strengthening local verifier contracts, fixture manifests, and demo tooling only while still excluding hosted verifier services, tenant policy layers, registry operations, billing, and enterprise operations
+- changed files:
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/expectations.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/index.js`
+  - `apps/demo-cli/src/index.js`
+  - `package.json`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/manifests/*.json`
+  - `fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json`
+  - `docs/protocol/fixture-manifest-profile.md`
+  - `README.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this turns the public fixture set into an executable verifier regression contract and closes a subtle honesty gap where expected manifest labels could hide runtime rendering drift
+- next likely step at the time:
+  - add the next audited negative scenario, likely delegation-scope conflict, after choosing the safest public-safe strategy for authoring new signed demo variants
+
 ## Iteration 16 - Add a portable verifier result contract and isolated owner-binding mismatch fixture
 - date: 2026-04-17
 - timestamp: 2026-04-17 10:05 America/Vancouver

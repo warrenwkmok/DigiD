@@ -94,3 +94,7 @@ Still open: exactly where to draw the line between a local verifier API that hel
 ## OQ-025 - Which adapter-mismatch and context-loss signals belong in the core verifier result contract versus channel-specific adapter profiles?
 Working resolution for now: the public reference verifier should export guardrails for `platform-identity-mismatch` and `artifact-context-missing`, and live surfaces should treat them as first-class warning paths when context or platform binding is lost.
 Still open: which concrete evidence fields each adapter profile must supply to trigger those warnings deterministically without bloating the core public contract into service-side policy logic.
+
+## OQ-026 - What is the safest public-safe strategy for authoring new signed negative fixtures?
+Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows public so the reference verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure.
+Still open: whether DigiD should use fixed demo-only signing keys, deterministic seeded keys, or full-corpus regeneration as the intended path for adding new signed negative scenarios such as delegation-scope conflict. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
