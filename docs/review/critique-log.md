@@ -3,6 +3,41 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-003 - Portable verifier contract and isolated owner-binding mismatch critique
+- date: 2026-04-17
+- timestamp: 2026-04-17 10:05 America/Vancouver
+- reviewed slice:
+  - portable verifier result contract
+  - local CLI export mode
+  - isolated owner-binding mismatch fixture family
+  - public/private boundary restatement in architecture docs
+- strengths:
+  - the reference verifier now exports a machine-readable contract that future adapters can consume without losing owner-binding, scope, replay, or freshness posture
+  - the new owner-binding mismatch scenario isolates a real trust failure without depending on missing-object errors or broad fixture breakage
+  - the slice adds adoption-facing implementation value while staying local-first and public-safe rather than drifting into a hosted verifier service
+- concerns:
+  - the contract currently tells adapters to synthesize context-loss and platform-mismatch warnings, but it does not yet prove those flows through dedicated adapter-profile fixtures
+  - the public repo still has to stop short of tenant-aware policy administration or hosted decision APIs even if the contract becomes richer
+  - the generator now knows about the new fixture family, but the current dirty worktree prevented a full regeneration pass this iteration
+- protocol concerns:
+  - warning-code vocabulary is now more complete, but channel-specific mismatch evidence binding is still profile work rather than a resolved core rule
+  - result-contract guardrails should remain thin and portable instead of becoming a policy-engine substitute
+- adoption concerns:
+  - the export contract makes adapter experimentation more realistic, especially for Slack- or voice-sidecar surfaces
+  - the next slice should either prove mismatch/context-loss rendering through fixtures or stop before the public repo grows service-shaped interfaces
+- recommended changes:
+  1. add one explicit platform-mismatch or context-loss fixture path before any real adapter code appears in this repo
+  2. keep result-contract evolution local-first and transparent, not tenant-aware or hosted
+  3. re-evaluate the commercial boundary before any adapter profile starts looking like deployable enterprise workflow code
+
+## Status
+- applied in this iteration:
+  - portable verifier result contract
+  - isolated owner-binding mismatch scenario
+- deferred to next loops:
+  - platform-mismatch fixtures
+  - any hosted or tenant-aware verifier surface
+
 ## CL-001 - Verifier-first MVP implementation critique
 - date: 2026-04-16
 - timestamp: 2026-04-16 20:05 America/Vancouver

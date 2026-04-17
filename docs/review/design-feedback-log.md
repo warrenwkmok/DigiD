@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-025 - Add a portable verifier result contract before any adapter or API surface grows
+- source: `2026-04-17 DigiD 3h loop`
+- date: 2026-04-17
+- timestamp: 2026-04-17 10:05 America/Vancouver
+- area: architecture
+- severity: high
+- status: applied
+- summary: DigiD needed one public-safe, machine-readable verifier result contract so future adapters preserve warning visibility, owner binding, scope diagnostics, and context-binding rules without the public repo drifting into a hosted verifier product.
+- action taken: Added a local-first verifier result contract export, preserved owner-binding and authority-scope reason fields in verifier output, added an isolated owner-binding mismatch fixture family, and documented result-contract guardrails plus the public/private boundary around hosted verifier and policy surfaces.
+- linked docs: `packages/verifier/src/contract.js`, `packages/verifier/src/verify-manifest.js`, `apps/demo-cli/src/index.js`, `docs/architecture/verifier-result-contract.md`, `fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json`
+- notes: This remains public-safe because the repo still ships transparent reference-verifier logic and local exports only. Hosted verifier services, registry operations, tenant-aware policy control, and enterprise workflow layers remain private-boundary candidates.
+
 ## DF-024 - Externalize verifier policy and make delegated owner binding executable
 - source: `2026-04-17 DigiD 3h loop`
 - date: 2026-04-17

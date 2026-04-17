@@ -1,0 +1,28 @@
+{
+  "object_type": "dgd.session",
+  "schema_version": "0.3",
+  "object_id": "dgd:session:voice_owner_binding_01",
+  "status": "active",
+  "session_type": "voice.live",
+  "communication_id": "dgd:communication:voice_owner_binding_01",
+  "channel": "voice",
+  "operator_id": "dgd:identity:org_northwind",
+  "sequence_scope": {
+    "scope_type": "conversation",
+    "scope_id": "dgd:session:voice_owner_binding_01",
+    "next_expected_sequence": 2
+  },
+  "timestamps": {
+    "created_at": "2026-04-15T00:20:05.000Z",
+    "started_at": "2026-04-15T00:20:10.000Z",
+    "ended_at": null
+  },
+  "created_at": "2026-04-15T00:20:05.000Z",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_owner_binding_01:key-2026-04",
+    "created_at": "2026-04-15T00:20:05.000Z",
+    "canonicalization": "JCS",
+    "signature": "5Gpey7YWilLgIdaKUUhqebYElIxAy3Ga8I3qlkYuOffEg35E8s4Vgjz36S7XgTMj219mfRXwi5cQiOTWz17WBg=="
+  }
+}

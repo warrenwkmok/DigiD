@@ -43,10 +43,12 @@ Displays trust state in a form normal people can interpret quickly and safely.
 
 The first implementation does not need decentralized purity.
 A practical v0 can use:
-- a central registry API for identities, attestations, and delegations
-- a verifier service API that returns `dgd.verification_result`
-- a thin voice adapter that emits signed events and messages
+- local fixture and object resolution for the public reference verifier
+- a local verifier CLI or library export that returns `dgd.verification_result` plus a portable result contract
+- thin demo adapters that emit signed events and messages without hosted control planes
 - a simple UI surface or CLI that renders trust state
+
+Hosted verifier services, registry operations, tenant-aware policy control, and other operational platform layers should remain private-boundary candidates rather than public-repo implementation targets.
 
 ## Minimum reference-verifier responsibilities
 
@@ -58,6 +60,7 @@ A reference verifier should be able to:
 5. resolve attestation and delegation chains
 6. check revocations and validity windows
 7. return a stable verification result object for UIs and logs
+8. return a portable result contract that preserves warning visibility and context-binding guardrails for adapters
 
 ## Demo-oriented architecture slice
 

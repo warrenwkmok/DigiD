@@ -79,6 +79,21 @@
   "expected_outcome": {
     "compact_label": "Delegation no longer active",
     "decision": "allow-with-warning",
-    "resolved_trust_state": "delegated-agent"
+    "resolved_trust_state": "delegated-agent",
+    "warning_codes": [
+      "delegation-expired-current-time",
+      "revocation-stale"
+    ],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": true,
+      "current_time_valid": false,
+      "owner_binding_status": "bound",
+      "authority_scope_status": "in-scope",
+      "revocation_status": "revoked",
+      "freshness_status": "stale",
+      "replay_status": "clear"
+    }
   }
 }

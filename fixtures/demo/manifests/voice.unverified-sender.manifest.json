@@ -51,6 +51,20 @@
   "expected_outcome": {
     "compact_label": "Unverified sender",
     "decision": "degraded-trust",
-    "resolved_trust_state": "unverified"
+    "resolved_trust_state": "unverified",
+    "warning_codes": [
+      "revocation-unknown"
+    ],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": false,
+      "current_time_valid": false,
+      "owner_binding_status": "not-required",
+      "authority_scope_status": "not-required",
+      "revocation_status": "unknown",
+      "freshness_status": "unknown",
+      "replay_status": "clear"
+    }
   }
 }

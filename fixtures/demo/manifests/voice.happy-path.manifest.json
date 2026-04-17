@@ -72,6 +72,18 @@
   "expected_outcome": {
     "compact_label": "Verified agent for Acme Support",
     "decision": "allow-with-trust-indicator",
-    "resolved_trust_state": "delegated-agent"
+    "resolved_trust_state": "delegated-agent",
+    "warning_codes": [],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": true,
+      "current_time_valid": true,
+      "owner_binding_status": "bound",
+      "authority_scope_status": "in-scope",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
   }
 }

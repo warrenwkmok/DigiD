@@ -18,6 +18,8 @@ import {
   evaluateOwnerBinding,
   resolveVerifierPolicy
 } from "./policy.js";
+import { derivePortableResultContract } from "./contract.js";
+import { evaluateFixtureExpectations } from "./expectations.js";
 
 function resolveSignerId(document, graph) {
   if (document.envelope_type === "dgd.message") {
@@ -277,9 +279,10 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const result = {
     manifest_id: manifest.manifest_id,
     scenario_id: manifest.scenario_id,
+    verified_at: new Date(verificationTime).toISOString(),
     decision,
     resolved_trust_state: resolvedTrustState,
-    compact_label: manifest.expected_outcome?.compact_label,
+    expected_outcome: manifest.expected_outcome ?? null,
     verification_mode: policy.verification_mode,
     policy,
     signer_identity: signerIdentity,
@@ -290,16 +293,22 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       event_time_valid: eventTimeValid,
       current_time_valid: currentTimeValid,
       owner_binding_status: ownerBinding.status,
+      owner_binding_reasons: ownerBinding.reasons,
       authority_scope_status: authorityScope.status,
+      authority_scope_reasons: authorityScope.reasons,
       revocation_status: revocationStatus,
       freshness_status: freshnessStatus,
       replay_status: replayStatus
     },
     warnings,
     errors,
-    compactBanner: null
+    compactBanner: null,
+    expectations: null,
+    portable_result_contract: null
   };
 
   result.compactBanner = deriveCompactBanner(result);
+  result.expectations = evaluateFixtureExpectations(result, manifest.expected_outcome);
+  result.portable_result_contract = derivePortableResultContract(result);
   return result;
 }

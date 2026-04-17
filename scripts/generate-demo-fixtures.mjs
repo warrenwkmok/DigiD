@@ -49,12 +49,14 @@ function signDocument(document, key) {
 
 function buildKeys() {
   const org = generateKeyPairSync("ed25519");
+  const rogueOrg = generateKeyPairSync("ed25519");
   const agent = generateKeyPairSync("ed25519");
   const human = generateKeyPairSync("ed25519");
   const unverified = generateKeyPairSync("ed25519");
 
   return {
     org: keyRecord("dgd:identity:org_acme", "key-2026-01", org.privateKey, org.publicKey),
+    rogueOrg: keyRecord("dgd:identity:org_northwind", "key-2026-01", rogueOrg.privateKey, rogueOrg.publicKey),
     agent: keyRecord("dgd:identity:agent_01", "key-2026-04", agent.privateKey, agent.publicKey),
     human: keyRecord("dgd:identity:human_01", "key-2026-04", human.privateKey, human.publicKey),
     unverified: keyRecord("dgd:identity:unverified_01", "key-2026-04", unverified.privateKey, unverified.publicKey)
@@ -66,6 +68,9 @@ async function ensureDirectories() {
     "fixtures/demo/manifests",
     "fixtures/demo/events",
     "fixtures/demo/messages",
+    "fixtures/demo/owner-binding",
+    "fixtures/demo/owner-binding/events",
+    "fixtures/demo/owner-binding/messages",
     "fixtures/demo/revocations",
     "fixtures/demo/results"
   ];
@@ -624,6 +629,293 @@ function buildUnverifiedFixtures(keys) {
   };
 }
 
+function buildOwnerBindingMismatchFixtures(keys) {
+  const verifiedOrgIdentity = signDocument({
+    object_type: "dgd.identity",
+    schema_version: "0.3",
+    object_id: "dgd:identity:org_acme_owner_binding",
+    identity_class: "organization",
+    display_name: "Acme Support",
+    verification_state: "verified-organization",
+    status: "active",
+    keys: [
+      {
+        kid: `${keys.org.kid}:owner-binding`,
+        algorithm: "Ed25519",
+        public_key: keys.org.public_key,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:20:00Z"),
+        not_before: iso("2026-04-15T00:20:00Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:24:00Z")
+      }
+    ],
+    controller: {
+      controller_id: "dgd:identity:org_acme_owner_binding",
+      relationship: "self-controlled"
+    },
+    disclosure: {
+      display_level: "standard",
+      real_world_identity_disclosed: true,
+      supports_selective_disclosure: false
+    },
+    created_at: iso("2026-04-15T00:20:00Z")
+  }, {
+    ...keys.org,
+    kid: `${keys.org.kid}:owner-binding`
+  });
+
+  const rogueOrgIdentity = signDocument({
+    object_type: "dgd.identity",
+    schema_version: "0.3",
+    object_id: "dgd:identity:org_northwind",
+    identity_class: "organization",
+    display_name: "Northwind Sales",
+    verification_state: "verified-organization",
+    status: "active",
+    keys: [
+      {
+        kid: keys.rogueOrg.kid,
+        algorithm: "Ed25519",
+        public_key: keys.rogueOrg.public_key,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:20:00Z"),
+        not_before: iso("2026-04-15T00:20:00Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:24:00Z")
+      }
+    ],
+    controller: {
+      controller_id: "dgd:identity:org_northwind",
+      relationship: "self-controlled"
+    },
+    disclosure: {
+      display_level: "standard",
+      real_world_identity_disclosed: true,
+      supports_selective_disclosure: false
+    },
+    created_at: iso("2026-04-15T00:20:00Z")
+  }, keys.rogueOrg);
+
+  const agentIdentity = signDocument({
+    object_type: "dgd.identity",
+    schema_version: "0.3",
+    object_id: "dgd:identity:agent_owner_binding_01",
+    identity_class: "agent",
+    display_name: "Acme Follow-up Agent 07",
+    verification_state: "verified-agent",
+    status: "active",
+    keys: [
+      {
+        kid: "dgd:key:agent_owner_binding_01:key-2026-04",
+        algorithm: "Ed25519",
+        public_key: keys.agent.public_key,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:20:00Z"),
+        not_before: iso("2026-04-15T00:20:00Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:24:00Z")
+      }
+    ],
+    controller: {
+      controller_id: "dgd:identity:org_acme_owner_binding",
+      relationship: "organization-issued"
+    },
+    disclosure: {
+      display_level: "standard",
+      real_world_identity_disclosed: false,
+      supports_selective_disclosure: false
+    },
+    created_at: iso("2026-04-15T00:20:01Z")
+  }, {
+    ...keys.org,
+    kid: `${keys.org.kid}:owner-binding`
+  });
+
+  const attestation = signDocument({
+    object_type: "dgd.attestation",
+    schema_version: "0.3",
+    object_id: "dgd:attestation:agent_owner_binding_01",
+    issuer_id: "dgd:identity:org_acme_owner_binding",
+    subject_id: "dgd:identity:agent_owner_binding_01",
+    attestation_type: "organization-issued-agent",
+    verification_state: "verified-agent",
+    status: "active",
+    valid_from: iso("2026-04-15T00:20:00Z"),
+    valid_until: iso("2026-10-15T00:20:00Z"),
+    revocation_check: {
+      mode: "online-or-cached",
+      max_age_seconds: 3600,
+      status: "clear",
+      checked_at: iso("2026-04-15T00:24:00Z")
+    },
+    created_at: iso("2026-04-15T00:20:02Z")
+  }, {
+    ...keys.org,
+    kid: `${keys.org.kid}:owner-binding`
+  });
+
+  const rogueDelegation = signDocument({
+    object_type: "dgd.delegation",
+    schema_version: "0.3",
+    object_id: "dgd:delegation:agent_owner_binding_01_voice",
+    issuer_id: "dgd:identity:org_northwind",
+    delegate_id: "dgd:identity:agent_owner_binding_01",
+    delegate_class: "agent",
+    status: "active",
+    authority: {
+      channels: ["voice"],
+      actions: ["communicate", "sign-session", "sign-message"],
+      restrictions: ["no-financial-approval"],
+      purpose_bindings: ["support-follow-up"]
+    },
+    valid_from: iso("2026-04-15T00:20:00Z"),
+    valid_until: iso("2026-10-15T00:20:00Z"),
+    revocation_check: {
+      mode: "online-required",
+      max_age_seconds: 300,
+      status: "clear",
+      checked_at: iso("2026-04-15T00:24:00Z")
+    },
+    created_at: iso("2026-04-15T00:20:03Z")
+  }, keys.rogueOrg);
+
+  const communication = signDocument({
+    object_type: "dgd.communication",
+    schema_version: "0.3",
+    object_id: "dgd:communication:voice_owner_binding_01",
+    status: "active",
+    channel: "voice",
+    channel_subtype: "outbound-call",
+    session_id: "dgd:session:voice_owner_binding_01",
+    sender: {
+      identity_id: "dgd:identity:agent_owner_binding_01",
+      identity_class: "agent",
+      verification_state: "delegated-agent"
+    },
+    operator_id: "dgd:identity:org_northwind",
+    delegation_id: "dgd:delegation:agent_owner_binding_01_voice",
+    purpose: "support-follow-up",
+    payload: {
+      content_type: "session-manifest",
+      content_digest: sha256("voice-owner-binding-session-manifest"),
+      content_length: 128,
+      media_mode: "real-time-voice"
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:20:05Z"),
+      session_started_at: iso("2026-04-15T00:20:10Z"),
+      session_ended_at: null
+    },
+    created_at: iso("2026-04-15T00:20:05Z")
+  }, {
+    ...keys.agent,
+    kid: "dgd:key:agent_owner_binding_01:key-2026-04"
+  });
+
+  const session = signDocument({
+    object_type: "dgd.session",
+    schema_version: "0.3",
+    object_id: "dgd:session:voice_owner_binding_01",
+    status: "active",
+    session_type: "voice.live",
+    communication_id: "dgd:communication:voice_owner_binding_01",
+    channel: "voice",
+    operator_id: "dgd:identity:org_northwind",
+    sequence_scope: {
+      scope_type: "conversation",
+      scope_id: "dgd:session:voice_owner_binding_01",
+      next_expected_sequence: 2
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:20:05Z"),
+      started_at: iso("2026-04-15T00:20:10Z"),
+      ended_at: null
+    },
+    created_at: iso("2026-04-15T00:20:05Z")
+  }, {
+    ...keys.agent,
+    kid: "dgd:key:agent_owner_binding_01:key-2026-04"
+  });
+
+  const startedPayload = {
+    direction: "outbound",
+    channel_subtype: "outbound-call",
+    session_started_at: iso("2026-04-15T00:20:10Z"),
+    announcement_expected: true
+  };
+
+  const startedEvent = signDocument({
+    envelope_type: "dgd.event",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:event_voice_owner_binding_started_01",
+    event_type: "voice.session.started",
+    subject_id: "dgd:communication:voice_owner_binding_01",
+    actor_id: "dgd:identity:agent_owner_binding_01",
+    operator_id: "dgd:identity:org_northwind",
+    delegation_id: "dgd:delegation:agent_owner_binding_01_voice",
+    conversation_id: "dgd:session:voice_owner_binding_01",
+    created_at: iso("2026-04-15T00:20:10Z"),
+    purpose: "support-follow-up",
+    sequence: 1,
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: startedPayload,
+    payload_digest: digestCanonicalPayload(startedPayload)
+  }, {
+    ...keys.agent,
+    kid: "dgd:key:agent_owner_binding_01:key-2026-04"
+  });
+
+  const announcementPayload = {
+    content_type: "application/dgd+json",
+    content_digest: sha256("agent-signature-not-bound-to-verified-owner"),
+    content_length: 96,
+    summary: "Agent signature not bound to verified owner",
+    purpose: "support-follow-up"
+  };
+
+  const announcementMessage = signDocument({
+    envelope_type: "dgd.message",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:msg_voice_owner_binding_announcement_01",
+    message_type: "voice.session.announcement",
+    subject_id: "dgd:communication:voice_owner_binding_01",
+    channel: "voice",
+    sender_id: "dgd:identity:agent_owner_binding_01",
+    operator_id: "dgd:identity:org_northwind",
+    delegation_id: "dgd:delegation:agent_owner_binding_01_voice",
+    conversation_id: "dgd:session:voice_owner_binding_01",
+    created_at: iso("2026-04-15T00:20:11Z"),
+    purpose: "support-follow-up",
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: announcementPayload
+  }, {
+    ...keys.agent,
+    kid: "dgd:key:agent_owner_binding_01:key-2026-04"
+  });
+
+  return {
+    "fixtures/demo/owner-binding/owner.identity.json": verifiedOrgIdentity,
+    "fixtures/demo/owner-binding/rogue-org.identity.json": rogueOrgIdentity,
+    "fixtures/demo/owner-binding/agent.identity.json": agentIdentity,
+    "fixtures/demo/owner-binding/agent.attestation.json": attestation,
+    "fixtures/demo/owner-binding/agent.delegation.json": rogueDelegation,
+    "fixtures/demo/owner-binding/voice.communication.json": communication,
+    "fixtures/demo/owner-binding/voice.session.json": session,
+    "fixtures/demo/owner-binding/events/voice.session.started.json": startedEvent,
+    "fixtures/demo/owner-binding/messages/voice.session.announcement.json": announcementMessage
+  };
+}
+
 function buildManifests() {
   const baseObjects = [
     { role: "organization_identity", object_type: "dgd.identity", path: "fixtures/demo/org.identity.json", required: true, stable_across_lineage: true },
@@ -651,7 +943,19 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Verified agent for Acme Support",
         decision: "allow-with-trust-indicator",
-        resolved_trust_state: "delegated-agent"
+        resolved_trust_state: "delegated-agent",
+        warning_codes: [],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: true,
+          owner_binding_status: "bound",
+          authority_scope_status: "in-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
       }
     },
     "fixtures/demo/manifests/voice.delegation-revoked.manifest.json": {
@@ -668,7 +972,19 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Delegation no longer active",
         decision: "allow-with-warning",
-        resolved_trust_state: "delegated-agent"
+        resolved_trust_state: "delegated-agent",
+        warning_codes: ["delegation-expired-current-time", "revocation-stale"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: false,
+          owner_binding_status: "bound",
+          authority_scope_status: "in-scope",
+          revocation_status: "revoked",
+          freshness_status: "stale",
+          replay_status: "clear"
+        }
       }
     },
     "fixtures/demo/manifests/voice.revocation-stale.manifest.json": {
@@ -685,7 +1001,19 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Verification stale, re-check recommended",
         decision: "allow-with-warning",
-        resolved_trust_state: "delegated-agent"
+        resolved_trust_state: "delegated-agent",
+        warning_codes: ["revocation-stale"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: true,
+          owner_binding_status: "bound",
+          authority_scope_status: "in-scope",
+          revocation_status: "stale",
+          freshness_status: "stale",
+          replay_status: "clear"
+        }
       }
     },
     "fixtures/demo/manifests/voice.missing-delegation.manifest.json": {
@@ -702,7 +1030,19 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Signature valid, authority not proven",
         decision: "degraded-trust",
-        resolved_trust_state: "verified-agent"
+        resolved_trust_state: "verified-agent",
+        warning_codes: ["authority-incomplete", "owner-binding-missing"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
+          owner_binding_status: "missing",
+          authority_scope_status: "missing",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
       }
     },
     "fixtures/demo/manifests/voice.verified-human.manifest.json": {
@@ -727,7 +1067,19 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Verified human",
         decision: "allow-with-trust-indicator",
-        resolved_trust_state: "verified-human"
+        resolved_trust_state: "verified-human",
+        warning_codes: [],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: true,
+          owner_binding_status: "not-required",
+          authority_scope_status: "not-required",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
       }
     },
     "fixtures/demo/manifests/voice.unverified-sender.manifest.json": {
@@ -750,7 +1102,58 @@ function buildManifests() {
       expected_outcome: {
         compact_label: "Unverified sender",
         decision: "degraded-trust",
-        resolved_trust_state: "unverified"
+        resolved_trust_state: "unverified",
+        warning_codes: ["revocation-unknown"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
+          owner_binding_status: "not-required",
+          authority_scope_status: "not-required",
+          revocation_status: "unknown",
+          freshness_status: "unknown",
+          replay_status: "clear"
+        }
+      }
+    },
+    "fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_owner_binding_mismatch",
+      scenario_id: "voice-owner-binding-mismatch",
+      scenario_class: "delegated-agent-voice",
+      description: "Valid delegated voice lineage where the acting operator and delegation issuer do not match the agent's verified owner",
+      lineage_group: "demo-voice-owner-binding-01",
+      verification_time: iso("2026-04-15T00:25:00Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      objects: [
+        { role: "owner_identity", object_type: "dgd.identity", path: "fixtures/demo/owner-binding/owner.identity.json", required: true, stable_across_lineage: true },
+        { role: "rogue_operator_identity", object_type: "dgd.identity", path: "fixtures/demo/owner-binding/rogue-org.identity.json", required: true, stable_across_lineage: true },
+        { role: "agent_identity", object_type: "dgd.identity", path: "fixtures/demo/owner-binding/agent.identity.json", required: true, stable_across_lineage: true },
+        { role: "agent_attestation", object_type: "dgd.attestation", path: "fixtures/demo/owner-binding/agent.attestation.json", required: true, stable_across_lineage: true },
+        { role: "agent_delegation", object_type: "dgd.delegation", path: "fixtures/demo/owner-binding/agent.delegation.json", required: true, stable_across_lineage: true },
+        { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/owner-binding/voice.communication.json", required: true, stable_across_lineage: true },
+        { role: "session_object", object_type: "dgd.session", path: "fixtures/demo/owner-binding/voice.session.json", required: true, stable_across_lineage: true },
+        { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/owner-binding/events/voice.session.started.json", required: true, stable_across_lineage: true },
+        { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/owner-binding/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
+      ],
+      expected_outcome: {
+        compact_label: "Agent signature not bound to verified owner",
+        decision: "degraded-trust",
+        resolved_trust_state: "verified-agent",
+        warning_codes: ["owner-binding-missing"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
+          owner_binding_status: "missing",
+          authority_scope_status: "in-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
       }
     }
   };
@@ -763,6 +1166,7 @@ async function main() {
     ...buildDelegatedVoiceFixtures(keys),
     ...buildDirectHumanFixtures(keys),
     ...buildUnverifiedFixtures(keys),
+    ...buildOwnerBindingMismatchFixtures(keys),
     ...buildManifests()
   };
 

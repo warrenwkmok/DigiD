@@ -17,6 +17,7 @@
 - `architecture/trust-states.md`
 - `architecture/reference-verifier.md`
 - `architecture/verifier-policy-profile.md`
+- `architecture/verifier-result-contract.md`
 - `architecture/verifier-ux-guidance.md`
 - `architecture/slack-adapter-concept.md`
 

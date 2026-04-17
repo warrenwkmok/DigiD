@@ -6,6 +6,8 @@
   "scripts": {
     "generate:fixtures": "node scripts/generate-demo-fixtures.mjs",
     "demo:verify": "node apps/demo-cli/src/index.js verify",
-    "demo:compare": "node apps/demo-cli/src/index.js compare"
+    "demo:compare": "node apps/demo-cli/src/index.js compare",
+    "demo:export": "node apps/demo-cli/src/index.js export",
+    "demo:audit": "node apps/demo-cli/src/index.js audit"
   }
 }

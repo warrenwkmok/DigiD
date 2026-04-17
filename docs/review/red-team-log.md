@@ -3,6 +3,36 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-003 - Portable verifier contract and context-loss red-team pass
+- date: 2026-04-17
+- timestamp: 2026-04-17 10:05 America/Vancouver
+- reviewed slice:
+  - portable verifier result contract
+  - local contract export mode
+  - owner-binding mismatch fixture family
+- attack scenarios:
+  - an adapter consumes the exported compact label but drops the warning channel, recreating the same green-badge-overstatement problem in a new form
+  - a live trust result is copied into a screenshot, transcript, or forwarded artifact without surfacing context degradation
+  - future hosted API work starts from the exported contract and quietly grows into a public trust-decision service that gives away monetizable platform logic
+- integration risks:
+  - platform-identity mismatch is still advisory in the contract until fixtures or adapter profiles prove how the mismatch state should be triggered
+  - live context-loss warnings now exist in vocabulary, but consuming surfaces could still ignore them unless contract conformance becomes testable
+- exploitability notes:
+  - this slice meaningfully hardens the adapter boundary by making warning preservation and context binding explicit
+  - the commercial moat still depends on not open-sourcing hosted verifier operations, tenant policy control, or enterprise workflow surfaces
+- recommended mitigations:
+  1. add at least one mismatch or context-loss fixture scenario before any public adapter implementation
+  2. treat contract conformance tests as the last public-safe adapter surface, not a hosted verifier runtime
+  3. move any multi-tenant verification API, policy admin console, or registry operation code to a private repo before implementation starts
+
+## Status
+- applied in this iteration:
+  - warning-preserving local result contract
+  - owner-binding mismatch negative fixture
+- planned:
+  - context-loss and platform-mismatch fixture coverage
+  - boundary check before service-shaped adapter work
+
 ## RT-001 - Verifier-first MVP implementation red-team pass
 - date: 2026-04-16
 - timestamp: 2026-04-16 20:05 America/Vancouver

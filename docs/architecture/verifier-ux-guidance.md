@@ -173,6 +173,18 @@ If a message, clip, screenshot, transcript, or media artifact has left its origi
 - `Original signature chain intact, display context changed`
 - `Transcript verified, attached media not re-verified`
 
+## Adapter/result contract guidance
+
+If a verifier exports machine-readable results for adapters, those exports SHOULD preserve:
+- warning codes
+- owner-binding and authority-scope diagnostics
+- rendering guardrails saying whether warning visibility is mandatory
+- context-binding rules for live surfaces
+
+Adapters SHOULD synthesize a mismatch or context-loss warning rather than silently reusing a positive compact label when:
+- platform-native identity cannot be bound to the DigiD trust path
+- a live result is copied outside its verified context
+
 ## First implementation contract
 
 The first verifier UI or CLI should:

@@ -65,6 +65,18 @@
   "expected_outcome": {
     "compact_label": "Verified human",
     "decision": "allow-with-trust-indicator",
-    "resolved_trust_state": "verified-human"
+    "resolved_trust_state": "verified-human",
+    "warning_codes": [],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": true,
+      "current_time_valid": true,
+      "owner_binding_status": "not-required",
+      "authority_scope_status": "not-required",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
   }
 }

@@ -74,9 +74,11 @@ The first version should prioritize:
 
 DigiD now includes a runnable verifier-first MVP slice:
 - signed demo fixtures for delegated agent, verified human, and unverified sender voice scenarios
+- audited negative fixtures for missing delegation, stale checks, revoked delegation, and owner-binding mismatch
 - a protocol package for canonicalization, shape validation, lineage checks, and signature verification
 - a verifier package that resolves event-time vs current-time trust outcomes
-- a demo CLI that renders compact trust banners plus expanded verification details
+- a demo CLI that renders compact trust banners, expanded verification details, portable result contracts, and manifest-audit output
+- a portable local verifier result contract for future adapters and export-safe guardrails
 
 ## Run the demo
 
@@ -96,6 +98,18 @@ Compare two scenarios:
 
 ```bash
 node apps/demo-cli/src/index.js compare fixtures/demo/manifests/voice.happy-path.manifest.json fixtures/demo/manifests/voice.delegation-revoked.manifest.json
+```
+
+Audit the full checked-in manifest suite against expected decisions, warnings, and verifier checks:
+
+```bash
+node apps/demo-cli/src/index.js audit fixtures/demo/manifests
+```
+
+Export the portable verifier result contract:
+
+```bash
+node apps/demo-cli/src/index.js export fixtures/demo/manifests/voice.happy-path.manifest.json
 ```
 
 ## Active review loop

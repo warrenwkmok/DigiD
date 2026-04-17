@@ -493,6 +493,10 @@ To keep verifier output portable across adapters, the first profile should norma
 - `lineage-conflict`
 - `replay-suspected`
 - `authority-incomplete`
+- `owner-binding-missing`
+- `delegation-scope-conflict`
+- `platform-identity-mismatch`
+- `artifact-context-missing`
 
 ### Reason codes for session end or revocation-adjacent events
 - `completed`

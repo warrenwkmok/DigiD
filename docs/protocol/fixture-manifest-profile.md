@@ -123,7 +123,15 @@ A manifest should be a JSON document shaped like this:
   "expected_outcome": {
     "compact_label": "Verified agent for Acme Support",
     "decision": "allow-with-trust-indicator",
-    "resolved_trust_state": "delegated-agent"
+    "resolved_trust_state": "delegated-agent",
+    "warning_codes": [],
+    "error_count": 0,
+    "checks": {
+      "owner_binding_status": "bound",
+      "authority_scope_status": "in-scope",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
   }
 }
 ```
@@ -140,6 +148,27 @@ A manifest should be a JSON document shaped like this:
 | `lineage_group` | yes | Shared group id for comparison scenarios |
 | `objects` | yes | Ordered required objects and envelopes |
 | `expected_outcome` | yes | Baseline verifier expectation |
+
+## Expected outcome contract
+
+`expected_outcome` should be strong enough to catch verifier drift, not just describe the happy path loosely.
+
+Recommended fields:
+- `compact_label`
+- `decision`
+- `resolved_trust_state`
+- `warning_codes`
+- `error_count`
+- `checks`
+
+For the current public fixture suite, `checks` should at least pin:
+- `owner_binding_status`
+- `authority_scope_status`
+- `revocation_status`
+- `freshness_status`
+- `replay_status`
+
+The verifier audit harness should fail when runtime output drifts from any declared expectation.
 
 ## Ordered dependency rules
 
@@ -218,6 +247,7 @@ fixtures/
       voice.happy-path.manifest.json
       voice.delegation-revoked.manifest.json
       voice.revocation-stale.manifest.json
+      voice.owner-binding-mismatch.manifest.json
     org.identity.json
     agent.identity.json
     agent.attestation.json

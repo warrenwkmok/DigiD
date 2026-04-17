@@ -65,6 +65,21 @@
   "expected_outcome": {
     "compact_label": "Signature valid, authority not proven",
     "decision": "degraded-trust",
-    "resolved_trust_state": "verified-agent"
+    "resolved_trust_state": "verified-agent",
+    "warning_codes": [
+      "authority-incomplete",
+      "owner-binding-missing"
+    ],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": false,
+      "current_time_valid": false,
+      "owner_binding_status": "missing",
+      "authority_scope_status": "missing",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
   }
 }

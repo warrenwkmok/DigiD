@@ -28,6 +28,7 @@ The verifier should be able to consume:
 
 The verifier should produce:
 - machine-readable verification result
+- portable adapter/result contract with rendering guardrails
 - user-facing trust summary
 - warning list
 - error list
@@ -63,7 +64,8 @@ It turns protocol theory into a testable product experience.
 
 ## Likely first implementation shape
 
-A small service or CLI that accepts a fixture manifest plus JSON objects and returns a verification result would be enough for the first technical proof of concept.
+A local CLI or library export that accepts a fixture manifest plus JSON objects and returns a verification result plus a portable result contract is enough for the first technical proof of concept.
+Hosted verifier services should stay outside this public repo's implementation scope.
 
 ## Reference verifier modes
 
@@ -78,3 +80,4 @@ That matters for DigiD because a mathematically valid old signature should not s
 
 The reference verifier should externalize policy rather than bury it inside ad hoc code paths.
 For the first slice, the operative policy contract is `docs/architecture/verifier-policy-profile.md`, and the operative fixture intake contract is `docs/protocol/fixture-manifest-profile.md`.
+The operative adapter/result export contract is `docs/architecture/verifier-result-contract.md`.

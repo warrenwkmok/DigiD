@@ -10,6 +10,46 @@ Format notes:
 
 ---
 
+## Iteration 16 - Add a portable verifier result contract and isolated owner-binding mismatch fixture
+- date: 2026-04-17
+- timestamp: 2026-04-17 10:05 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a portable verifier result contract that preserves owner-binding, authority-scope, freshness, replay, and warning visibility requirements for future adapters
+  - exposed the contract through a local demo CLI `export` mode and a manifest audit mode so DigiD can support adapter experiments and verifier-drift checks without shipping a hosted verifier API in the public repo
+  - added an isolated owner-binding mismatch fixture family proving that a valid agent signature plus in-scope delegation still degrades when the acting operator is not the agent's verified owner
+  - tightened architecture and protocol docs so out-of-context rendering and platform-identity mismatch stay first-class warning paths instead of adapter-specific afterthoughts
+  - explicitly kept the slice on the public-safe side of the boundary by shipping local result contracts, reference verifier logic, and fixtures only, while keeping hosted verifier services, registry operations, and enterprise policy surfaces out of scope
+- changed files:
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/expectations.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/index.js`
+  - `apps/demo-cli/src/index.js`
+  - `package.json`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/owner-binding/*`
+  - `fixtures/demo/manifests/*`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/reference-verifier.md`
+  - `docs/architecture/system-architecture.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/protocol/fixture-manifest-profile.md`
+  - `docs/protocol/message-formats.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/open-questions.md`
+  - `docs/INDEX.md`
+  - `README.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this closes the next public-safe verifier gap by giving future adapters a strict, machine-readable trust contract before any hosted verifier surface or enterprise integration drifts into the public repo
+- next likely step at the time:
+  - decide whether the next public-safe slice is platform-mismatch fixture coverage or whether adapter-profile work should move to a private commercial repo first
+
 ## Iteration 15 - Externalize verifier policy and enforce owner binding
 - date: 2026-04-17
 - timestamp: 2026-04-17 00:00 America/Vancouver

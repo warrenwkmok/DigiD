@@ -1,90 +1,97 @@
 {
   "manifest_type": "dgd.fixture_manifest",
   "schema_version": "0.3",
-  "manifest_id": "dgd:manifest:voice_revocation_stale",
-  "scenario_id": "voice-revocation-stale",
+  "manifest_id": "dgd:manifest:voice_owner_binding_mismatch",
+  "scenario_id": "voice-owner-binding-mismatch",
   "scenario_class": "delegated-agent-voice",
-  "description": "Revocation checks have gone stale",
-  "lineage_group": "demo-voice-acme-01",
-  "verification_time": "2026-04-15T00:12:30.000Z",
+  "description": "Valid delegated voice lineage where the acting operator and delegation issuer do not match the agent's verified owner",
+  "lineage_group": "demo-voice-owner-binding-01",
+  "verification_time": "2026-04-15T00:25:00.000Z",
   "verification_defaults": {
     "mode": "dual",
     "revocation_max_age_seconds": 300
   },
   "objects": [
     {
-      "role": "organization_identity",
+      "role": "owner_identity",
       "object_type": "dgd.identity",
-      "path": "fixtures/demo/org.identity.json",
+      "path": "fixtures/demo/owner-binding/owner.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "rogue_operator_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/owner-binding/rogue-org.identity.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "agent_identity",
       "object_type": "dgd.identity",
-      "path": "fixtures/demo/agent.identity.json",
+      "path": "fixtures/demo/owner-binding/agent.identity.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "agent_attestation",
       "object_type": "dgd.attestation",
-      "path": "fixtures/demo/agent.attestation.json",
+      "path": "fixtures/demo/owner-binding/agent.attestation.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "agent_delegation",
       "object_type": "dgd.delegation",
-      "path": "fixtures/demo/agent.delegation.json",
+      "path": "fixtures/demo/owner-binding/agent.delegation.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "communication_anchor",
       "object_type": "dgd.communication",
-      "path": "fixtures/demo/voice.communication.json",
+      "path": "fixtures/demo/owner-binding/voice.communication.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "session_object",
       "object_type": "dgd.session",
-      "path": "fixtures/demo/voice.session.json",
+      "path": "fixtures/demo/owner-binding/voice.session.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "session_started_event",
       "object_type": "dgd.event",
-      "path": "fixtures/demo/events/voice.session.started.json",
+      "path": "fixtures/demo/owner-binding/events/voice.session.started.json",
       "required": true,
       "stable_across_lineage": true
     },
     {
       "role": "session_announcement_message",
       "object_type": "dgd.message",
-      "path": "fixtures/demo/messages/voice.session.announcement.json",
+      "path": "fixtures/demo/owner-binding/messages/voice.session.announcement.json",
       "required": true,
       "stable_across_lineage": true
     }
   ],
   "expected_outcome": {
-    "compact_label": "Verification stale, re-check recommended",
-    "decision": "allow-with-warning",
-    "resolved_trust_state": "delegated-agent",
+    "compact_label": "Agent signature not bound to verified owner",
+    "decision": "degraded-trust",
+    "resolved_trust_state": "verified-agent",
     "warning_codes": [
-      "revocation-stale"
+      "owner-binding-missing"
     ],
     "error_count": 0,
     "checks": {
       "signature_valid": true,
-      "event_time_valid": true,
-      "current_time_valid": true,
-      "owner_binding_status": "bound",
+      "event_time_valid": false,
+      "current_time_valid": false,
+      "owner_binding_status": "missing",
       "authority_scope_status": "in-scope",
-      "revocation_status": "stale",
-      "freshness_status": "stale",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
       "replay_status": "clear"
     }
   }

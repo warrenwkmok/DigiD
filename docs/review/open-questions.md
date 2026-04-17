@@ -90,3 +90,7 @@ Still open: whether later commercial profiles should introduce a dedicated owner
 ## OQ-024 - What is the last public-safe verifier surface before DigiD crosses into private commercial infrastructure?
 Working resolution for now: the public repo can keep shipping protocol, trust-model, fixtures, reference verifier logic, and limited local or demo interfaces that expose transparent diagnostics.
 Still open: exactly where to draw the line between a local verifier API that helps adoption and a hosted verifier service, enterprise policy surface, registry operation layer, or other monetizable platform capability that should move to a private repo before implementation.
+
+## OQ-025 - Which adapter-mismatch and context-loss signals belong in the core verifier result contract versus channel-specific adapter profiles?
+Working resolution for now: the public reference verifier should export guardrails for `platform-identity-mismatch` and `artifact-context-missing`, and live surfaces should treat them as first-class warning paths when context or platform binding is lost.
+Still open: which concrete evidence fields each adapter profile must supply to trigger those warnings deterministically without bloating the core public contract into service-side policy logic.

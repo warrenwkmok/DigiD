@@ -220,6 +220,10 @@ At minimum, the profile should support:
 - `lineage-conflict`
 - `replay-suspected`
 - `authority-incomplete`
+- `owner-binding-missing`
+- `delegation-scope-conflict`
+- `platform-identity-mismatch`
+- `artifact-context-missing`
 
 Adapters MAY rephrase warning text, but SHOULD preserve the underlying code so downstream analytics, audits, and UI tests can compare outcomes consistently.
 
