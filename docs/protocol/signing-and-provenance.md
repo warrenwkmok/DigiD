@@ -58,6 +58,36 @@ Recommended verifier posture:
 - require proof `kid` to resolve to the signer identity unless the protocol explicitly allows delegated custodianship
 - distinguish event-time validity from current-time operational validity
 
+## Agent ownership-binding requirement
+
+Agent signatures should not be treated as free-floating proof that "a real DigiD agent signed this."
+
+For DigiD, an agent key should only become high-trust when the verifier can bind that key and identity back to a controlling human or organization.
+That binding should be explicit, signed, and verifier-checkable.
+
+For the first delegated-agent profile, the verifier should require all of these:
+- the agent identity declares a non-self controller through `controller.controller_id`
+- the controlling human or organization signs the agent identity issuance or current controlling identity record
+- the controlling human or organization signs the attestation that classifies the subject as a verified agent
+- the controlling human or organization signs the delegation that authorizes the agent for the claimed channel, action, and purpose
+- `proof.kid` on delegated agent artifacts resolves to a key published on that same agent identity
+
+That means a valid delegated-agent trust path is not just:
+- agent key signs message
+
+It is:
+- owner-controlled identity binds the agent identity
+- owner attests the agent class and standing
+- owner delegates current authority
+- agent key signs the live artifact
+
+If that ownership-binding chain is missing, the verifier should not render `delegated-agent` or any equivalent high-trust agent label.
+At most it should render a degraded posture such as:
+- `Signature valid, authority not proven`
+- `Agent signature not bound to verified owner`
+
+This matters because otherwise an attacker can generate a technically valid agent keypair, mint a plausible agent-shaped identity object, and rely on UI shortcuts to imply owner backing that was never actually proven.
+
 ## Key lifecycle and recovery posture
 
 For the first implementation, DigiD should explicitly model:

@@ -290,3 +290,15 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added `docs/review/critique-log.md` and `docs/review/red-team-log.md`, and updated the review workflow so critique and adversarial passes are logged every meaningful implementation slice.
 - linked docs: `docs/review/critique-log.md`, `docs/review/red-team-log.md`, `docs/review/review-workflow.md`
 - notes: This creates the critique-log and red-team-log structure requested for the active build loop.
+
+## DF-023 - Require delegated agent signatures to bind back to a controlling human or organization
+- source: `2026-04-16 DigiD implementation loop`
+- date: 2026-04-16
+- timestamp: 2026-04-16 20:20 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: An agent key alone should not be enough to imply owner-backed trust. Delegated agent signatures need an explicit, signed ownership chain back to the controlling human or organization so fake standalone agent keys cannot inherit trust by presentation.
+- action taken: Tightened the signing, object-schema, and normative protocol docs so delegated-agent trust now requires controller binding, owner-signed attestation, active delegation, and key-to-identity resolution as one coherent chain.
+- linked docs: `docs/protocol/signing-and-provenance.md`, `docs/protocol/object-schemas.md`, `docs/protocol/normative-protocol-draft.md`
+- notes: The implementation should enforce this more explicitly in verifier output and future key-binding artifacts, not only in docs.

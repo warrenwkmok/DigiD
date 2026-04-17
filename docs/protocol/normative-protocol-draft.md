@@ -97,6 +97,7 @@ If signer identity resolution is ambiguous, verification MUST fail.
 - MAY be self-controlled or issuer-controlled
 - MUST contain at least one key record
 - MUST NOT claim `status: active` without at least one active signing key
+- agent or service identities that are not self-controlled MUST NOT be treated as owner-backed unless the controlling human or organization is verifier-resolvable from signed records
 
 ### `dgd.attestation`
 - MUST reference `issuer_id` and `subject_id`
@@ -143,6 +144,7 @@ A verifier MUST NOT render `verified-agent` or `delegated-agent` unless:
 - the signing key is active at evaluation time or valid at event time under accepted historical policy
 - a qualifying attestation path exists
 - any required delegation exists and is in scope
+- the signer identity's controlling human or organization is bound through a signed ownership chain when the agent is not self-controlled
 
 A verifier MUST NOT render `verified-human` unless a qualifying human-verification attestation path exists.
 
@@ -196,6 +198,7 @@ The verifier MUST reject when:
 - a listed critical extension is unsupported
 - delegation is required but missing
 - channel or action is out of scope for delegation
+- a delegated agent signature cannot be bound back to the claimed controlling human or organization
 - delegated live lineage conflicts across communication, session, and envelope objects
 - an ordered live-session fixture stream has duplicate, regressing, or non-contiguous event `sequence` values within one `conversation_id`
 

@@ -82,3 +82,7 @@ Still open: whether later media-heavy profiles should treat artifact objects as 
 ## OQ-022 - When should the critique and red-team roles become runtime agents instead of review logs?
 Working resolution for this iteration: keep them as explicit repo artifacts and review obligations while the verifier MVP is still local and fixture-driven.
 Still open: whether the next build slice should automate those roles as local scripts, Codex workflows, or service-side agents once the verifier API exists.
+
+## OQ-023 - Does DigiD need a first-class signed key-binding object for non-self-controlled agents?
+Working resolution for now: the first delegated-agent profile can rely on the signed identity controller binding plus owner-signed attestation and delegation to bind the agent key back to a human or organization.
+Still open: whether later commercial profiles should introduce a dedicated owner-signed key-binding or key-authorization object so agent key issuance, rotation, and emergency revocation are even more explicit.

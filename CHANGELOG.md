@@ -38,6 +38,26 @@ Format notes:
 - next likely step at the time:
   - expose the verifier pipeline through a small local API and choose the first concrete adapter surface to bind to it
 
+## Iteration 14 - Tighten delegated agent ownership binding
+- date: 2026-04-16
+- timestamp: 2026-04-16 20:20 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - tightened the protocol so delegated agent trust cannot rest on an agent key alone
+  - required a verifier-checkable ownership chain from the agent signing key back to the controlling human or organization
+  - logged the follow-up design question about whether DigiD should later add a first-class signed key-binding object
+- changed files:
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this closes a real spoofing gap where a fake standalone agent identity could otherwise look more owner-backed than DigiD had actually proven
+- next likely step at the time:
+  - enforce owner-binding more explicitly in the verifier implementation and decide whether to model dedicated signed key-binding artifacts
+
 ---
 
 ## Iteration 12 — Tighten signer resolution and ordered live-event rules

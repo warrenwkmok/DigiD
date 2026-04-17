@@ -239,6 +239,8 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - `keys[].kid` values MUST be unique within the identity object
 - `keys[].purposes` MUST include `assertion` for any key used to sign DigiD objects or envelopes
 - if `controller.controller_id` differs from `object_id`, verifier UX SHOULD avoid presenting the identity as self-controlled
+- for agent or service identities that are not self-controlled, high-trust verification MUST depend on a signed owner-binding path, not on the agent key alone
+- the first delegated-agent profile SHOULD treat controller binding, agent attestation, and active delegation as a combined ownership proof chain from the controlling human or organization to the agent signing key
 
 ## 2. Attestation object
 
@@ -338,6 +340,7 @@ Defines authority for one subject to act on behalf of another.
 - if `authority.restrictions` are present, verifier output SHOULD surface them when rendering expanded trust details
 - `delegate_id` MUST resolve to the same identity that signs delegated `dgd.communication`, `dgd.session`, `dgd.message`, and `dgd.event` artifacts in the first live profile
 - the first live delegated profile MUST reject authority escalation when an envelope or communication claims an action not enumerated in the delegation, even if the channel is otherwise allowed
+- the first live delegated profile MUST also reject owner-binding gaps where the delegate signing key is present but the controlling human or organization cannot be resolved through the signed identity, attestation, and delegation chain
 
 ## 4. Signed communication object
 
@@ -398,6 +401,7 @@ A normalized high-level communication object for completed or in-progress exchan
 - for live delegated flows, `dgd.communication` SHOULD be treated as mandatory protocol profile input, not optional metadata
 - if `operator_id` is present, the communication MUST be treated as the authoritative lineage source for later envelope `sender_id`, `operator_id`, `delegation_id`, `conversation_id`, and `purpose` checks
 - a verifier MUST treat an envelope as lineage-conflicting if it claims delegated authority that does not match the bound communication object, unless a future signed rotation profile explicitly permits the change
+- a verifier MUST NOT treat a delegated-agent communication as owner-backed unless `operator_id`, `delegation_id`, the agent identity controller binding, and the agent signing key all resolve into one coherent ownership chain
 
 ### Communication signing boundary profile
 
