@@ -254,3 +254,15 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added a top-level `purpose` contract for delegated live envelopes, introduced shared lineage blocks, added a portable warning and reason-code profile, aligned the normative draft with `dgd.session` and `dgd.artifact`, and updated the first demo flow to validate lineage before verifier rendering.
 - linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/normative-protocol-draft.md`, `docs/mvp/first-demo-flow.md`
 - notes: This makes the next honest slice more clearly about producing fixtures and validators instead of revisiting envelope semantics again.
+
+## DF-020 — Make signer resolution and ordered live-event scope implementation-safe
+- source: `2026-04-16 DigiD focused build loop`
+- date: 2026-04-16
+- timestamp: 2026-04-16 18:00 America/Vancouver
+- area: protocol
+- severity: high
+- status: applied
+- summary: The v0.3 docs still left two implementation hazards: signer identity could be inferred differently by different verifiers, and live-session message/event ordering could drift because sequence expectations were not explicit enough.
+- action taken: Added a family-by-family signer-resolution matrix, tightened delegated-signer and artifact-derivation constraints, made ordered live-session events contiguous from sequence `1` in the first fixture profile, clarified that trust-banner messages are non-sequenced but lineage-bound, and updated the first demo build order to validate ordered-event scope explicitly.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/normative-protocol-draft.md`, `docs/mvp/first-demo-flow.md`
+- notes: This should reduce drift before fixture generation and make replay tests more deterministic in the first verifier slice.

@@ -146,6 +146,7 @@ Verifier note:
 ## Shared proof block
 
 All signed DigiD objects should use the same proof structure.
+The signer for each object family MUST be determinable from signed fields alone, without adapter-side hints.
 
 ```json
 {
@@ -163,6 +164,20 @@ Notes:
 - verifiers should reject unknown critical proof parameters
 - the first implementation profile should only accept `Ed25519`
 - `proof.kid` must resolve unambiguously to the signing identity during verification
+- signer resolution for the first profile is family-specific and MUST follow this matrix:
+
+| Object family | Expected signer identity |
+| --- | --- |
+| `dgd.identity` | `object_id` when self-controlled, otherwise `controller.controller_id` |
+| `dgd.attestation` | `issuer_id` |
+| `dgd.delegation` | `issuer_id` |
+| `dgd.communication` | `sender.identity_id` |
+| `dgd.session` | same signer lineage as the bound `dgd.communication` |
+| `dgd.artifact` | same signer lineage as the artifact producer, which MUST align with the bound communication unless a future service-capture profile says otherwise |
+| `dgd.verification_result` | verifier identity or local unsigned output when the profile explicitly permits unsigned local results |
+| `dgd.revocation` | authorized revoker identity, typically `issuer_id` |
+
+A verifier MUST reject an object when the resolved signer identity from object fields conflicts with the identity resolved from `proof.kid`.
 
 ## 1. Identity object
 
@@ -321,6 +336,8 @@ Defines authority for one subject to act on behalf of another.
 - if `purpose_bindings` are present, the communication or event using the delegation MUST declare one matching purpose
 - the first live-communication profile SHOULD require `valid_until` so delegated authority cannot drift into effectively permanent access
 - if `authority.restrictions` are present, verifier output SHOULD surface them when rendering expanded trust details
+- `delegate_id` MUST resolve to the same identity that signs delegated `dgd.communication`, `dgd.session`, `dgd.message`, and `dgd.event` artifacts in the first live profile
+- the first live delegated profile MUST reject authority escalation when an envelope or communication claims an action not enumerated in the delegation, even if the channel is otherwise allowed
 
 ## 4. Signed communication object
 
@@ -446,6 +463,8 @@ Represents the ordered interaction scope for a live communication flow.
 - `timestamps.started_at` MUST be greater than or equal to the communication `timestamps.session_started_at` when both exist
 - if `operator_id` is present, it MUST match the bound communication lineage
 - the first demo profile SHOULD require one signed `dgd.session` object so replay checks and ordered-event scope are explicit instead of inferred from envelopes alone
+- `sequence_scope.next_expected_sequence` MUST either be omitted from immutable fixtures or reflect the next sequence after the highest signed event already included in the fixture set
+- if `sequence_scope.next_expected_sequence` is present, verifiers MUST treat it as advisory replay metadata unless a future countersignature profile proves it was updated after the latest accepted event
 
 ## 6. Artifact object
 
@@ -495,6 +514,7 @@ Represents a detached recording, transcript, summary, or exported media artifact
 - `derived_from` SHOULD reference the signed communication or envelope lineage that made the artifact possible
 - a verifier SHOULD degrade trust when an artifact claims `edited: false` but the provenance chain is incomplete or conflicting
 - the first demo profile MAY keep artifacts optional, but any recording or transcript fixture SHOULD use `dgd.artifact` instead of leaving artifact identity implicit in message envelopes alone
+- the first implementation profile SHOULD require `derived_from` whenever the artifact is generated from a live session so post-call manifests cannot silently detach from the signed event stream
 
 ## 7. Verification result object
 

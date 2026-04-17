@@ -53,6 +53,7 @@ For v0.3:
 | `verification_context` | all | yes | Verification mode and freshness posture |
 | `payload` | all | yes | Minimal payload or payload descriptor |
 | `payload_digest` | event | yes | Digest over canonical event payload bytes |
+| `sequence` | event | ordered live-session events yes | Monotonic within `conversation_id`; optional outside ordered scopes |
 | `proof` | all | yes | Signature proof block |
 
 ## Envelope binding profile
@@ -85,6 +86,7 @@ The first verifier slice should treat envelope fields in three buckets.
 - detached content bytes for message bodies, recordings, transcripts, and artifacts
 - large structured payloads that are too bulky to inline, provided the envelope signs a stable digest, content type, and length
 - event payload objects, where the envelope signs `payload_digest` over the canonical payload bytes
+- message payload descriptors for detached trust banners, transcripts, or manifests, where the envelope signs `payload.content_digest`, `payload.content_length`, and any directly rendered summary fields
 
 ### Bucket 3, must stay out of trust claims unless separately signed
 - adapter delivery ids
@@ -198,12 +200,16 @@ To keep envelopes meaningful instead of merely signed blobs:
 - `voice.session.started` and `voice.session.announcement` in the first live delegated profile MUST also agree on `purpose`, unless the announcement payload explicitly narrows the purpose text without changing its delegation meaning
 - if `subject_id` references a derived artifact instead of the communication anchor, the envelope MUST still carry a `conversation_id` and lineage that resolves back to one active `dgd.communication` object in scope
 - if `subject_id` references a `dgd.artifact`, the artifact `session_id` and `communication_id` MUST agree with the envelope lineage
+- for ordered live-session events, `sequence` MUST start at `1` for the first signed event in a fixture stream and increase by exactly `1` thereafter unless a future gap-tolerant profile explicitly says otherwise
+- the first implementation profile MUST treat duplicate `sequence` values within the same `conversation_id` as replay-suspected, even when signed bytes differ
+- message envelopes in the first live delegated voice profile SHOULD remain non-sequenced and instead bind to the nearest preceding signed event plus the shared `conversation_id`, so adapters do not quietly create two competing ordered streams
 
 ## Core message types for the first prototype
 
 ### Voice session announcement message
 
 Signed object that a verifier UI can render at call start.
+In the first delegated voice profile this message is intentionally not sequence-bearing. It binds to the same `conversation_id` and communication lineage as `voice.session.started`, and the verifier should treat it as the trust-banner payload for that session state rather than as a separate ordered event.
 
 ```json
 {
@@ -430,6 +436,7 @@ Created when a delegation is no longer valid.
 - `verification.performed` SHOULD record whether the result reflects `event_time`, `current_time`, or `dual` evaluation
 - revocation events SHOULD identify the revoked object in payload fields even when `subject_id` is the broader session or communication object
 - payload fields that restate signer, operator, or delegation lineage MUST exactly match the top-level envelope ids when included
+- for the first fixture-driven implementation, ordered event streams MUST be contiguous within one manifest scenario so replay and regression tests are deterministic without transport-specific gap recovery rules
 
 ## Signed verification event example
 
@@ -536,6 +543,7 @@ When envelopes are consumed through a fixture manifest:
 - `voice.session.started` and `voice.session.announcement` SHOULD each declare the same lineage through `subject_id`, `conversation_id`, `sender_id`, `operator_id`, and `delegation_id`
 - duplicate `envelope_id` values with non-identical signed bytes MUST be treated as invalid
 - duplicate `sequence` values in the same declared scope SHOULD be treated as replay-suspicious under the verifier policy profile
+- manifest scenarios for the first ordered live-session slice SHOULD declare one contiguous event stream per `conversation_id`, plus any non-sequenced trust-banner messages that bind to it
 
 See `docs/protocol/fixture-manifest-profile.md` and `docs/architecture/verifier-policy-profile.md`.
 

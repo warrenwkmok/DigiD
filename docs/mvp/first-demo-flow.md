@@ -97,6 +97,11 @@ For the first fixture profile they must also share:
 - identical signer, operator, delegation, and session lineage
 - no unsigned trust-facing fields beyond what can be deterministically derived from signed payload fields
 
+Ordered-event rule for the first demo:
+- `voice.session.started` is sequence-bearing and MUST be event sequence `1`
+- the trust-banner `voice.session.announcement` message is deliberately non-sequenced and binds to the same `conversation_id` plus the immediately preceding signed start event
+- any later ordered events such as `verification.performed` or `voice.session.ended` continue the contiguous event stream without gaps
+
 For this slice, delegated live envelopes should carry purpose twice only when necessary:
 - canonical trust-bearing purpose at the envelope top level
 - optional payload-local restatement only when it helps rendering or detached payload validation
@@ -151,8 +156,8 @@ Any post-call artifact fixture should preserve the same communication and sessio
 | 4 | delegation | org key | grants voice authority |
 | 5 | communication object | agent key | binds signer, operator, purpose, and session ids |
 | 6 | session object | agent key | fixes ordered live-session scope and replay boundary |
-| 7 | `voice.session.started` event | agent key | proves session initiation |
-| 8 | `voice.session.announcement` message | agent key | powers UI trust banner |
+| 7 | `voice.session.started` event | agent key | ordered event stream starts at sequence `1` |
+| 8 | `voice.session.announcement` message | agent key | non-sequenced trust-banner payload bound to the same session lineage |
 | 9 | verification result | verifier key or unsigned local result | shows resolved trust state |
 | 10 | optional artifact object or recording manifest | agent key or service key | preserves provenance after call |
 
@@ -273,10 +278,11 @@ Suggested compact outputs:
 2. typed event-payload validation for the happy-path event set
 3. signed-versus-referenced field validation for trust-facing message and event payloads
 4. lineage validation for communication, session, delegated authority, and artifact bindings
-5. verifier pipeline over the happy-path fixture set
-6. trust-state renderer for compact and expanded views
-7. degraded comparison fixtures for revoked and stale outcomes
-8. optional recording and transcript provenance fixtures
+5. ordered-event validation for contiguous `sequence` values within each `conversation_id`
+6. verifier pipeline over the happy-path fixture set
+7. trust-state renderer for compact and expanded views
+8. degraded comparison fixtures for revoked and stale outcomes
+9. optional recording and transcript provenance fixtures
 
 ## Architecture note carried forward
 

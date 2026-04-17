@@ -134,6 +134,7 @@ If signer identity resolution is ambiguous, verification MUST fail.
 - MUST include actor identity field
 - MUST include monotonic `sequence` within the scoped stream if the event belongs to an ordered session
 - MUST include `purpose` when delegated authority is claimed in the first live delegated profile
+- for the first fixture-driven live-session profile, ordered events within one `conversation_id` MUST form a contiguous sequence starting at `1`
 
 ## Trust path requirements
 
@@ -196,6 +197,7 @@ The verifier MUST reject when:
 - delegation is required but missing
 - channel or action is out of scope for delegation
 - delegated live lineage conflicts across communication, session, and envelope objects
+- an ordered live-session fixture stream has duplicate, regressing, or non-contiguous event `sequence` values within one `conversation_id`
 
 ## Minimum downgrade cases
 
