@@ -1,0 +1,70 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:voice_missing_delegation",
+  "scenario_id": "voice-missing-delegation",
+  "scenario_class": "delegated-agent-voice",
+  "description": "Delegated envelope lineage without the delegation object",
+  "lineage_group": "demo-voice-acme-01",
+  "verification_time": "2026-04-15T00:05:00.000Z",
+  "verification_defaults": {
+    "mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "objects": [
+    {
+      "role": "organization_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/org.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/agent.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_attestation",
+      "object_type": "dgd.attestation",
+      "path": "fixtures/demo/agent.attestation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/voice.communication.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/voice.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_started_event",
+      "object_type": "dgd.event",
+      "path": "fixtures/demo/events/voice.session.started.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_announcement_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/messages/voice.session.announcement.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Signature valid, authority not proven",
+    "decision": "degraded-trust",
+    "resolved_trust_state": "verified-agent"
+  }
+}

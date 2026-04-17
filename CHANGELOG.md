@@ -10,6 +10,36 @@ Format notes:
 
 ---
 
+## Iteration 13 - Ship the verifier-first MVP implementation
+- date: 2026-04-16
+- timestamp: 2026-04-16 20:05 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a runnable protocol package for canonicalization, shape validation, lineage checks, and Ed25519 signature verification
+  - added a verifier package that loads fixture manifests, resolves trust graphs, derives event-time and current-time outcomes, and emits compact trust banners
+  - added a demo CLI with `verify` and `compare` commands
+  - generated signed demo fixtures for delegated-agent, revoked, stale, missing-delegation, verified-human, and unverified sender flows
+  - added dedicated critique and red-team logs so each build iteration leaves review artifacts behind
+- changed files:
+  - `package.json`
+  - `packages/protocol/src/*`
+  - `packages/verifier/src/*`
+  - `apps/demo-cli/src/index.js`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/*`
+  - `README.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/open-questions.md`
+  - `docs/review/review-workflow.md`
+- why it mattered:
+  - DigiD now has a working local product prototype instead of only a protocol and architecture design corpus
+- next likely step at the time:
+  - expose the verifier pipeline through a small local API and choose the first concrete adapter surface to bind to it
+
+---
+
 ## Iteration 12 — Tighten signer resolution and ordered live-event rules
 - date: 2026-04-16
 - timestamp: 2026-04-16 18:00 America/Vancouver

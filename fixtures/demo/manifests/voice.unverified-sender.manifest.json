@@ -1,0 +1,56 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:voice_unverified_sender",
+  "scenario_id": "voice-unverified-sender",
+  "scenario_class": "unverified-voice",
+  "description": "Self-asserted sender comparison scenario",
+  "lineage_group": "demo-voice-unverified-01",
+  "verification_time": "2026-04-15T00:05:00.000Z",
+  "verification_defaults": {
+    "mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "objects": [
+    {
+      "role": "unverified_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/unverified.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/unverified.communication.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/unverified.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_started_event",
+      "object_type": "dgd.event",
+      "path": "fixtures/demo/events/unverified.voice.session.started.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_announcement_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/messages/unverified.voice.session.announcement.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Unverified sender",
+    "decision": "degraded-trust",
+    "resolved_trust_state": "unverified"
+  }
+}

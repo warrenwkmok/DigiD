@@ -1,0 +1,28 @@
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.3",
+  "envelope_id": "dgd:envelope:msg_voice_unverified_announcement_01",
+  "message_type": "voice.session.announcement",
+  "subject_id": "dgd:communication:voice_unverified_01",
+  "channel": "voice",
+  "sender_id": "dgd:identity:unverified_01",
+  "conversation_id": "dgd:session:voice_unverified_01",
+  "created_at": "2026-04-15T00:02:11.000Z",
+  "verification_context": {
+    "verification_mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "payload": {
+    "content_type": "application/dgd+json",
+    "content_digest": "sha256:4c6916aa7ccc5239f82422c01ae529f85730fb42a79ac27e0eb034b404e11efd",
+    "content_length": 19,
+    "summary": "Unverified sender"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:unverified_01:key-2026-04",
+    "created_at": "2026-04-15T00:02:11.000Z",
+    "canonicalization": "JCS",
+    "signature": "1ev1Yd5ic0nFS86qvqLf3rDqd+pGYGVQyljDl55TH68zLMi3MluEhNNGHj/S8Ta8KLBoRoFdtJhR+mB32j5wCQ=="
+  }
+}

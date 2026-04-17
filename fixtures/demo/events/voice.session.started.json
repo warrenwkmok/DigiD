@@ -1,0 +1,32 @@
+{
+  "envelope_type": "dgd.event",
+  "schema_version": "0.3",
+  "envelope_id": "dgd:envelope:event_voice_started_01",
+  "event_type": "voice.session.started",
+  "subject_id": "dgd:communication:voice_acme_01",
+  "actor_id": "dgd:identity:agent_01",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:agent_01_voice",
+  "conversation_id": "dgd:session:voice_acme_01",
+  "created_at": "2026-04-15T00:00:10.000Z",
+  "purpose": "support-follow-up",
+  "sequence": 1,
+  "verification_context": {
+    "verification_mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "payload": {
+    "direction": "outbound",
+    "channel_subtype": "outbound-call",
+    "session_started_at": "2026-04-15T00:00:10.000Z",
+    "announcement_expected": true
+  },
+  "payload_digest": "sha256:540c2c30eb5c9409ecc98c5a0d5e62d0f095ae752d13464e4219f3a852e3b8d9",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:10.000Z",
+    "canonicalization": "JCS",
+    "signature": "jn2idkzCosM0eWNHpbXZRollaxETyYyPy/O4wmqbp6aR6l7N7/3+EQOv/fJteOnTefh1UZgatKrE0l/u7hGOCQ=="
+  }
+}

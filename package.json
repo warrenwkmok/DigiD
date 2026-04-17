@@ -1,0 +1,11 @@
+{
+  "name": "digid",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:fixtures": "node scripts/generate-demo-fixtures.mjs",
+    "demo:verify": "node apps/demo-cli/src/index.js verify",
+    "demo:compare": "node apps/demo-cli/src/index.js compare"
+  }
+}

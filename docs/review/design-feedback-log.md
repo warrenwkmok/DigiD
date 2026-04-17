@@ -266,3 +266,27 @@ Every meaningful critique should end up in one of these states:
 - action taken: Added a family-by-family signer-resolution matrix, tightened delegated-signer and artifact-derivation constraints, made ordered live-session events contiguous from sequence `1` in the first fixture profile, clarified that trust-banner messages are non-sequenced but lineage-bound, and updated the first demo build order to validate ordered-event scope explicitly.
 - linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/normative-protocol-draft.md`, `docs/mvp/first-demo-flow.md`
 - notes: This should reduce drift before fixture generation and make replay tests more deterministic in the first verifier slice.
+
+## DF-021 - Build the runnable verifier-first MVP instead of extending design prose again
+- source: `2026-04-16 DigiD implementation loop`
+- date: 2026-04-16
+- timestamp: 2026-04-16 20:05 America/Vancouver
+- area: architecture
+- severity: high
+- status: applied
+- summary: The repo had enough protocol and review structure. The next honest move was to ship a runnable verifier-first MVP instead of adding more non-executable design documents.
+- action taken: Added a protocol package, verifier package, demo CLI, signed fixture generator, and fixture manifests covering delegated-agent, revoked, stale, missing-delegation, verified-human, and unverified flows.
+- linked docs: `README.md`, `packages/protocol/src/*`, `packages/verifier/src/*`, `apps/demo-cli/src/index.js`, `scripts/generate-demo-fixtures.mjs`, `fixtures/demo/manifests/*`
+- notes: This is the first slice where DigiD becomes a working product prototype rather than only a design repo.
+
+## DF-022 - Make per-iteration critique and red-team artifacts first-class repo outputs
+- source: `2026-04-16 DigiD implementation loop`
+- date: 2026-04-16
+- timestamp: 2026-04-16 20:05 America/Vancouver
+- area: security
+- severity: medium
+- status: applied
+- summary: The review workflow defined critic and red-team roles, but the repo still lacked dedicated per-iteration logs for those passes.
+- action taken: Added `docs/review/critique-log.md` and `docs/review/red-team-log.md`, and updated the review workflow so critique and adversarial passes are logged every meaningful implementation slice.
+- linked docs: `docs/review/critique-log.md`, `docs/review/red-team-log.md`, `docs/review/review-workflow.md`
+- notes: This creates the critique-log and red-team-log structure requested for the active build loop.

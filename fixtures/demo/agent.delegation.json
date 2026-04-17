@@ -1,0 +1,41 @@
+{
+  "object_type": "dgd.delegation",
+  "schema_version": "0.3",
+  "object_id": "dgd:delegation:agent_01_voice",
+  "issuer_id": "dgd:identity:org_acme",
+  "delegate_id": "dgd:identity:agent_01",
+  "delegate_class": "agent",
+  "status": "active",
+  "authority": {
+    "channels": [
+      "voice"
+    ],
+    "actions": [
+      "communicate",
+      "sign-session",
+      "sign-message"
+    ],
+    "restrictions": [
+      "no-financial-approval"
+    ],
+    "purpose_bindings": [
+      "support-follow-up"
+    ]
+  },
+  "valid_from": "2026-04-15T00:00:00.000Z",
+  "valid_until": "2026-10-15T00:00:00.000Z",
+  "revocation_check": {
+    "mode": "online-required",
+    "max_age_seconds": 300,
+    "status": "clear",
+    "checked_at": "2026-04-15T00:04:00.000Z"
+  },
+  "created_at": "2026-04-15T00:00:02.000Z",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-04-15T00:00:02.000Z",
+    "canonicalization": "JCS",
+    "signature": "LZ5FYy4o2QoH+JhdHbUSU9pMfPeuzQkVnm+d3oSquZQyQrVhW8MsUeeiBmLQWQhis2TnJVnqOSuBK+QYTBkhDg=="
+  }
+}

@@ -103,10 +103,11 @@ An adoption-loop pass is not complete until it feeds back into the repo as well.
 
 After each meaningful critique, red-team, or adoption-loop pass:
 1. log the resulting items in `design-feedback-log.md` when needed
-2. add unresolved strategic questions to `open-questions.md`
-3. apply immediate doc changes where the findings clearly improve the design
-4. record whether recommendations were applied, planned, deferred, rejected, or escalated for decision
-5. if the finding changes what DigiD appears to guarantee on real platforms, revisit the relevant product, protocol, architecture, threat-model, UX, and MVP docs together
+2. append the per-iteration review to `critique-log.md` and `red-team-log.md` where applicable
+3. add unresolved strategic questions to `open-questions.md`
+4. apply immediate doc changes where the findings clearly improve the design
+5. record whether recommendations were applied, planned, deferred, rejected, or escalated for decision
+6. if the finding changes what DigiD appears to guarantee on real platforms, revisit the relevant product, protocol, architecture, threat-model, UX, and MVP docs together
 
 ## Operating principle
 

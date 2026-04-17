@@ -78,3 +78,7 @@ Still open: whether lower-risk future channels can safely collapse session scope
 ## OQ-019 — Should `dgd.artifact` stay optional in the core verifier path or become a required object whenever detached media or transcripts exist?
 Working resolution for the first demo slice: optional for the happy path, required whenever a recording, transcript, or post-call summary is part of the fixture set.
 Still open: whether later media-heavy profiles should treat artifact objects as mandatory lineage anchors instead of mere post-call extras.
+
+## OQ-022 - When should the critique and red-team roles become runtime agents instead of review logs?
+Working resolution for this iteration: keep them as explicit repo artifacts and review obligations while the verifier MVP is still local and fixture-driven.
+Still open: whether the next build slice should automate those roles as local scripts, Codex workflows, or service-side agents once the verifier API exists.

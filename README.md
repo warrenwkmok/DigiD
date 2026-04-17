@@ -70,14 +70,39 @@ The first version should prioritize:
 5. simple visible trust indicators
 6. privacy-preserving disclosure rather than maximum identity exposure
 
-## Next build direction
+## Current implementation status
 
-The repo is being scaffolded first as a product and protocol design repository.
-That means the first phase is:
-- clear concept definition
-- protocol shape
-- trust model
-- MVP design
-- future technical implementation plan
+DigiD now includes a runnable verifier-first MVP slice:
+- signed demo fixtures for delegated agent, verified human, and unverified sender voice scenarios
+- a protocol package for canonicalization, shape validation, lineage checks, and signature verification
+- a verifier package that resolves event-time vs current-time trust outcomes
+- a demo CLI that renders compact trust banners plus expanded verification details
 
-Implementation can begin after the protocol and product surface are coherent enough to build against.
+## Run the demo
+
+Generate the signed fixtures:
+
+```bash
+node scripts/generate-demo-fixtures.mjs
+```
+
+Verify the happy-path delegated agent scenario:
+
+```bash
+node apps/demo-cli/src/index.js verify fixtures/demo/manifests/voice.happy-path.manifest.json
+```
+
+Compare two scenarios:
+
+```bash
+node apps/demo-cli/src/index.js compare fixtures/demo/manifests/voice.happy-path.manifest.json fixtures/demo/manifests/voice.delegation-revoked.manifest.json
+```
+
+## Active review loop
+
+DigiD now keeps per-iteration review artifacts under `docs/review/`:
+- `critique-log.md`
+- `red-team-log.md`
+- `design-feedback-log.md`
+
+Those logs are intended to feed the next design/build loop instead of leaving critique as disconnected commentary.

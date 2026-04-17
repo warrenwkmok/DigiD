@@ -1,0 +1,70 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:voice_verified_human",
+  "scenario_id": "voice-verified-human",
+  "scenario_class": "verified-human-voice",
+  "description": "Verified human direct voice call",
+  "lineage_group": "demo-voice-human-01",
+  "verification_time": "2026-04-15T00:05:00.000Z",
+  "verification_defaults": {
+    "mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "objects": [
+    {
+      "role": "organization_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/org.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "human_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/human.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "human_attestation",
+      "object_type": "dgd.attestation",
+      "path": "fixtures/demo/human.attestation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/human.communication.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/human.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_started_event",
+      "object_type": "dgd.event",
+      "path": "fixtures/demo/events/human.voice.session.started.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_announcement_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/messages/human.voice.session.announcement.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Verified human",
+    "decision": "allow-with-trust-indicator",
+    "resolved_trust_state": "verified-human"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "object_type": "dgd.communication",
+  "schema_version": "0.3",
+  "object_id": "dgd:communication:voice_acme_01",
+  "status": "active",
+  "channel": "voice",
+  "channel_subtype": "outbound-call",
+  "session_id": "dgd:session:voice_acme_01",
+  "sender": {
+    "identity_id": "dgd:identity:agent_01",
+    "identity_class": "agent",
+    "verification_state": "delegated-agent"
+  },
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:agent_01_voice",
+  "purpose": "support-follow-up",
+  "payload": {
+    "content_type": "session-manifest",
+    "content_digest": "sha256:518cd17e0c7eaeeacd3dc3755e7c9a163c0e5f52248ea3450d7a322ea49512f2",
+    "content_length": 128,
+    "media_mode": "real-time-voice"
+  },
+  "timestamps": {
+    "created_at": "2026-04-15T00:00:05.000Z",
+    "session_started_at": "2026-04-15T00:00:10.000Z",
+    "session_ended_at": null
+  },
+  "created_at": "2026-04-15T00:00:05.000Z",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:00:05.000Z",
+    "canonicalization": "JCS",
+    "signature": "kZFA3H8JKwWvY2wXSfVRURJcbPm9dZ+KB/7HUU8DLInqohHmFSepl1OHv3d5KBsP4b4/BlD+OqulIKQB8lumDw=="
+  }
+}
