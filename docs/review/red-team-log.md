@@ -3,6 +3,25 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-008 - Verified organization + pinned trust root red-team pass
+- date: 2026-04-18
+- timestamp: 2026-04-18 12:54 America/Vancouver
+- reviewed slice:
+  - `verified-organization` trust state rendered from receiver-pinned trust roots
+  - `message.verified-organization` async-message fixture family
+  - receiver UX note about `issuer not trusted` being a policy gap
+- attack scenarios:
+  - a sender (or attacker) tricks an integration into accepting sender-supplied `trusted_issuer_ids` (or equivalent) so an attacker-controlled org id is treated as "verified organization"
+  - a UI treats "pinned" as universally verified and hides the fact that the trust root is locally configured, leading users to overgeneralize the meaning of "verified organization"
+  - a malicious actor uses a lookalike org display name and relies on a receiver pinning the wrong org id (social engineering / misbinding)
+- integration risks:
+  - any workflow for acquiring, distributing, or administering pinned org roots is boundary-sensitive and should not be implemented as a hosted public service in this repo
+  - if adapters suppress `issuer-untrusted` or similar warnings while keeping positive trust chips, they recreate the "fake verified ecosystem" attack path
+- recommended mitigations:
+  1. treat pinned trust roots as receiver-side configuration only; never accept them from sender inputs in real deployments
+  2. keep trust-root administration, issuer discovery, and trust registry operations private before implementation
+  3. keep UX wording explicit that unanchored issuers are a policy gap, not a signature failure
+
 ## RT-007 - Trusted issuer anchors red-team pass
 - date: 2026-04-18
 - timestamp: 2026-04-18 00:55 America/Vancouver

@@ -1,0 +1,30 @@
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.3",
+  "envelope_id": "dgd:envelope:msg_globex_policy_update_01",
+  "message_type": "message.policy.update",
+  "subject_id": "dgd:communication:message_globex_01",
+  "channel": "message",
+  "sender_id": "dgd:identity:org_globex",
+  "conversation_id": "dgd:session:message_globex_01",
+  "created_at": "2026-04-15T00:30:11.000Z",
+  "purpose": "policy-update",
+  "verification_context": {
+    "verification_mode": "current_time",
+    "revocation_max_age_seconds": 3600
+  },
+  "payload": {
+    "content_type": "application/dgd+json",
+    "content_digest": "sha256:1f2ca09a627ed1a613bb9df8062eec31fdf168293eec9a01097b891769213b70",
+    "content_length": 96,
+    "summary": "Policy update from Globex Corporate",
+    "purpose": "policy-update"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_globex:key-2026-01",
+    "created_at": "2026-04-15T00:30:11.000Z",
+    "canonicalization": "JCS",
+    "signature": "ZmszAO0OdTUhDmRg06fZdfylHgknNC4baugIHg/6DNpsNNzyNg0kiqTLZ92ZT1Aa/TWXor7h1eEZfp0A2Q6uBg=="
+  }
+}

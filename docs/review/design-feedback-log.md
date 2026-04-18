@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-030 - Add verified organization trust state via pinned trust anchors
+- source: `2026-04-18 DigiD 3h loop`
+- date: 2026-04-18
+- timestamp: 2026-04-18 12:54 America/Vancouver
+- area: trust-state UX
+- severity: high
+- status: applied
+- summary: The repo claimed a `verified-organization` trust state, but the reference verifier could not render it and had no fixture coverage for org-signed communications. That risked collapsing org identity into generic "authenticated agent" thinking and leaving receiver-facing org trust ambiguous.
+- action taken: Added `verified-organization` resolution to the reference verifier, gated on receiver-side trust anchoring (pinned org id in `trusted_issuer_ids`). Added a manifest-audited async message fixture (`message.verified-organization`) so org-signed communications are exercised in the same regression loop as delegated voice cases.
+- linked docs: `packages/verifier/src/verify-manifest.js`, `fixtures/demo/manifests/message.verified-organization.manifest.json`, `docs/architecture/trust-states.md`, `docs/architecture/verifier-ux-guidance.md`
+- notes: This stays public-safe by treating trust roots as local verifier policy input only. Issuer discovery, trust-root administration workflows, and any hosted trust registry operations remain private-boundary candidates.
+
 ## DF-029 - Require trusted issuer anchors for high-trust states
 - source: `2026-04-18 DigiD 3h loop`
 - date: 2026-04-18

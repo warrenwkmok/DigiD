@@ -108,8 +108,17 @@ Expanded views should distinguish clearly between:
 - `Delegation no longer active`
 - `Verification stale, re-check recommended`
 - `Signature valid, authority not proven`
+- `Signature valid, issuer not trusted`
 - `Platform identity does not match verified DigiD identity`
 - `Artifact copied outside verified context`
+
+### Issuer trust warning note
+
+If the UI says `Signature valid, issuer not trusted`, it should be understood as:
+- the signature verified against the claimed key, but
+- the receiver has not anchored the issuer (trust-root/policy gap), so the verifier will not upgrade into a high-trust state.
+
+This is not a cryptographic failure message.
 
 ### Avoid weak or misleading warning language
 Avoid euphemisms like:

@@ -110,3 +110,7 @@ Still open: whether commercial or standards-track profiles eventually need a sig
 ## OQ-029 - How should verifiers learn which issuers are trusted without a public trust registry?
 Working resolution for the fixture-driven public demo: accept an explicit `trusted_issuer_ids` allowlist as verifier policy input.
 Still open: what the real-world trust-root distribution and administration model should be, and where the public/private boundary sits for issuer discovery, trust registry operations, and enterprise trust-root workflows.
+
+## OQ-030 - What does "verified organization" mean outside pinned trust roots?
+Working resolution for the public fixture demo: a verifier may render `verified-organization` when the receiver has explicitly anchored the org identity as a trusted root (pinned id in `trusted_issuer_ids`).
+Still open: whether real deployments should rely on third-party issuer attestations for organizations (and how those issuers are discovered/administered), and which parts of that workflow must move private (trust-root administration, enterprise policy surfaces, registry operations) before implementation.

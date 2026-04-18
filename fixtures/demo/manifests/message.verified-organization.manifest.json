@@ -1,0 +1,64 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:message_verified_organization",
+  "scenario_id": "message-verified-organization",
+  "scenario_class": "verified-organization-message",
+  "description": "Pinned verified organization message for Globex Corporate",
+  "lineage_group": "demo-message-globex-01",
+  "verification_time": "2026-04-15T00:35:00.000Z",
+  "verification_defaults": {
+    "mode": "current_time",
+    "revocation_max_age_seconds": 3600,
+    "trusted_issuer_ids": [
+      "dgd:identity:org_globex"
+    ]
+  },
+  "objects": [
+    {
+      "role": "organization_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/globex.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/globex.communication.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/globex.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "policy_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/messages/globex.policy-update.message.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Verified organization",
+    "decision": "allow-with-trust-indicator",
+    "resolved_trust_state": "verified-organization",
+    "warning_codes": [],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": true,
+      "current_time_valid": true,
+      "owner_binding_status": "not-required",
+      "authority_scope_status": "not-required",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
+  }
+}

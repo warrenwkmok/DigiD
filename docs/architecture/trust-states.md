@@ -1,4 +1,4 @@
-# DigiD trust states
+﻿# DigiD trust states
 
 ## Why trust states matter
 
@@ -14,11 +14,12 @@ A real person with a strong attestation chain.
 A software agent with a valid identity and attestation chain, but not necessarily acting under a verified operator at the moment of communication.
 
 ### Verified organization
-A company or institution with a trusted organizational identity.
+A receiver-meaningful organization identity that is anchored in receiver policy (for example, pinned as a trusted issuer root, or proven via an attestation from a trusted issuer).
+A verifier MUST NOT render this state solely because the organization self-asserts `verification_state`.
 
 ### Org-issued agent
 An agent that is issued by (and acting under authority of) a verified organization.
-This is the “support bot” trust state: the receiver sees the organization as the accountable authority.
+This is the "support bot" trust state: the receiver sees the organization as the accountable authority.
 
 ### Delegated agent
 An agent that is explicitly acting on behalf of a verified human (or other non-organization operator).

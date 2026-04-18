@@ -211,7 +211,15 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const attestationActiveAtEventTime = attestation ? isActiveInWindow(attestation, eventTime) : false;
   const attestationActiveNow = attestation ? isActiveInWindow(attestation, verificationTime) : false;
   const attestationIssuerTrusted = attestation ? trustedIssuerIds.has(attestation.issuer_id) : true;
-  const issuerTrustValid = Boolean(attestationIssuerTrusted);
+  const signerPinned = Boolean(signerIdentity && trustedIssuerIds.has(signerIdentity.object_id));
+  const identityTrustedAtEventTime =
+    signerIdentity?.identity_class === "organization"
+      ? signerPinned
+      : Boolean(attestation && attestationActiveAtEventTime && attestationIssuerTrusted);
+  const identityTrustedNow =
+    signerIdentity?.identity_class === "organization"
+      ? signerPinned
+      : Boolean(attestation && attestationActiveNow && attestationIssuerTrusted);
   const delegationRequired = Boolean(communication?.operator_id || communication?.delegation_id);
   const delegationActiveAtEventTime = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, eventTime) && (!revocation || eventTime < asInstant(revocation.revoked_at))) : true;
   const delegationActiveNow = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, verificationTime) && (!revocation || verificationTime < asInstant(revocation.revoked_at))) : true;
@@ -256,37 +264,36 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const eventTimeValid = Boolean(
     signatureValid &&
       signerActiveAtEventTime &&
-      attestationActiveAtEventTime &&
       delegationActiveAtEventTime &&
-      issuerTrustValid &&
+      identityTrustedAtEventTime &&
       ownerBindingValid &&
       authorityScopeValid
   );
   const currentTimeValid = Boolean(
     signatureValid &&
       signerActiveNow &&
-      attestationActiveNow &&
       delegationActiveNow &&
-      issuerTrustValid &&
+      identityTrustedNow &&
       ownerBindingValid &&
       authorityScopeValid &&
       freshnessStatus !== "unknown"
   );
 
   let resolvedTrustState = "unverified";
-  if (signerIdentity?.identity_class === "human" && attestationActiveAtEventTime && issuerTrustValid) {
+  if (signerIdentity?.identity_class === "human" && identityTrustedAtEventTime) {
     resolvedTrustState = "verified-human";
+  } else if (signerIdentity?.identity_class === "organization" && identityTrustedAtEventTime) {
+    resolvedTrustState = "verified-organization";
   } else if (
     signerIdentity?.identity_class === "agent" &&
-    attestationActiveAtEventTime &&
+    identityTrustedAtEventTime &&
     delegationRequired &&
     delegationActiveAtEventTime &&
-    issuerTrustValid &&
     ownerBindingValid &&
     authorityScopeValid
   ) {
     resolvedTrustState = operatorIdentity?.identity_class === "organization" ? "org-issued-agent" : "delegated-agent";
-  } else if (signerIdentity?.identity_class === "agent" && attestationActiveAtEventTime && issuerTrustValid) {
+  } else if (signerIdentity?.identity_class === "agent" && identityTrustedAtEventTime) {
     resolvedTrustState = "verified-agent";
   }
 
@@ -322,7 +329,15 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       revocation_status: revocationStatus,
       freshness_status: freshnessStatus,
       replay_status: replayStatus,
-      issuer_trust_status: attestation ? (issuerTrustValid ? "trusted" : "untrusted") : "not-required"
+      issuer_trust_status: attestation
+        ? attestationIssuerTrusted
+          ? "trusted"
+          : "untrusted"
+        : signerIdentity?.identity_class === "organization"
+          ? signerPinned
+            ? "pinned"
+            : "untrusted"
+          : "not-required"
     },
     warnings,
     errors,

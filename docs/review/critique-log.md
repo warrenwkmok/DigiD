@@ -3,6 +3,28 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-008 - Verified organization trust-state critique (pinned trust roots)
+- date: 2026-04-18
+- timestamp: 2026-04-18 12:54 America/Vancouver
+- reviewed slice:
+  - `verified-organization` trust state resolution in the reference verifier
+  - `message.verified-organization` fixture manifest for org-signed async communications
+  - receiver-facing UX guidance clarifying `issuer not trusted` as a policy/trust-root gap
+- strengths:
+  - makes "verified organization" executable and regression-tested instead of staying as aspirational prose
+  - keeps the trust model honest by requiring an explicit receiver-side anchor (pinned org id), rather than trusting self-asserted identity metadata
+  - broadens the demo wedge from voice-only to a second channel class without adding hosted services or policy surfaces
+- concerns:
+  - pinning an org identity is a powerful receiver policy act; any future UI/workflow around acquiring or managing pinned roots is boundary-sensitive and should not drift into the public repo as a hosted trust registry
+  - the verifier should remain explicit that `issuer not trusted` is not "signature failed" and should avoid UI language that implies the issuer is objectively untrustworthy (it is unanchored)
+- protocol concerns:
+  - do not let `verification_state` fields become an input to verifier trust-state rendering; the trust-state must remain derived from signed lineage + explicit trust-root policy
+  - org-signed communications should remain compatible with delegated-agent flows and should not weaken the "under whose authority" question for org-issued agents
+- recommended changes:
+  1. keep pinned trust roots as local verifier policy input; never accept them from sender-provided manifests in real deployments
+  2. keep issuer discovery, trust-root administration, and trust registry operations private before implementation
+  3. ensure compact UX wording clearly distinguishes "unanchored" from "invalid"
+
 ## CL-007 - Trusted issuer anchors and org-issued agent trust-state critique
 - date: 2026-04-18
 - timestamp: 2026-04-18 00:55 America/Vancouver

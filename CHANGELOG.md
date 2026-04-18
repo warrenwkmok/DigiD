@@ -1,4 +1,4 @@
-# DigiD changelog
+﻿# DigiD changelog
 
 This changelog tracks meaningful DigiD repo iterations so Master Warren can quickly see what changed, why it changed, and what the next likely move was.
 
@@ -10,10 +10,39 @@ Format notes:
 
 ---
 
+## Iteration 21 - Add verified organization trust state + pinned-org message fixture
+- date: 2026-04-18
+- timestamp: 2026-04-18 12:54 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a first-class `verified-organization` trust state to the reference verifier, gated on an explicit receiver-side trust anchor (pinned organization id in `trusted_issuer_ids`) so self-asserted identity fields cannot upgrade trust
+  - introduced an async-message fixture family (`message.verified-organization`) that exercises organization-signed communications in the same manifest-audited loop as the live voice cases
+  - documented receiver-facing UX guidance that `issuer not trusted` is a trust-root/policy gap (receiver has not anchored the issuer), not a signature failure
+- changed files:
+  - `packages/verifier/src/verify-manifest.js`
+  - `fixtures/demo/manifests/message.verified-organization.manifest.json`
+  - `fixtures/demo/globex.identity.json`
+  - `fixtures/demo/globex.communication.json`
+  - `fixtures/demo/globex.session.json`
+  - `fixtures/demo/messages/globex.policy-update.message.json`
+  - `scripts/generate-verified-organization-message-fixture.mjs`
+  - `docs/architecture/trust-states.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - DigiD should not collapse "organization identity" into "authenticated agent": receivers need a distinct trust state for org-signed communications, but that trust must still be explicitly anchored in receiver policy
+  - this makes the trust model more honest: an organization can be a trust root (pinned) without pretending the protocol itself discovered or administered that trust
+- next likely step at the time:
+  - decide whether a public-safe "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration must move private before any richer org verification workflows are implemented
+
 ## Iteration 20 - Add trusted issuer anchors and org-issued agent trust state
 - date: 2026-04-18
 - timestamp: 2026-04-18 10:07 America/Vancouver
-- commit: `uncommitted`
+- commit: `cb4f502`
 - summary:
   - added an explicit `verification_defaults.trusted_issuer_ids` allowlist to fixture manifests so the reference verifier can distinguish trusted issuer roots from self-consistent but unknown ecosystems
   - introduced the `issuer-untrusted` warning and a new `voice.issuer-untrusted` regression scenario where signatures are valid but no trusted issuer anchor exists
@@ -35,10 +64,10 @@ Format notes:
   - `scripts/generate-demo-fixtures.mjs`
   - `CHANGELOG.md`
 - why it mattered:
-  - DigiD is about owner-bound authority and communications trust, not just “an authenticated agent”; trusted issuer anchors are the minimal missing ingredient that prevents fake self-contained trust ecosystems from being misrendered as verified
+  - DigiD is about owner-bound authority and communications trust, not just "an authenticated agent"; trusted issuer anchors are the minimal missing ingredient that prevents fake self-contained trust ecosystems from being misrendered as verified
   - `org-issued-agent` makes the trust UI closer to the real product question: who is acting, under whose authority, and is that authority anchored in something the receiver actually trusts?
 - next likely step at the time:
-  - add a short receiver-facing UX note that “issuer not trusted” is a policy/trust-root gap, not a signature failure, and decide which issuer discovery / trust registry workflows must stay private before implementation
+  - add a short receiver-facing UX note that "issuer not trusted" is a policy/trust-root gap, not a signature failure, and decide which issuer discovery / trust registry workflows must stay private before implementation
 
 ## Iteration 19 - Add fixture-backed adapter evidence and presentation audit
 - date: 2026-04-18
@@ -244,7 +273,34 @@ Format notes:
 
 ---
 
-## Iteration 12 — Tighten signer resolution and ordered live-event rules
+## Iteration 21 - Add verified organization trust state + pinned-org message fixture
+- date: 2026-04-18
+- timestamp: 2026-04-18 12:54 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a first-class `verified-organization` trust state to the reference verifier, gated on an explicit receiver-side trust anchor (pinned organization id in `trusted_issuer_ids`) so self-asserted identity fields cannot upgrade trust
+  - introduced an async-message fixture family (`message.verified-organization`) that exercises organization-signed communications in the same manifest-audited loop as the live voice cases
+  - documented receiver-facing UX guidance that `issuer not trusted` is a trust-root/policy gap (receiver has not anchored the issuer), not a signature failure
+- changed files:
+  - `packages/verifier/src/verify-manifest.js`
+  - `fixtures/demo/manifests/message.verified-organization.manifest.json`
+  - `fixtures/demo/globex.identity.json`
+  - `fixtures/demo/globex.communication.json`
+  - `fixtures/demo/globex.session.json`
+  - `fixtures/demo/messages/globex.policy-update.message.json`
+  - `docs/architecture/trust-states.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - DigiD should not collapse "organization identity" into "authenticated agent": receivers need a distinct trust state for org-signed communications, but that trust must still be explicitly anchored in receiver policy
+  - this makes the trust model more honest: an organization can be a trust root (pinned) without pretending the protocol itself discovered or administered that trust
+- next likely step at the time:
+  - decide whether a public-safe "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration must move private before any richer org verification workflows are implemented
+## Iteration 12 â€” Tighten signer resolution and ordered live-event rules
 - date: 2026-04-16
 - timestamp: 2026-04-16 18:00 America/Vancouver
 - commit: `d251f3f`
@@ -265,7 +321,7 @@ Format notes:
 - next likely step at the time:
   - generate the first happy-path and degraded fixture manifests using the stricter signer and sequence rules
 
-## Iteration 11 — Tighten live delegated envelope lineage and warning portability
+## Iteration 11 â€” Tighten live delegated envelope lineage and warning portability
 - date: 2026-04-16
 - timestamp: 2026-04-16 16:51 America/Vancouver
 - commit: `422c942`
@@ -287,7 +343,7 @@ Format notes:
 - next likely step at the time:
   - create actual happy-path and degraded JSON fixtures plus lineage validators
 
-## Iteration 10 — Expand review loop and implementation planning
+## Iteration 10 â€” Expand review loop and implementation planning
 - date: 2026-04-16
 - timestamp: 2026-04-16 16:20 America/Vancouver
 - commit: `20ff198`
@@ -310,7 +366,7 @@ Format notes:
 - next likely step at the time:
   - stop adding prose dependencies and produce the first honest fixture family
 
-## Iteration 09 — Specify session and artifact lineage as first-class protocol objects
+## Iteration 09 â€” Specify session and artifact lineage as first-class protocol objects
 - date: 2026-04-16
 - timestamp: 2026-04-16 15:55 America/Vancouver
 - commit: `a2d9c02`
@@ -330,7 +386,7 @@ Format notes:
 - next likely step at the time:
   - align the normative draft and fixture plans around the new lineage objects
 
-## Iteration 08 — Add fixture manifest and verifier policy profiles
+## Iteration 08 â€” Add fixture manifest and verifier policy profiles
 - date: 2026-04-16
 - timestamp: 2026-04-16 15:35 America/Vancouver
 - commit: `edc350c`
@@ -352,7 +408,7 @@ Format notes:
 - next likely step at the time:
   - normalize event payloads and live-session lineage more tightly so fixtures can be validated machine-readably
 
-## Iteration 07 — Tighten fixture and envelope profile toward machine-readable validation
+## Iteration 07 â€” Tighten fixture and envelope profile toward machine-readable validation
 - date: 2026-04-16
 - timestamp: 2026-04-16 14:55 America/Vancouver
 - commit: `2e76088`
@@ -371,7 +427,7 @@ Format notes:
 - next likely step at the time:
   - add standing review loops and keep feeding critique back into concrete repo changes
 
-## Iteration 06 — Tighten protocol schemas and demo bindings
+## Iteration 06 â€” Tighten protocol schemas and demo bindings
 - date: 2026-04-16
 - timestamp: 2026-04-16 14:25 America/Vancouver
 - commit: `434765e`
@@ -390,7 +446,7 @@ Format notes:
 - next likely step at the time:
   - add manifest and policy profile contracts, then create real fixtures
 
-## Iteration 05 — Tighten protocol resolution and freshness rules
+## Iteration 05 â€” Tighten protocol resolution and freshness rules
 - date: 2026-04-15
 - timestamp: 2026-04-15 22:10 America/Vancouver
 - commit: `053c1ef`
@@ -411,7 +467,7 @@ Format notes:
 - next likely step at the time:
   - tighten object, envelope, and demo bindings so fixture-driven implementation becomes unambiguous
 
-## Iteration 04 — Add critique assimilation loop
+## Iteration 04 â€” Add critique assimilation loop
 - date: 2026-04-16
 - timestamp: 2026-04-16 11:10 America/Vancouver
 - commit: `86f390c`
@@ -427,7 +483,7 @@ Format notes:
 - next likely step at the time:
   - add standing reviewer roles and workflow structure around the loop
 
-## Iteration 03 — Add critique roles and review workflow
+## Iteration 03 â€” Add critique roles and review workflow
 - date: 2026-04-16
 - timestamp: 2026-04-16 10:40 America/Vancouver
 - commit: `84c698b`
@@ -445,7 +501,7 @@ Format notes:
 - next likely step at the time:
   - continue protocol tightening while avoiding process bloat
 
-## Iteration 02 — Add protocol schemas and first demo flow
+## Iteration 02 â€” Add protocol schemas and first demo flow
 - date: 2026-04-15
 - timestamp: 2026-04-15 20:45 America/Vancouver
 - commit: `cc0212e`
@@ -463,7 +519,7 @@ Format notes:
 - next likely step at the time:
   - make the protocol normative, define trust resolution order, and model revocation more concretely
 
-## Iteration 01 — Scaffold product and protocol foundation
+## Iteration 01 â€” Scaffold product and protocol foundation
 - date: 2026-04-15
 - timestamp: 2026-04-15 18:30 America/Vancouver
 - commit: `bc78508`
@@ -480,3 +536,4 @@ Format notes:
   - gave DigiD an initial strategic frame and a place for protocol and product work to accumulate coherently
 - next likely step at the time:
   - add actual signable object models and a concrete demo flow
+
