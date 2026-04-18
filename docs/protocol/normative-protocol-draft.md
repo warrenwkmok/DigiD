@@ -228,6 +228,8 @@ At minimum, the profile should support:
 
 Adapters MAY rephrase warning text, but SHOULD preserve the underlying code so downstream analytics, audits, and UI tests can compare outcomes consistently.
 
+If a verifier emits `delegation-scope-conflict`, it SHOULD preserve the primary failed scope dimension in diagnostics and user-visible copy when that dimension is unambiguous from signed inputs.
+
 ## First implementation note
 
 The first implementation SHOULD encode these rules as discriminated unions plus a deterministic resolution pipeline so demo fixtures and later production adapters share the same trust logic.

@@ -10,7 +10,7 @@
     {
       "kid": "dgd:key:unverified_01:key-2026-04",
       "algorithm": "Ed25519",
-      "public_key": "MCowBQYDK2VwAyEA7R4kvyDDFLipsUIJQ3CN8B9ZGRDxIK3miMKSBDFK3X4=",
+      "public_key": "MCowBQYDK2VwAyEA3bw9FoA5MdAh2QYy42VwruK7s2IgS2ccYwOzcTVG6VU=",
       "status": "active",
       "purposes": [
         "assertion"
@@ -36,6 +36,6 @@
     "kid": "dgd:key:unverified_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00.000Z",
     "canonicalization": "JCS",
-    "signature": "R10xnZ+w0/sj/b8LyqpJpkbTgiNdAphBfbT/wBwwffeP8SyQoSQtmHBfqG4PgaLGARUX26CaeCdWtHXqCN6HDA=="
+    "signature": "4lsKjW8JbpopNLFPjJsIbaIO6+1xFk01ZzIVtO9qn4Ty/ET6V7+lGifZcoNZb9036ntU6anmvXHcDmzPk9tSCA=="
   }
 }

@@ -71,6 +71,9 @@ async function ensureDirectories() {
     "fixtures/demo/owner-binding",
     "fixtures/demo/owner-binding/events",
     "fixtures/demo/owner-binding/messages",
+    "fixtures/demo/scope-conflict",
+    "fixtures/demo/scope-conflict/events",
+    "fixtures/demo/scope-conflict/messages",
     "fixtures/demo/revocations",
     "fixtures/demo/results"
   ];
@@ -327,6 +330,123 @@ function buildDelegatedVoiceFixtures(keys) {
     "fixtures/demo/events/voice.session.started.json": startedEvent,
     "fixtures/demo/messages/voice.session.announcement.json": announcementMessage,
     "fixtures/demo/revocations/delegation.revoked.json": revocation
+  };
+}
+
+function buildScopeConflictFixtures(keys) {
+  const communication = signDocument({
+    object_type: "dgd.communication",
+    schema_version: "0.3",
+    object_id: "dgd:communication:voice_scope_conflict_01",
+    status: "active",
+    channel: "voice",
+    channel_subtype: "outbound-call",
+    session_id: "dgd:session:voice_scope_conflict_01",
+    sender: {
+      identity_id: "dgd:identity:agent_01",
+      identity_class: "agent",
+      verification_state: "delegated-agent"
+    },
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    purpose: "billing-notice",
+    payload: {
+      content_type: "session-manifest",
+      content_digest: sha256("voice-scope-conflict-session-manifest"),
+      content_length: 128,
+      media_mode: "real-time-voice"
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:06:05Z"),
+      session_started_at: iso("2026-04-15T00:06:10Z"),
+      session_ended_at: null
+    },
+    created_at: iso("2026-04-15T00:06:05Z")
+  }, keys.agent);
+
+  const session = signDocument({
+    object_type: "dgd.session",
+    schema_version: "0.3",
+    object_id: "dgd:session:voice_scope_conflict_01",
+    status: "active",
+    session_type: "voice.live",
+    communication_id: "dgd:communication:voice_scope_conflict_01",
+    channel: "voice",
+    operator_id: "dgd:identity:org_acme",
+    sequence_scope: {
+      scope_type: "conversation",
+      scope_id: "dgd:session:voice_scope_conflict_01",
+      next_expected_sequence: 2
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:06:05Z"),
+      started_at: iso("2026-04-15T00:06:10Z"),
+      ended_at: null
+    },
+    created_at: iso("2026-04-15T00:06:05Z")
+  }, keys.agent);
+
+  const startedPayload = {
+    direction: "outbound",
+    channel_subtype: "outbound-call",
+    session_started_at: iso("2026-04-15T00:06:10Z"),
+    announcement_expected: true
+  };
+
+  const startedEvent = signDocument({
+    envelope_type: "dgd.event",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:event_voice_scope_conflict_started_01",
+    event_type: "voice.session.started",
+    subject_id: "dgd:communication:voice_scope_conflict_01",
+    actor_id: "dgd:identity:agent_01",
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    conversation_id: "dgd:session:voice_scope_conflict_01",
+    created_at: iso("2026-04-15T00:06:10Z"),
+    purpose: "billing-notice",
+    sequence: 1,
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: startedPayload,
+    payload_digest: digestCanonicalPayload(startedPayload)
+  }, keys.agent);
+
+  const announcementPayload = {
+    content_type: "application/dgd+json",
+    content_digest: sha256("signature-valid-purpose-not-delegated"),
+    content_length: 64,
+    summary: "Signature valid, purpose not delegated",
+    purpose: "billing-notice"
+  };
+
+  const announcementMessage = signDocument({
+    envelope_type: "dgd.message",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:msg_voice_scope_conflict_announcement_01",
+    message_type: "voice.session.announcement",
+    subject_id: "dgd:communication:voice_scope_conflict_01",
+    channel: "voice",
+    sender_id: "dgd:identity:agent_01",
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    conversation_id: "dgd:session:voice_scope_conflict_01",
+    created_at: iso("2026-04-15T00:06:11Z"),
+    purpose: "billing-notice",
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: announcementPayload
+  }, keys.agent);
+
+  return {
+    "fixtures/demo/scope-conflict/voice.communication.json": communication,
+    "fixtures/demo/scope-conflict/voice.session.json": session,
+    "fixtures/demo/scope-conflict/events/voice.session.started.json": startedEvent,
+    "fixtures/demo/scope-conflict/messages/voice.session.announcement.json": announcementMessage
   };
 }
 
@@ -927,6 +1047,13 @@ function buildManifests() {
     { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/events/voice.session.started.json", required: true, stable_across_lineage: true },
     { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
   ];
+  const scopeConflictObjects = [
+    ...baseObjects.slice(0, 4),
+    { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/scope-conflict/voice.communication.json", required: true, stable_across_lineage: true },
+    { role: "session_object", object_type: "dgd.session", path: "fixtures/demo/scope-conflict/voice.session.json", required: true, stable_across_lineage: true },
+    { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/scope-conflict/events/voice.session.started.json", required: true, stable_across_lineage: true },
+    { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/scope-conflict/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
+  ];
 
   return {
     "fixtures/demo/manifests/voice.happy-path.manifest.json": {
@@ -1074,6 +1201,35 @@ function buildManifests() {
         }
       }
     },
+    "fixtures/demo/manifests/voice.delegation-purpose-conflict.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_delegation_purpose_conflict",
+      scenario_id: "voice-delegation-purpose-conflict",
+      scenario_class: "delegated-agent-voice",
+      description: "Valid delegated voice lineage where the claimed communication purpose falls outside the signed delegation",
+      lineage_group: "demo-voice-scope-conflict-01",
+      verification_time: iso("2026-04-15T00:07:00Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
+      objects: scopeConflictObjects,
+      expected_outcome: {
+        compact_label: "Signature valid, purpose not delegated",
+        decision: "degraded-trust",
+        resolved_trust_state: "verified-agent",
+        warning_codes: ["delegation-scope-conflict"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
+          owner_binding_status: "bound",
+          authority_scope_status: "out-of-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
+      }
+    },
     "fixtures/demo/manifests/voice.verified-human.manifest.json": {
       manifest_type: "dgd.fixture_manifest",
       schema_version: "0.3",
@@ -1193,6 +1349,7 @@ async function main() {
   const keys = buildKeys();
   const files = {
     ...buildDelegatedVoiceFixtures(keys),
+    ...buildScopeConflictFixtures(keys),
     ...buildDirectHumanFixtures(keys),
     ...buildUnverifiedFixtures(keys),
     ...buildOwnerBindingMismatchFixtures(keys),

@@ -1,3 +1,5 @@
+import { summarizeAuthorityScopeConflict } from "./policy.js";
+
 export function deriveCompactBanner(result) {
   const warningCodes = new Set(result.warnings.map((warning) => warning.code));
 
@@ -18,7 +20,7 @@ export function deriveCompactBanner(result) {
   }
 
   if (warningCodes.has("delegation-scope-conflict")) {
-    return "Signature valid, authority out of scope";
+    return summarizeAuthorityScopeConflict(result.checks.authority_scope_reasons, { compact: true });
   }
 
   if (warningCodes.has("revocation-stale")) {

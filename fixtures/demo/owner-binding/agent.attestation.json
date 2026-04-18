@@ -18,9 +18,9 @@
   "created_at": "2026-04-15T00:20:02.000Z",
   "proof": {
     "type": "ed25519-2020",
-    "kid": "dgd:key:org_acme_owner_binding:key-2026-01",
+    "kid": "dgd:key:org_acme:key-2026-01:owner-binding",
     "created_at": "2026-04-15T00:20:02.000Z",
     "canonicalization": "JCS",
-    "signature": "3bw2byZnI+YApjH5Q2qTkHFu4X8z0Q6YlGRlrNKxMAnUuGF769j+h5EQzpGPz7Oyi6uu7ISjVgzWkkgdUQYIDQ=="
+    "signature": "CYewuo/dYehWuC6//3tBT6gBG71e04RcolH6cU8rURxjBFOACoDedHmySJ6QIpdX9SHQahEyCxdEsWSfvkCACA=="
   }
 }

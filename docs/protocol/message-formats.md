@@ -511,6 +511,7 @@ To keep verifier output portable across adapters, the first profile should norma
 Rules:
 - verifier-produced `warning_codes` MUST use stable slugs from this list unless declared as non-critical extensions
 - user-facing warning copy MAY vary by adapter, but SHOULD map back to these stable codes
+- when `warning_codes` includes `delegation-scope-conflict`, user-facing copy SHOULD preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when the verifier can determine it cleanly from signed inputs
 - event payload `reason` fields SHOULD use the reason-code profile instead of free text when an exact code exists
 
 ## Verification rules for envelopes

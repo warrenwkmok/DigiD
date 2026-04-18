@@ -114,3 +114,7 @@ Still open: what the real-world trust-root distribution and administration model
 ## OQ-030 - What does "verified organization" mean outside pinned trust roots?
 Working resolution for the public fixture demo: a verifier may render `verified-organization` when the receiver has explicitly anchored the org identity as a trusted root (pinned id in `trusted_issuer_ids`).
 Still open: whether real deployments should rely on third-party issuer attestations for organizations (and how those issuers are discovered/administered), and which parts of that workflow must move private (trust-root administration, enterprise policy surfaces, registry operations) before implementation.
+
+## OQ-031 - How far should DigiD standardize delegation restriction semantics in the public repo?
+Working resolution for now: the public verifier may preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when it is cleanly derivable from signed inputs, while keeping one stable machine-readable warning code: `delegation-scope-conflict`.
+Still open: whether broader restriction families, customer-specific delegation templates, and richer policy-authoring workflows belong in public protocol docs at all, or should stay private with enterprise policy tooling before implementation.

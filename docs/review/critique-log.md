@@ -3,6 +3,31 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-009 - Delegation purpose-conflict critique
+- date: 2026-04-18
+- timestamp: 2026-04-18 14:20 America/Vancouver
+- reviewed slice:
+  - reason-specific authority-scope warning copy in the reference verifier
+  - signed `voice.delegation-purpose-conflict` fixture family and audited manifest coverage
+  - protocol and UX wording that keeps `delegation-scope-conflict` machine-readable while preserving purpose/channel/action specificity in rendered copy
+- strengths:
+  - sharpens DigiD's core communications-trust claim by showing not only that authority failed, but how it failed
+  - adds the missing audited negative fixture that earlier critique and red-team passes were already pointing at
+  - improves product expression without exploding the warning-code vocabulary or drifting into private policy tooling
+- concerns:
+  - the verifier now has a public-safe way to distinguish purpose, channel, and action conflicts, but richer restriction taxonomies could still spiral into customer-specific policy logic if expanded carelessly
+  - compact copy should stay constrained to clearly derivable cases; ambiguous multi-reason conflicts should remain generic
+- protocol concerns:
+  - the machine-readable warning code should stay `delegation-scope-conflict`; protocol portability would get worse if every scope subtype became a new top-level warning slug
+  - signed inputs should remain the only source for reason-specific downgrade wording
+- adoption concerns:
+  - this makes the voice wedge more legible for real receivers because `purpose not delegated` is much easier to reason about than a generic scope failure
+  - future enterprise delegation policy consoles or workflow authoring remain private-boundary work and should not be inferred from this public-safe improvement
+- recommended changes:
+  1. keep scope-conflict subtyping limited to diagnostics and copy derived from signed inputs
+  2. add a second audited scope-conflict variant only if it proves a materially different trust decision, not just a new string
+  3. keep delegation authoring, customer-specific restriction catalogs, and operational policy workflows private before implementation
+
 ## CL-008 - Verified organization trust-state critique (pinned trust roots)
 - date: 2026-04-18
 - timestamp: 2026-04-18 12:54 America/Vancouver

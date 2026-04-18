@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-031 - Preserve scope-conflict specificity in delegated trust output
+- source: `2026-04-18 DigiD 3h loop`
+- date: 2026-04-18
+- timestamp: 2026-04-18 14:20 America/Vancouver
+- area: trust-state UX
+- severity: high
+- status: applied
+- summary: DigiD already detected delegation scope conflicts, but the public demo still collapsed purpose, channel, and action failures into one generic "authority out of scope" message and lacked a signed negative fixture proving the most product-relevant case.
+- action taken: Added verifier helpers that preserve the primary out-of-scope dimension in warning copy and compact banners, plus a signed `voice.delegation-purpose-conflict` fixture family that exercises a purpose-out-of-scope delegated voice call in the manifest-audited loop.
+- linked docs: `packages/verifier/src/policy.js`, `packages/verifier/src/display.js`, `packages/verifier/src/verify-manifest.js`, `fixtures/demo/manifests/voice.delegation-purpose-conflict.manifest.json`, `docs/architecture/verifier-ux-guidance.md`, `docs/protocol/message-formats.md`
+- notes: This remains public-safe because it is still transparent verifier logic, protocol wording, and local fixture coverage. Enterprise policy authoring, customer-specific restriction taxonomies, and delegated workflow administration remain private-boundary candidates.
+
 ## DF-030 - Add verified organization trust state via pinned trust anchors
 - source: `2026-04-18 DigiD 3h loop`
 - date: 2026-04-18

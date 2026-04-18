@@ -93,6 +93,51 @@ export function evaluateOwnerBinding({ signerIdentity, operatorIdentity, attesta
   };
 }
 
+function categorizeAuthorityScopeReasons(reasons = []) {
+  const hasPurpose = reasons.includes("purpose-out-of-scope");
+  const hasChannel = reasons.includes("channel-out-of-scope");
+  const hasAction = reasons.some(
+    (reason) => reason.endsWith("-out-of-scope") && !["purpose-out-of-scope", "channel-out-of-scope"].includes(reason)
+  );
+
+  return { hasPurpose, hasChannel, hasAction };
+}
+
+export function summarizeAuthorityScopeConflict(reasons = [], options = {}) {
+  const { compact = false } = options;
+  const { hasPurpose, hasChannel, hasAction } = categorizeAuthorityScopeReasons(reasons);
+
+  if (compact) {
+    if (hasPurpose && !hasChannel && !hasAction) {
+      return "Signature valid, purpose not delegated";
+    }
+
+    if (hasChannel && !hasPurpose && !hasAction) {
+      return "Signature valid, channel not delegated";
+    }
+
+    if (hasAction && !hasPurpose && !hasChannel) {
+      return "Signature valid, action not delegated";
+    }
+
+    return "Signature valid, authority out of scope";
+  }
+
+  if (hasPurpose && !hasChannel && !hasAction) {
+    return "Delegated authority does not cover the claimed purpose";
+  }
+
+  if (hasChannel && !hasPurpose && !hasAction) {
+    return "Delegated authority does not cover the claimed channel";
+  }
+
+  if (hasAction && !hasPurpose && !hasChannel) {
+    return "Delegated authority does not cover the required communication action";
+  }
+
+  return "Delegated authority does not cover the claimed communication scope";
+}
+
 export function evaluateDelegationScope({ communication, delegation, envelopes }) {
   const delegationRequired = Boolean(communication?.operator_id || communication?.delegation_id);
   if (!delegationRequired) {

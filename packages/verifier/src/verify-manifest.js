@@ -16,7 +16,8 @@ import {
   evaluateDelegationScope,
   evaluateFreshness,
   evaluateOwnerBinding,
-  resolveVerifierPolicy
+  resolveVerifierPolicy,
+  summarizeAuthorityScopeConflict
 } from "./policy.js";
 import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
@@ -252,7 +253,12 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   }
 
   if (authorityScope.status === "out-of-scope") {
-    warnings.push(buildWarning("delegation-scope-conflict", "Delegated authority does not cover the claimed communication scope"));
+    warnings.push(
+      buildWarning(
+        "delegation-scope-conflict",
+        summarizeAuthorityScopeConflict(authorityScope.reasons)
+      )
+    );
   }
 
   if (delegationRequired && delegation && !delegationActiveNow && delegationActiveAtEventTime) {

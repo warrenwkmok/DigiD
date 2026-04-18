@@ -1,11 +1,11 @@
 {
   "object_type": "dgd.communication",
   "schema_version": "0.3",
-  "object_id": "dgd:communication:voice_acme_01",
+  "object_id": "dgd:communication:voice_scope_conflict_01",
   "status": "active",
   "channel": "voice",
   "channel_subtype": "outbound-call",
-  "session_id": "dgd:session:voice_acme_01",
+  "session_id": "dgd:session:voice_scope_conflict_01",
   "sender": {
     "identity_id": "dgd:identity:agent_01",
     "identity_class": "agent",
@@ -13,24 +13,24 @@
   },
   "operator_id": "dgd:identity:org_acme",
   "delegation_id": "dgd:delegation:agent_01_voice",
-  "purpose": "support-follow-up",
+  "purpose": "billing-notice",
   "payload": {
     "content_type": "session-manifest",
-    "content_digest": "sha256:518cd17e0c7eaeeacd3dc3755e7c9a163c0e5f52248ea3450d7a322ea49512f2",
+    "content_digest": "sha256:4680c6691fe2238980528b7c900d87a62b5b841a1f440b5c7418df9ac0fd7e6d",
     "content_length": 128,
     "media_mode": "real-time-voice"
   },
   "timestamps": {
-    "created_at": "2026-04-15T00:00:05.000Z",
-    "session_started_at": "2026-04-15T00:00:10.000Z",
+    "created_at": "2026-04-15T00:06:05.000Z",
+    "session_started_at": "2026-04-15T00:06:10.000Z",
     "session_ended_at": null
   },
-  "created_at": "2026-04-15T00:00:05.000Z",
+  "created_at": "2026-04-15T00:06:05.000Z",
   "proof": {
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
-    "created_at": "2026-04-15T00:00:05.000Z",
+    "created_at": "2026-04-15T00:06:05.000Z",
     "canonicalization": "JCS",
-    "signature": "Up/E/lWYF+igSbFc9ApMtXR5YYNz499wACz3e5/ePVAdDgcpdzITjr4ncTAgKcGa78cY+7Z7ILn2E7Zkf6dUCg=="
+    "signature": "lOoQLckQQ6b6xLot7VBKFRMuc/MPg2uVSHhH1dUByAKN8oxlQfjppdL7NzOaz0WV9mAUpqjCrBDICPVUKd4/BA=="
   }
 }

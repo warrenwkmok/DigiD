@@ -1,0 +1,28 @@
+{
+  "object_type": "dgd.session",
+  "schema_version": "0.3",
+  "object_id": "dgd:session:voice_scope_conflict_01",
+  "status": "active",
+  "session_type": "voice.live",
+  "communication_id": "dgd:communication:voice_scope_conflict_01",
+  "channel": "voice",
+  "operator_id": "dgd:identity:org_acme",
+  "sequence_scope": {
+    "scope_type": "conversation",
+    "scope_id": "dgd:session:voice_scope_conflict_01",
+    "next_expected_sequence": 2
+  },
+  "timestamps": {
+    "created_at": "2026-04-15T00:06:05.000Z",
+    "started_at": "2026-04-15T00:06:10.000Z",
+    "ended_at": null
+  },
+  "created_at": "2026-04-15T00:06:05.000Z",
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:06:05.000Z",
+    "canonicalization": "JCS",
+    "signature": "/k36ZntZDwyux3PbDDO86c3IKC9cf74J6h80a9L49DjmUeSWZ0ZjenJYt/rFloJrb6pLesc97Rm9YL6IsOZECA=="
+  }
+}

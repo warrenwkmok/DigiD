@@ -1,15 +1,15 @@
 {
   "envelope_type": "dgd.event",
   "schema_version": "0.3",
-  "envelope_id": "dgd:envelope:event_voice_started_01",
+  "envelope_id": "dgd:envelope:event_voice_scope_conflict_started_01",
   "event_type": "voice.session.started",
-  "subject_id": "dgd:communication:voice_acme_01",
+  "subject_id": "dgd:communication:voice_scope_conflict_01",
   "actor_id": "dgd:identity:agent_01",
   "operator_id": "dgd:identity:org_acme",
   "delegation_id": "dgd:delegation:agent_01_voice",
-  "conversation_id": "dgd:session:voice_acme_01",
-  "created_at": "2026-04-15T00:00:10.000Z",
-  "purpose": "support-follow-up",
+  "conversation_id": "dgd:session:voice_scope_conflict_01",
+  "created_at": "2026-04-15T00:06:10.000Z",
+  "purpose": "billing-notice",
   "sequence": 1,
   "verification_context": {
     "verification_mode": "dual",
@@ -18,15 +18,15 @@
   "payload": {
     "direction": "outbound",
     "channel_subtype": "outbound-call",
-    "session_started_at": "2026-04-15T00:00:10.000Z",
+    "session_started_at": "2026-04-15T00:06:10.000Z",
     "announcement_expected": true
   },
-  "payload_digest": "sha256:540c2c30eb5c9409ecc98c5a0d5e62d0f095ae752d13464e4219f3a852e3b8d9",
+  "payload_digest": "sha256:743822323307df8d999507a348104a510dd86deff22cc4fcee20f2d746de55c3",
   "proof": {
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
-    "created_at": "2026-04-15T00:00:10.000Z",
+    "created_at": "2026-04-15T00:06:10.000Z",
     "canonicalization": "JCS",
-    "signature": "WZANYw/RSryWYjgo3kx0Z6Ox0sC/SzVTPiSZVaDgap7xiVgQNBILnP7H78NrnlvshE5BnuXhyMDMFAZHnex1BA=="
+    "signature": "TJYRCKzoM5s+nuOG8j4VCYTcapk10TPuysKJ+V6sdbK6W1NHuQdZ2T9fxCdqiG4TBh8y9MyLcPzfe1ZleSzeAA=="
   }
 }

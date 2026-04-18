@@ -108,9 +108,24 @@ Expanded views should distinguish clearly between:
 - `Delegation no longer active`
 - `Verification stale, re-check recommended`
 - `Signature valid, authority not proven`
+- `Signature valid, purpose not delegated`
 - `Signature valid, issuer not trusted`
 - `Platform identity does not match verified DigiD identity`
 - `Artifact copied outside verified context`
+
+When one specific authority-scope dimension fails on its own, compact copy SHOULD preserve that dimension instead of collapsing everything into a generic out-of-scope warning.
+
+### Scope-conflict note
+
+If the verifier knows the authority failure is specifically about purpose, channel, or action, the product surface should say so.
+
+Example:
+- compact: `Signature valid, purpose not delegated`
+- expanded:
+  - authority scope: out-of-scope
+  - authority scope reasons: purpose-out-of-scope
+
+Keep the machine-readable warning code stable as `delegation-scope-conflict`, but preserve the primary failure dimension in rendered copy and diagnostics.
 
 ### Issuer trust warning note
 
@@ -205,6 +220,7 @@ The first verifier UI or CLI should:
 3. render warnings separately from positive trust statements
 4. distinguish event-time and current-time results when they differ
 5. treat mismatch, stale, revoked, and missing-authority states as first-class outcomes
+6. preserve the specific out-of-scope dimension when authority fails for one clear reason
 
 ## Relationship to other docs
 

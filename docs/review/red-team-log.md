@@ -3,6 +3,28 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-009 - Delegation purpose-conflict red-team pass
+- date: 2026-04-18
+- timestamp: 2026-04-18 14:20 America/Vancouver
+- reviewed slice:
+  - reason-specific scope-conflict wording in verifier output
+  - signed `voice.delegation-purpose-conflict` negative fixture
+  - protocol wording that keeps one stable `delegation-scope-conflict` code while preserving the failed scope dimension in copy
+- attack scenarios:
+  - a malicious sender presents a perfectly signed agent interaction for a real organization, but switches the communication purpose to one the delegation never authorized and relies on generic UI copy to hide the difference
+  - an adapter preserves the positive actor/org identity chips while suppressing the authority-scope reason, leading receivers to assume the communication is still within delegated bounds
+  - future product work starts encoding customer-specific restriction matrices in the public repo under the guise of `better scope diagnostics`
+- integration risks:
+  - scope diagnostics are public-safe only while they stay transparent, signed-input-derived, and fixture-audited
+  - any admin workflow for defining delegation templates, custom restriction catalogs, or tenant policy exceptions belongs on the private side of the boundary
+- exploitability notes:
+  - the new fixture materially hardens the public verifier because an attacker can no longer rely on the current repo having only generic or missing regression coverage for delegation scope conflicts
+  - preserving `purpose not delegated` in compact copy reduces the chance that a receiver treats the warning as generic noise
+- recommended mitigations:
+  1. keep scope-conflict copy derived strictly from signed purpose/channel/action inputs
+  2. require adapters to preserve degraded authority wording whenever `delegation-scope-conflict` is present
+  3. keep delegation authoring tools, enterprise policy management, and customer-specific restriction workflows private before implementation
+
 ## RT-008 - Verified organization + pinned trust root red-team pass
 - date: 2026-04-18
 - timestamp: 2026-04-18 12:54 America/Vancouver

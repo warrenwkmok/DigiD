@@ -10,7 +10,9 @@
   "verification_defaults": {
     "mode": "dual",
     "revocation_max_age_seconds": 300,
-    "trusted_issuer_ids": ["dgd:identity:org_acme"]
+    "trusted_issuer_ids": [
+      "dgd:identity:org_acme"
+    ]
   },
   "objects": [
     {

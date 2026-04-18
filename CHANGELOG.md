@@ -10,6 +10,36 @@ Format notes:
 
 ---
 
+## Iteration 22 - Add audited delegation purpose-conflict trust slice
+- date: 2026-04-18
+- timestamp: 2026-04-18 14:20 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a signed `voice.delegation-purpose-conflict` fixture family so DigiD now regression-tests the case where a delegated agent signs a real communication outside the delegated purpose
+  - upgraded verifier warning copy and compact banner derivation so single-dimension scope failures preserve the actual reason, starting with `Signature valid, purpose not delegated`
+  - tightened protocol and UX docs so `delegation-scope-conflict` stays machine-readable while rendered product surfaces preserve the failed scope dimension when it is unambiguous from signed inputs
+- changed files:
+  - `packages/verifier/src/policy.js`
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/scope-conflict/*`
+  - `fixtures/demo/manifests/voice.delegation-purpose-conflict.manifest.json`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/protocol/message-formats.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `README.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - DigiD is about communications trust under delegated authority, not just signature validity. If an agent acts outside the delegated purpose, the verifier needs to say that plainly instead of collapsing the failure into generic warning language.
+  - this closes an already-logged gap with audited signed fixtures and keeps the slice public-safe by stopping at transparent verifier logic and local demo coverage
+- next likely step at the time:
+  - decide whether the next public-safe scope slice is a channel-conflict or action-conflict variant, or whether richer delegation authoring and restriction management should move private before any further implementation
+
 ## Iteration 21 - Add verified organization trust state + pinned-org message fixture
 - date: 2026-04-18
 - timestamp: 2026-04-18 12:54 America/Vancouver

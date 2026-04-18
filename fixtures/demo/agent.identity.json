@@ -10,7 +10,7 @@
     {
       "kid": "dgd:key:agent_01:key-2026-04",
       "algorithm": "Ed25519",
-      "public_key": "MCowBQYDK2VwAyEA08nPedjOiWXyc0tCal5nn+AhnHmZNWeGYFfQRXeWC2w=",
+      "public_key": "MCowBQYDK2VwAyEAP2ADqJ0RfT0hSLNUebZMqAUfhl/z/mopebqUD2A/3qg=",
       "status": "active",
       "purposes": [
         "assertion"
@@ -36,6 +36,6 @@
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:00.000Z",
     "canonicalization": "JCS",
-    "signature": "MtDnIrtgww/N66SuUqqJs6vt7Fs2UC8Bvf/YV2o5l/0N6XamUza4BLtN4JTUncgzsviEJjV+B85lYbjRDY6zCg=="
+    "signature": "FxRl05UQVtbSLyl4mp7wxXeWDNPYpAAG/LNuF3z/kqV7lbMi7AuxOZwXdHc+XHx4shlhky92Bj8dDXXPJiaECQ=="
   }
 }

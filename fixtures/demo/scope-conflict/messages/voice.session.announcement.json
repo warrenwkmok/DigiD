@@ -1,0 +1,32 @@
+{
+  "envelope_type": "dgd.message",
+  "schema_version": "0.3",
+  "envelope_id": "dgd:envelope:msg_voice_scope_conflict_announcement_01",
+  "message_type": "voice.session.announcement",
+  "subject_id": "dgd:communication:voice_scope_conflict_01",
+  "channel": "voice",
+  "sender_id": "dgd:identity:agent_01",
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:agent_01_voice",
+  "conversation_id": "dgd:session:voice_scope_conflict_01",
+  "created_at": "2026-04-15T00:06:11.000Z",
+  "purpose": "billing-notice",
+  "verification_context": {
+    "verification_mode": "dual",
+    "revocation_max_age_seconds": 300
+  },
+  "payload": {
+    "content_type": "application/dgd+json",
+    "content_digest": "sha256:4ba77aaa369f41cb8fc5679f3de0b87f7c2a1e7a9250d0c85188a8d339746585",
+    "content_length": 64,
+    "summary": "Signature valid, purpose not delegated",
+    "purpose": "billing-notice"
+  },
+  "proof": {
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "created_at": "2026-04-15T00:06:11.000Z",
+    "canonicalization": "JCS",
+    "signature": "AQsMjZO6utS8+FEYpl3FmsnHT030rH0hjxZmDcMr8aiOYPSav3eDvJsLztDNOOnlQ8RLBMfvlr+9TLrsJV5GAA=="
+  }
+}
