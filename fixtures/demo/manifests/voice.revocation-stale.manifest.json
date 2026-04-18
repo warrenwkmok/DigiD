@@ -9,7 +9,8 @@
   "verification_time": "2026-04-15T00:12:30.000Z",
   "verification_defaults": {
     "mode": "dual",
-    "revocation_max_age_seconds": 300
+    "revocation_max_age_seconds": 300,
+    "trusted_issuer_ids": ["dgd:identity:org_acme"]
   },
   "objects": [
     {
@@ -72,7 +73,7 @@
   "expected_outcome": {
     "compact_label": "Verification stale, re-check recommended",
     "decision": "allow-with-warning",
-    "resolved_trust_state": "delegated-agent",
+    "resolved_trust_state": "org-issued-agent",
     "warning_codes": [
       "revocation-stale"
     ],

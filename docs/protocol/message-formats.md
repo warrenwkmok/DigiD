@@ -233,7 +233,7 @@ In the first delegated voice profile this message is intentionally not sequence-
     "content_type": "application/dgd+json",
     "content_digest": "sha256:...",
     "content_length": 902,
-    "summary": "Verified agent for Acme Support",
+    "summary": "Org-issued agent for Acme Support",
     "purpose": "support-follow-up"
   },
   "proof": {
@@ -456,7 +456,7 @@ Created when a delegation is no longer valid.
   },
   "payload": {
     "decision": "allow-with-warning",
-    "resolved_trust_state": "delegated-agent",
+    "resolved_trust_state": "org-issued-agent",
     "verification_mode": "dual",
     "revocation_status": "stale",
     "warning_codes": ["revocation-stale"]
@@ -492,6 +492,7 @@ To keep verifier output portable across adapters, the first profile should norma
 - `key-expired-current-time`
 - `lineage-conflict`
 - `replay-suspected`
+- `issuer-untrusted`
 - `authority-incomplete`
 - `owner-binding-missing`
 - `delegation-scope-conflict`

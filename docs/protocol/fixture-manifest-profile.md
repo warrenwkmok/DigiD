@@ -52,6 +52,7 @@ A manifest should be a JSON document shaped like this:
   "verification_defaults": {
     "mode": "dual",
     "revocation_max_age_seconds": 300,
+    "trusted_issuer_ids": ["dgd:identity:org_acme"],
     "duplicate_envelope_policy": "warn",
     "replay_policy": "same-subject-sequence-conflict-reject"
   },
@@ -121,9 +122,9 @@ A manifest should be a JSON document shaped like this:
     ]
   },
   "expected_outcome": {
-    "compact_label": "Verified agent for Acme Support",
+    "compact_label": "Org-issued agent for Acme Support",
     "decision": "allow-with-trust-indicator",
-    "resolved_trust_state": "delegated-agent",
+    "resolved_trust_state": "org-issued-agent",
     "warning_codes": [],
     "error_count": 0,
     "checks": {
@@ -169,6 +170,19 @@ For the current public fixture suite, `checks` should at least pin:
 - `replay_status`
 
 The verifier audit harness should fail when runtime output drifts from any declared expectation.
+
+## Trusted issuer anchors
+
+The fixture verifier is only meaningful if it can distinguish:
+- a trust chain rooted in a known issuer, vs
+- a self-consistent but unknown ecosystem that only proves internal signature consistency.
+
+To support this, manifests MAY include `verification_defaults.trusted_issuer_ids`, an explicit allowlist of identity ids
+that the verifier treats as trusted issuers for the scenario.
+
+Notes:
+- If omitted, the public demo verifier currently falls back to treating the `organization_identity` role as the trusted issuer.
+- This is a fixture/demo affordance, not a production trust registry design.
 
 ## Ordered dependency rules
 

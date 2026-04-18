@@ -195,12 +195,23 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const eventTime = asInstant(eventEnvelope?.created_at ?? communication?.timestamps?.session_started_at ?? communication?.created_at);
   const policy = resolveVerifierPolicy(manifest, communication);
   const maxAgeSeconds = policy.revocation_max_age_seconds;
+  const manifestTrustedIssuers = manifest?.verification_defaults?.trusted_issuer_ids;
+  const defaultTrustedIssuer = graph.roles.get("organization_identity")?.object_id ?? null;
+  const trustedIssuerIds = new Set(
+    Array.isArray(manifestTrustedIssuers)
+      ? manifestTrustedIssuers.filter((entry) => typeof entry === "string" && entry.length > 0)
+      : defaultTrustedIssuer
+        ? [defaultTrustedIssuer]
+        : []
+  );
 
   const signatureValid = errors.filter((entry) => entry.includes("Signature verification failed")).length === 0;
   const signerActiveAtEventTime = signerIdentity ? isActiveInWindow(signerIdentity, eventTime) : false;
   const signerActiveNow = signerIdentity ? isActiveInWindow(signerIdentity, verificationTime) : false;
   const attestationActiveAtEventTime = attestation ? isActiveInWindow(attestation, eventTime) : false;
   const attestationActiveNow = attestation ? isActiveInWindow(attestation, verificationTime) : false;
+  const attestationIssuerTrusted = attestation ? trustedIssuerIds.has(attestation.issuer_id) : true;
+  const issuerTrustValid = Boolean(attestationIssuerTrusted);
   const delegationRequired = Boolean(communication?.operator_id || communication?.delegation_id);
   const delegationActiveAtEventTime = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, eventTime) && (!revocation || eventTime < asInstant(revocation.revoked_at))) : true;
   const delegationActiveNow = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, verificationTime) && (!revocation || verificationTime < asInstant(revocation.revoked_at))) : true;
@@ -208,6 +219,15 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const ownerBinding = evaluateOwnerBinding({ signerIdentity, operatorIdentity, attestation, delegation, communication });
   const authorityScope = evaluateDelegationScope({ communication, delegation, envelopes: graph.envelopes });
   const revocationStatus = revocation ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
+
+  if (attestation && !attestationIssuerTrusted) {
+    warnings.push(
+      buildWarning(
+        "issuer-untrusted",
+        "Attestation issuer is not trusted by verifier policy"
+      )
+    );
+  }
 
   if (freshnessStatus === "stale") {
     warnings.push(buildWarning("revocation-stale", "Verification stale, re-check recommended"));
@@ -238,6 +258,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signerActiveAtEventTime &&
       attestationActiveAtEventTime &&
       delegationActiveAtEventTime &&
+      issuerTrustValid &&
       ownerBindingValid &&
       authorityScopeValid
   );
@@ -246,24 +267,26 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signerActiveNow &&
       attestationActiveNow &&
       delegationActiveNow &&
+      issuerTrustValid &&
       ownerBindingValid &&
       authorityScopeValid &&
       freshnessStatus !== "unknown"
   );
 
   let resolvedTrustState = "unverified";
-  if (signerIdentity?.identity_class === "human" && attestationActiveAtEventTime) {
+  if (signerIdentity?.identity_class === "human" && attestationActiveAtEventTime && issuerTrustValid) {
     resolvedTrustState = "verified-human";
   } else if (
     signerIdentity?.identity_class === "agent" &&
     attestationActiveAtEventTime &&
     delegationRequired &&
     delegationActiveAtEventTime &&
+    issuerTrustValid &&
     ownerBindingValid &&
     authorityScopeValid
   ) {
-    resolvedTrustState = "delegated-agent";
-  } else if (signerIdentity?.identity_class === "agent" && attestationActiveAtEventTime) {
+    resolvedTrustState = operatorIdentity?.identity_class === "organization" ? "org-issued-agent" : "delegated-agent";
+  } else if (signerIdentity?.identity_class === "agent" && attestationActiveAtEventTime && issuerTrustValid) {
     resolvedTrustState = "verified-agent";
   }
 
@@ -298,7 +321,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       authority_scope_reasons: authorityScope.reasons,
       revocation_status: revocationStatus,
       freshness_status: freshnessStatus,
-      replay_status: replayStatus
+      replay_status: replayStatus,
+      issuer_trust_status: attestation ? (issuerTrustValid ? "trusted" : "untrusted") : "not-required"
     },
     warnings,
     errors,

@@ -106,3 +106,7 @@ Still open: which additional evidence fields, if any, are justified per adapter 
 ## OQ-028 - Should future platform-binding evidence stay local-only or become a signed DigiD object?
 Working resolution for now: keep adapter evidence local-only and explicitly outside the signed DigiD protocol object model so the public repo can audit presentation honesty without claiming more protocol proof than DigiD currently has.
 Still open: whether commercial or standards-track profiles eventually need a signed or countersigned platform-binding primitive for higher-assurance adapter surfaces.
+
+## OQ-029 - How should verifiers learn which issuers are trusted without a public trust registry?
+Working resolution for the fixture-driven public demo: accept an explicit `trusted_issuer_ids` allowlist as verifier policy input.
+Still open: what the real-world trust-root distribution and administration model should be, and where the public/private boundary sits for issuer discovery, trust registry operations, and enterprise trust-root workflows.

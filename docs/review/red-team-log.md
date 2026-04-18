@@ -3,6 +3,28 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-007 - Trusted issuer anchors red-team pass
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:55 America/Vancouver
+- reviewed slice:
+  - `verification_defaults.trusted_issuer_ids` as a minimal trust-root input
+  - `issuer-untrusted` warning and `voice.issuer-untrusted` regression scenario
+  - explicit `org-issued-agent` trust state rendering
+- attack scenarios:
+  - an attacker creates a fully self-consistent org + agent + attestation + delegation graph and relies on a verifier treating internal signature consistency as "verified"
+  - an integration accidentally accepts a sender-supplied manifest (or equivalent policy input) that smuggles in a malicious issuer allowlist and upgrades trust incorrectly
+  - a UI collapses high-trust states back into generic "verified agent" language, masking which authority actually backs the communication
+- integration risks:
+  - issuer trust is now explicitly policy-bound; any future hosted policy registry, issuer administration, or enterprise trust-root workflow is a private-boundary candidate and should not be implemented in this public repo
+  - if adapters drop `issuer-untrusted` warnings while keeping a positive label, they recreate the original exploit path
+- exploitability notes:
+  - adding the `issuer-untrusted` scenario is a strong regression guardrail: it proves the verifier refuses to upgrade trust without an explicit trusted issuer anchor
+  - the `org-issued-agent` trust chip reduces ambiguity about who is accountable for agent actions
+- recommended mitigations:
+  1. treat trusted issuer anchors as receiver-side configuration only; never accept them from the sender in real deployments
+  2. keep trust-root administration, issuer discovery, and trust registry operations private before implementation
+  3. keep warning codes mandatory in any adapter rendering path so issuer-untrusted cannot be silently suppressed
+
 ## RT-006 - Adapter evidence contract red-team pass
 - date: 2026-04-18
 - timestamp: 2026-04-18 00:10 America/Vancouver

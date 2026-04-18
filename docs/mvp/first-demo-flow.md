@@ -123,7 +123,7 @@ The verifier checks:
 
 ### 9. UI renders trust state
 Compact state:
-- **Verified agent for Acme Support**
+- **Org-issued agent for Acme Support**
 
 Expanded state:
 - sender: Acme Support Agent 01
@@ -202,7 +202,7 @@ The first demo should render at least these four outcomes from the same fixture 
 
 | Scenario | Event-time result | Current-time result | Expected UI posture |
 | --- | --- | --- | --- |
-| happy path | valid | valid | Verified agent for Acme Support |
+| happy path | valid | valid | Org-issued agent for Acme Support |
 | delegation revoked after call | valid | degraded or reject | Delegation no longer active |
 | stale revocation data | valid | warning | Verification stale, re-check recommended |
 | missing delegation | degraded | degraded | Signature valid, authority not proven |
@@ -267,7 +267,7 @@ The renderer should only treat these as trust-proven inputs:
 Unsigned adapter metadata may be shown as operational context, but not inside the core trust banner or compact trust chip.
 
 Suggested compact outputs:
-- `Verified agent for Acme Support`
+- `Org-issued agent for Acme Support`
 - `Delegation no longer active`
 - `Verification stale, re-check recommended`
 - `Unverified sender`

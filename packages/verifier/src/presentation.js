@@ -65,6 +65,8 @@ function chooseDecision(baseDecision, synthesizedWarningCodes) {
 
 function deriveMismatchCompactLabel(contract) {
   switch (contract.resolved_trust_state) {
+    case "org-issued-agent":
+      return "Org-issued agent, platform identity mismatch";
     case "delegated-agent":
     case "verified-agent":
       return "Verified agent, platform identity mismatch";

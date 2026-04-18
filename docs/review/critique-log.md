@@ -1,7 +1,41 @@
-# DigiD critique log
+﻿# DigiD critique log
 
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
+
+## CL-007 - Trusted issuer anchors and org-issued agent trust-state critique
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:55 America/Vancouver
+- reviewed slice:
+  - `verification_defaults.trusted_issuer_ids` allowlist for fixture manifests
+  - `issuer-untrusted` warning and the `voice.issuer-untrusted` regression scenario
+  - explicit `org-issued-agent` trust state for organization-backed agents
+- strengths:
+  - directly addresses the fake authenticated agent ecosystem failure mode: signature consistency is no longer treated as equivalent to issuer-backed trust
+  - keeps the public demo honest by forcing trust-root decisions to be explicit in the manifest instead of implicitly trusting self-asserted `verification_state`
+  - improves product expression by separating org-issued agent from generic authenticated/verified agent language
+- concerns:
+  - `trusted_issuer_ids` is a demo harness input; it must not drift into a public hosted trust registry or policy-admin surface
+  - the warning vocabulary should remain small; issuer trust should not turn into a sprawling reason-code taxonomy in the public repo
+  - the "who is trusted?" question is now front-and-center and must be treated as a boundary-sensitive product decision
+- protocol concerns:
+  - issuer trust is a policy input, not something the signature chain can self-assert; the verifier must keep rejecting self-contained ecosystems even if they look internally coherent
+  - `org-issued-agent` should remain a trust-state classification derived from authority + issuer trust, not a field agents can "declare"
+- adoption concerns:
+  - this makes the voice demo more believable in a real receiver environment: if the receiver has not anchored the issuer, the UI degrades instead of showing a strong badge
+  - future enterprise issuance/trust-root workflows likely belong in private commercial tooling before implementation
+- recommended changes:
+  1. keep `trusted_issuer_ids` as the only public trust-anchor input for fixtures; do not add registry operations to the public repo
+  2. treat future issuer discovery, revocation distribution, and trust-root administration as private-boundary candidates
+  3. add a short UX note that "issuer not trusted" is about receiver policy, not signature failure
+
+## Status
+- applied in this iteration:
+  - trusted issuer anchors in fixture manifests
+  - issuer trust enforcement in the reference verifier
+  - explicit org-issued agent trust state
+- deferred to next loops:
+  - any trust registry operations or issuer administration workflows
 
 ## CL-006 - Adapter evidence contract critique
 - date: 2026-04-18

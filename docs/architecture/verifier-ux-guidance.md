@@ -49,7 +49,7 @@ The compact banner should answer:
 - `Verified human`
 - `Verified organization`
 - `Verified agent`
-- `Verified agent for Acme Support`
+- `Org-issued agent for Acme Support`
 - `Delegation no longer active`
 - `Verification stale, re-check recommended`
 - `Unverified sender`

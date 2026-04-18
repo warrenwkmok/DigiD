@@ -18,7 +18,7 @@
   "expected_outcome": {
     "base_decision": "allow-with-trust-indicator",
     "effective_decision": "allow-with-warning",
-    "effective_compact_label": "Verified agent, platform identity mismatch",
+    "effective_compact_label": "Org-issued agent, platform identity mismatch",
     "synthesized_warning_codes": [
       "platform-identity-mismatch"
     ],

@@ -90,7 +90,7 @@ The adapter should expose:
 
 ### Compact posture
 Prefer short labels such as:
-- `Verified agent for Acme Support`
+- `Org-issued agent for Acme Support`
 - `Verification stale`
 - `Delegation no longer active`
 - `Unverified sender`

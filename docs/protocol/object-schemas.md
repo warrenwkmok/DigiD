@@ -546,8 +546,8 @@ Represents a portable verifier output that downstream UIs can render without rep
     "event_time_valid": true,
     "current_time_valid": true
   },
-  "resolved_trust_state": "delegated-agent",
-  "display_summary": "Verified agent acting for Acme Support",
+  "resolved_trust_state": "org-issued-agent",
+  "display_summary": "Org-issued agent for Acme Support",
   "warnings": [],
   "errors": []
 }

@@ -139,10 +139,11 @@ If signer identity resolution is ambiguous, verification MUST fail.
 
 ## Trust path requirements
 
-A verifier MUST NOT render `verified-agent` or `delegated-agent` unless:
+A verifier MUST NOT render `verified-agent`, `delegated-agent`, or `org-issued-agent` unless:
 - the signer identity is active
 - the signing key is active at evaluation time or valid at event time under accepted historical policy
 - a qualifying attestation path exists
+- the issuer(s) of that trust path are trusted under the verifier's policy inputs
 - any required delegation exists and is in scope
 - the signer identity's controlling human or organization is bound through a signed ownership chain when the agent is not self-controlled
 

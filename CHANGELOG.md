@@ -10,10 +10,40 @@ Format notes:
 
 ---
 
+## Iteration 20 - Add trusted issuer anchors and org-issued agent trust state
+- date: 2026-04-18
+- timestamp: 2026-04-18 10:07 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added an explicit `verification_defaults.trusted_issuer_ids` allowlist to fixture manifests so the reference verifier can distinguish trusted issuer roots from self-consistent but unknown ecosystems
+  - introduced the `issuer-untrusted` warning and a new `voice.issuer-untrusted` regression scenario where signatures are valid but no trusted issuer anchor exists
+  - upgraded the product-facing trust chip from generic delegated-agent language to an explicit `org-issued-agent` trust state for organization-backed communications, including adapter mismatch labels
+- changed files:
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/presentation.js`
+  - `fixtures/demo/manifests/*.json`
+  - `fixtures/demo/presentation/*.json`
+  - `docs/protocol/fixture-manifest-profile.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/architecture/trust-states.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `CHANGELOG.md`
+- why it mattered:
+  - DigiD is about owner-bound authority and communications trust, not just “an authenticated agent”; trusted issuer anchors are the minimal missing ingredient that prevents fake self-contained trust ecosystems from being misrendered as verified
+  - `org-issued-agent` makes the trust UI closer to the real product question: who is acting, under whose authority, and is that authority anchored in something the receiver actually trusts?
+- next likely step at the time:
+  - add a short receiver-facing UX note that “issuer not trusted” is a policy/trust-root gap, not a signature failure, and decide which issuer discovery / trust registry workflows must stay private before implementation
+
 ## Iteration 19 - Add fixture-backed adapter evidence and presentation audit
 - date: 2026-04-18
 - timestamp: 2026-04-18 00:10 America/Vancouver
-- commit: `uncommitted`
+- commit: `946ab5a`
 - summary:
   - added a bounded local `dgd.adapter_evidence` contract so `platform-identity-mismatch` and `artifact-context-missing` no longer depend on manual demo flags
   - added fixture-backed voice presentation evidence plus `present-evidence` and `present-audit` CLI flows so adapter-facing honesty can be regression-tested locally

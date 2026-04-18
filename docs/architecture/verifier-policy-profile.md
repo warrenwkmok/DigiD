@@ -160,7 +160,7 @@ Good:
 - details: `Call artifacts were validly signed at event time, but current delegated authority is no longer active.`
 
 Bad:
-- `Verified agent for Acme Support` with only a hidden warning about revocation
+- `Org-issued agent for Acme Support` with only a hidden warning about revocation
 
 ## Restriction conflict policy
 

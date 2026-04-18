@@ -9,7 +9,8 @@
   "verification_time": "2026-04-15T00:05:00.000Z",
   "verification_defaults": {
     "mode": "dual",
-    "revocation_max_age_seconds": 300
+    "revocation_max_age_seconds": 300,
+    "trusted_issuer_ids": ["dgd:identity:org_acme"]
   },
   "objects": [
     {
@@ -70,9 +71,9 @@
     }
   ],
   "expected_outcome": {
-    "compact_label": "Verified agent for Acme Support",
+    "compact_label": "Org-issued agent for Acme Support",
     "decision": "allow-with-trust-indicator",
-    "resolved_trust_state": "delegated-agent",
+    "resolved_trust_state": "org-issued-agent",
     "warning_codes": [],
     "error_count": 0,
     "checks": {

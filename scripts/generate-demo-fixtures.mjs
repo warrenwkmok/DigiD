@@ -938,18 +938,47 @@ function buildManifests() {
       description: "Verified delegated agent voice call for Acme Support",
       lineage_group: "demo-voice-acme-01",
       verification_time: iso("2026-04-15T00:05:00Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
       objects: baseObjects,
       expected_outcome: {
-        compact_label: "Verified agent for Acme Support",
+        compact_label: "Org-issued agent for Acme Support",
         decision: "allow-with-trust-indicator",
-        resolved_trust_state: "delegated-agent",
+        resolved_trust_state: "org-issued-agent",
         warning_codes: [],
         error_count: 0,
         checks: {
           signature_valid: true,
           event_time_valid: true,
           current_time_valid: true,
+          owner_binding_status: "bound",
+          authority_scope_status: "in-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
+      }
+    },
+    "fixtures/demo/manifests/voice.issuer-untrusted.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_issuer_untrusted",
+      scenario_id: "voice-issuer-untrusted",
+      scenario_class: "delegated-agent-voice",
+      description: "All signatures valid, but issuer is not trusted by verifier policy",
+      lineage_group: "demo-voice-acme-01",
+      verification_time: iso("2026-04-15T00:05:00Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: [] },
+      objects: baseObjects,
+      expected_outcome: {
+        compact_label: "Signature valid, issuer not trusted",
+        decision: "degraded-trust",
+        resolved_trust_state: "unverified",
+        warning_codes: ["issuer-untrusted"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
           owner_binding_status: "bound",
           authority_scope_status: "in-scope",
           revocation_status: "clear",
@@ -967,12 +996,12 @@ function buildManifests() {
       description: "Delegation revoked after the call",
       lineage_group: "demo-voice-acme-01",
       verification_time: iso("2026-04-15T00:15:00Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
       objects: [...baseObjects, { role: "delegation_revocation", object_type: "dgd.revocation", path: "fixtures/demo/revocations/delegation.revoked.json", required: true, stable_across_lineage: false }],
       expected_outcome: {
         compact_label: "Delegation no longer active",
         decision: "allow-with-warning",
-        resolved_trust_state: "delegated-agent",
+        resolved_trust_state: "org-issued-agent",
         warning_codes: ["delegation-expired-current-time", "revocation-stale"],
         error_count: 0,
         checks: {
@@ -996,12 +1025,12 @@ function buildManifests() {
       description: "Revocation checks have gone stale",
       lineage_group: "demo-voice-acme-01",
       verification_time: iso("2026-04-15T00:12:30Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
       objects: baseObjects,
       expected_outcome: {
         compact_label: "Verification stale, re-check recommended",
         decision: "allow-with-warning",
-        resolved_trust_state: "delegated-agent",
+        resolved_trust_state: "org-issued-agent",
         warning_codes: ["revocation-stale"],
         error_count: 0,
         checks: {
@@ -1025,7 +1054,7 @@ function buildManifests() {
       description: "Delegated envelope lineage without the delegation object",
       lineage_group: "demo-voice-acme-01",
       verification_time: iso("2026-04-15T00:05:00Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
       objects: baseObjects.filter((entry) => entry.role !== "agent_delegation"),
       expected_outcome: {
         compact_label: "Signature valid, authority not proven",
@@ -1054,7 +1083,7 @@ function buildManifests() {
       description: "Verified human direct voice call",
       lineage_group: "demo-voice-human-01",
       verification_time: iso("2026-04-15T00:05:00Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
       objects: [
         { role: "organization_identity", object_type: "dgd.identity", path: "fixtures/demo/org.identity.json", required: true, stable_across_lineage: true },
         { role: "human_identity", object_type: "dgd.identity", path: "fixtures/demo/human.identity.json", required: true, stable_across_lineage: true },
@@ -1126,7 +1155,7 @@ function buildManifests() {
       description: "Valid delegated voice lineage where the acting operator and delegation issuer do not match the agent's verified owner",
       lineage_group: "demo-voice-owner-binding-01",
       verification_time: iso("2026-04-15T00:25:00Z"),
-      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300 },
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme_owner_binding"] },
       objects: [
         { role: "owner_identity", object_type: "dgd.identity", path: "fixtures/demo/owner-binding/owner.identity.json", required: true, stable_across_lineage: true },
         { role: "rogue_operator_identity", object_type: "dgd.identity", path: "fixtures/demo/owner-binding/rogue-org.identity.json", required: true, stable_across_lineage: true },

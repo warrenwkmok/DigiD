@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-029 - Require trusted issuer anchors for high-trust states
+- source: `2026-04-18 DigiD 3h loop`
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:55 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: A self-consistent signature chain can still be a fake authenticated ecosystem unless verifiers have an explicit notion of which issuers they trust. The public demo needed a minimal, fixture-safe way to model issuer trust without building a trust registry.
+- action taken: Added `verification_defaults.trusted_issuer_ids` to the fixture manifest profile and enforced it in the reference verifier. Introduced the `issuer-untrusted` warning and a new `voice.issuer-untrusted` fixture manifest to keep this failure mode regression-tested. Also split the product-facing trust chip into an explicit `org-issued-agent` state instead of collapsing it into generic “verified agent”.
+- linked docs: `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/display.js`, `fixtures/demo/manifests/voice.issuer-untrusted.manifest.json`, `docs/protocol/fixture-manifest-profile.md`, `docs/protocol/normative-protocol-draft.md`, `docs/architecture/trust-states.md`
+- notes: This stays public-safe because it is a local policy input and fixture harness contract, not a hosted trust registry, tenant policy console, or enterprise integration layer.
+
 ## DF-028 - Standardize a local adapter evidence contract before any channel profile grows
 - source: `2026-04-18 DigiD 3h loop`
 - date: 2026-04-18

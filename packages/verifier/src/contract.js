@@ -40,6 +40,7 @@ export function derivePortableResultContract(result) {
     interaction_class: interactionClass,
     warning_codes: warningCodes,
     must_preserve_fields: [
+      "checks.issuer_trust_status",
       "checks.owner_binding_status",
       "checks.owner_binding_reasons",
       "checks.authority_scope_status",
@@ -77,6 +78,7 @@ export function derivePortableResultContract(result) {
       signature_valid: result.checks.signature_valid,
       event_time_valid: result.checks.event_time_valid,
       current_time_valid: result.checks.current_time_valid,
+      issuer_trust_status: result.checks.issuer_trust_status,
       owner_binding_status: result.checks.owner_binding_status,
       owner_binding_reasons: result.checks.owner_binding_reasons,
       authority_scope_status: result.checks.authority_scope_status,

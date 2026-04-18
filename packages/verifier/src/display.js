@@ -5,6 +5,10 @@ export function deriveCompactBanner(result) {
     return "Delegation no longer active";
   }
 
+  if (warningCodes.has("issuer-untrusted")) {
+    return "Signature valid, issuer not trusted";
+  }
+
   if (warningCodes.has("authority-incomplete")) {
     return "Signature valid, authority not proven";
   }
@@ -26,10 +30,16 @@ export function deriveCompactBanner(result) {
   }
 
   switch (result.resolved_trust_state) {
+    case "org-issued-agent":
+      return `Org-issued agent for ${result.operator_identity?.display_name ?? "unknown operator"}`;
     case "delegated-agent":
-      return `Verified agent for ${result.operator_identity?.display_name ?? "unknown operator"}`;
+      return `Delegated agent for ${result.operator_identity?.display_name ?? "unknown operator"}`;
     case "verified-human":
       return "Verified human";
+    case "verified-organization":
+      return "Verified organization";
+    case "verified-agent":
+      return "Verified agent";
     case "unverified":
       return "Unverified sender";
     default:
@@ -53,6 +63,7 @@ export function renderExpandedDetails(result) {
     ["Verification mode", result.verification_mode],
     ["Interaction class", result.policy.interaction_class],
     ["Signature valid", String(result.checks.signature_valid)],
+    ["Issuer trust", result.checks.issuer_trust_status ?? "unknown"],
     ["Event-time valid", String(result.checks.event_time_valid)],
     ["Current-time valid", String(result.checks.current_time_valid)],
     ["Owner binding", result.checks.owner_binding_status],

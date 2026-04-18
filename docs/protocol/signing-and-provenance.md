@@ -166,7 +166,7 @@ And separately whether the signer is:
 That lets the UI say things like:
 - Verified human
 - Verified agent
-- Verified agent for Acme Support
+- Org-issued agent for Acme Support
 - Verified service for Acme Support
 - Signature valid, authority no longer active
 
