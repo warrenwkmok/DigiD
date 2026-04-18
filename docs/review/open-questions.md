@@ -100,5 +100,9 @@ Working resolution for now: keep audited manifests, checked-in demo fixtures, an
 Still open: whether DigiD should use fixed demo-only signing keys, deterministic seeded keys, or full-corpus regeneration as the intended path for adding new signed negative scenarios such as delegation-scope conflict. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
 
 ## OQ-027 - What is the minimum public-safe evidence contract for adapter mismatch and context-loss inputs?
-Working resolution for now: the public repo can simulate platform mismatch and context loss through local presentation guardrails over exported verifier contracts, using explicit local flags or demo-supplied evidence rather than a hosted adapter decision service.
-Still open: which evidence fields should eventually be standardized per adapter profile so Slack handles, caller ids, email senders, transcripts, or copied artifacts trigger mismatch/context-loss warnings consistently without turning the public repo into a tenant-aware policy engine.
+Working resolution for now: the public repo should use a local `dgd.adapter_evidence` contract with fixture-backed `presentation_context.verified_context_status` and `platform_identity.binding_status` fields so mismatch and context-loss warnings no longer depend on manual flags.
+Still open: which additional evidence fields, if any, are justified per adapter profile without turning the public repo into a tenant-aware policy engine or a channel-specific business-rules matrix.
+
+## OQ-028 - Should future platform-binding evidence stay local-only or become a signed DigiD object?
+Working resolution for now: keep adapter evidence local-only and explicitly outside the signed DigiD protocol object model so the public repo can audit presentation honesty without claiming more protocol proof than DigiD currently has.
+Still open: whether commercial or standards-track profiles eventually need a signed or countersigned platform-binding primitive for higher-assurance adapter surfaces.

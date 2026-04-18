@@ -3,6 +3,36 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-006 - Adapter evidence contract red-team pass
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:10 America/Vancouver
+- reviewed slice:
+  - local `dgd.adapter_evidence` contract
+  - fixture-backed platform-mismatch and context-loss evidence
+  - demo CLI `present-evidence` and `present-audit` flows
+- attack scenarios:
+  - an adapter reuses a positive verifier contract but never records whether the verified surface was preserved, allowing copied artifacts to inherit a trust badge
+  - an adapter claims platform mismatch checks exist while never actually providing a deterministic binding-status input
+  - the local evidence contract slowly accumulates customer rules and becomes a de facto hosted adapter policy engine
+- integration risks:
+  - if additional adapter fields proliferate without discipline, the evidence contract will stop being auditable and start acting like channel-specific workflow state
+  - a future platform-binding primitive may need signing or countersigning, but conflating that future need with the current local evidence contract would blur protocol and presentation responsibilities
+- exploitability notes:
+  - this slice materially hardens the current public reference surface because mismatch and context-loss can now be regression-tested from checked-in evidence files instead of manual flags
+  - the commercial moat still depends on keeping conformance, tenancy, and rollout tooling outside the public repo
+- recommended mitigations:
+  1. keep adapter evidence schema small and local-only
+  2. require fixture-backed presentation audit before expanding to a second adapter family
+  3. move any hosted adapter conformance services, tenant-aware rendering APIs, or enterprise rollout tooling private before implementation
+
+## Status
+- applied in this iteration:
+  - fixture-backed adapter evidence schema
+  - presentation expectation audit over local evidence files
+- planned:
+  - boundary decision for any future signed platform-binding object
+  - private-boundary split before hosted adapter conformance work
+
 ## RT-005 - Presentation guardrail red-team pass
 - date: 2026-04-17
 - timestamp: 2026-04-17 13:35 America/Vancouver
@@ -28,6 +58,35 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - applied in this iteration:
   - local mismatch/context-loss warning synthesis
   - demoable guardrail degradation for copied or mismatched surfaces
+
+## RT-006 - Adapter evidence contract red-team pass
+- date: 2026-04-17
+- timestamp: 2026-04-17 21:34 America/Vancouver
+- reviewed slice:
+  - portable verifier contract
+  - presentation guardrail synthesis
+  - Slack adapter concept and normative protocol wording
+- attack scenarios:
+  - an adapter inherits the portable result contract but supplies platform identity as an unstated local flag, so mismatch becomes a UI choice instead of a signed evidence check
+  - a forwarded or quoted artifact still looks verifiable because the current public contract can synthesize `platform-identity-mismatch` and `artifact-context-missing`, but it cannot yet prove a channel-specific binding object for Slack, email, or other adapters
+  - hosted adapter logic could be introduced later under the guise of "profile conformance" and gradually absorb trust-decision behavior that should stay local or private-boundary
+- integration risks:
+  - the docs describe mismatch handling, but the repo still lacks a concrete signed adapter evidence schema for platform-native identity binding
+  - without a fixture-backed evidence shape, downstream adapters can implement the right warning text while skipping the real binding test
+- exploitability notes:
+  - this is exploitable as a presentation downgrade: a receiver can be shown a positive compact label with no mechanically verified platform-binding proof behind it
+  - the gap is public-safe to close with local fixtures and contract code, but not with a hosted decision service
+- recommended mitigations:
+  1. add a minimal signed adapter evidence object or fixture-backed profile for platform identity binding
+  2. require the public contract to synthesize mismatch only from that evidence object, not from manual flags alone
+  3. keep adapter conformance evaluation local and transparent until the public repo stops being the source of trust decisions
+
+## Status
+- applied in this iteration:
+  - RT-006 evidence-contract gap logged
+- planned:
+  - fixture-backed adapter evidence profile
+  - local-only conformance checks for mismatch/context loss
 - planned:
   - bounded adapter evidence contract
   - private-boundary split before any hosted adapter service work

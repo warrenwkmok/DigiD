@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-028 - Standardize a local adapter evidence contract before any channel profile grows
+- source: `2026-04-18 DigiD 3h loop`
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:10 America/Vancouver
+- area: architecture
+- severity: high
+- status: applied
+- summary: DigiD could already synthesize `platform-identity-mismatch` and `artifact-context-missing`, but the trigger path still depended on manual CLI flags instead of a bounded fixture-backed adapter evidence shape.
+- action taken: Added a local `dgd.adapter_evidence` contract, fixture-backed presentation evidence files, a `present-evidence` flow, a `present-audit` regression pass, and architecture updates that keep adapter evidence explicitly local-only and separate from signed protocol objects.
+- linked docs: `packages/verifier/src/presentation.js`, `packages/verifier/src/contract.js`, `apps/demo-cli/src/index.js`, `fixtures/demo/presentation/*.json`, `docs/architecture/adapter-evidence-contract.md`, `docs/architecture/verifier-result-contract.md`, `README.md`
+- notes: This remains public-safe because the contract is still transparent local evidence over exported verifier output, not a hosted adapter decision service, tenant policy engine, or new production trust object.
+
 ## DF-027 - Make adapter-facing mismatch and context-loss guardrails executable locally before any public adapter code appears
 - source: `2026-04-17 DigiD 3h loop`
 - date: 2026-04-17

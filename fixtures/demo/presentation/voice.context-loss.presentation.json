@@ -1,0 +1,33 @@
+{
+  "evidence_type": "dgd.adapter_evidence",
+  "schema_version": "0.1",
+  "evidence_id": "dgd:evidence:voice_context_loss",
+  "manifest_path": "fixtures/demo/manifests/voice.happy-path.manifest.json",
+  "adapter_profile": "voice-sidecar-v0",
+  "presentation_context": {
+    "verified_context_status": "lost",
+    "surface": "call_transcript_export",
+    "context_source": "copied_artifact"
+  },
+  "platform_identity": {
+    "binding_status": "matched",
+    "platform": "pstn",
+    "native_label": "Acme Support callback",
+    "verified_label": "Acme Support Agent 01"
+  },
+  "expected_outcome": {
+    "base_decision": "allow-with-trust-indicator",
+    "effective_decision": "allow-with-warning",
+    "effective_compact_label": "Artifact copied outside verified context",
+    "synthesized_warning_codes": [
+      "artifact-context-missing"
+    ],
+    "effective_warning_codes": [
+      "artifact-context-missing"
+    ],
+    "presentation_context": {
+      "verified_context_status": "lost",
+      "platform_identity_status": "matched"
+    }
+  }
+}

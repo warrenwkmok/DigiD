@@ -41,6 +41,16 @@ A portable verifier result contract SHOULD include:
 - preserved check fields for owner binding, authority scope, revocation, freshness, and replay posture
 - rendering guardrails that tell adapters what must remain visible
 
+The local public demo may also pair that result with a separate local adapter evidence document:
+- `evidence_type: dgd.adapter_evidence`
+- one `manifest_path` pointing at the verifier scenario it decorates
+- local presentation-context evidence
+- local platform-binding evidence
+- optional presentation expectations for local audit
+
+That evidence contract is not a new signed DigiD protocol object.
+It is a bounded local adapter-profile input so mismatch and context-loss states stop depending on manual CLI flags.
+
 ## Required rendering guardrails
 
 Adapters or local demos consuming this contract SHOULD preserve:
@@ -54,6 +64,32 @@ Adapters SHOULD also obey these guardrails:
 - warning visibility is mandatory whenever warning codes are present
 - positive compact labels MUST NOT survive if the warning channel is removed
 - live trust surfaces SHOULD treat the result as bound to a verified context, not as a screenshot-safe badge
+
+## Local adapter evidence contract v0.1
+
+The current public-safe adapter evidence contract should stay minimal.
+
+Required fields:
+- `evidence_type`
+- `schema_version`
+- `evidence_id`
+- `manifest_path`
+- `adapter_profile`
+- `presentation_context.verified_context_status`
+- `platform_identity.binding_status`
+
+Allowed values in the first slice:
+- `presentation_context.verified_context_status`: `preserved` or `lost`
+- `platform_identity.binding_status`: `matched`, `mismatch`, or `unavailable`
+
+Optional local context:
+- `presentation_context.surface`
+- `presentation_context.context_source`
+- `platform_identity.platform`
+- `platform_identity.native_label`
+- `platform_identity.verified_label`
+
+This shape is intentionally small so DigiD can regression-test adapter honesty without turning the public repo into a tenant-aware policy matrix.
 
 ## Context-loss handling
 
@@ -72,5 +108,5 @@ This keeps adapters honest about Slack handles, messaging accounts, caller ids, 
 ## Relationship to the reference verifier
 
 The public reference verifier may export this contract through a local CLI or library API.
-The public reference verifier may also apply local presentation guardrails over the exported contract to simulate context loss or platform mismatch in demos.
-That remains public-safe because it exposes transparent diagnostics and warning synthesis rules, not tenant-specific hosted policy, adapter orchestration, or operational infrastructure.
+The public reference verifier may also apply local presentation guardrails over the exported contract using a checked-in local adapter evidence file or explicit local demo flags.
+That remains public-safe because it exposes transparent diagnostics, small evidence contracts, and warning synthesis rules, not tenant-specific hosted policy, adapter orchestration, or operational infrastructure.

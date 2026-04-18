@@ -10,8 +10,47 @@ const warningMessages = {
   "platform-identity-mismatch": "Platform identity does not match verified DigiD identity"
 };
 
+const allowedVerifiedContextStatuses = new Set(["preserved", "lost"]);
+const allowedPlatformIdentityStatuses = new Set(["matched", "mismatch", "unavailable"]);
+
 function dedupe(values) {
   return [...new Set(values)];
+}
+
+function arraysEqual(left = [], right = []) {
+  return JSON.stringify([...left].sort()) === JSON.stringify([...right].sort());
+}
+
+function normalizeAdapterEvidence(evidence) {
+  if (evidence?.evidence_type !== "dgd.adapter_evidence") {
+    throw new Error("Adapter evidence must declare evidence_type dgd.adapter_evidence");
+  }
+
+  const verifiedContextStatus = evidence.presentation_context?.verified_context_status ?? "preserved";
+  if (!allowedVerifiedContextStatuses.has(verifiedContextStatus)) {
+    throw new Error(`Unsupported verified_context_status: ${verifiedContextStatus}`);
+  }
+
+  const platformIdentityStatus = evidence.platform_identity?.binding_status ?? "matched";
+  if (!allowedPlatformIdentityStatuses.has(platformIdentityStatus)) {
+    throw new Error(`Unsupported platform identity binding status: ${platformIdentityStatus}`);
+  }
+
+  return {
+    evidence_id: evidence.evidence_id ?? null,
+    adapter_profile: evidence.adapter_profile ?? "unspecified",
+    presentation_context: {
+      verified_context_status: verifiedContextStatus,
+      surface: evidence.presentation_context?.surface ?? null,
+      context_source: evidence.presentation_context?.context_source ?? null
+    },
+    platform_identity: {
+      binding_status: platformIdentityStatus,
+      platform: evidence.platform_identity?.platform ?? null,
+      native_label: evidence.platform_identity?.native_label ?? null,
+      verified_label: evidence.platform_identity?.verified_label ?? null
+    }
+  };
 }
 
 function chooseDecision(baseDecision, synthesizedWarningCodes) {
@@ -99,5 +138,89 @@ export function applyPresentationGuardrails(contract, options = {}) {
     },
     must_preserve_fields: contract.must_preserve_fields,
     checks: contract.checks
+  };
+}
+
+export function applyAdapterEvidence(contract, evidence) {
+  const normalizedEvidence = normalizeAdapterEvidence(evidence);
+  const presentation = applyPresentationGuardrails(contract, {
+    verified_context_preserved: normalizedEvidence.presentation_context.verified_context_status !== "lost",
+    platform_identity_status: normalizedEvidence.platform_identity.binding_status
+  });
+
+  return {
+    ...presentation,
+    adapter_evidence: normalizedEvidence
+  };
+}
+
+export function evaluatePresentationExpectations(presentation, expectedOutcome) {
+  if (!expectedOutcome) {
+    return {
+      checked: false,
+      passed: true,
+      mismatches: []
+    };
+  }
+
+  const mismatches = [];
+
+  if (expectedOutcome.base_decision && presentation.base_decision !== expectedOutcome.base_decision) {
+    mismatches.push(`Expected base_decision ${expectedOutcome.base_decision}, received ${presentation.base_decision}`);
+  }
+
+  if (expectedOutcome.effective_decision && presentation.effective_decision !== expectedOutcome.effective_decision) {
+    mismatches.push(`Expected effective_decision ${expectedOutcome.effective_decision}, received ${presentation.effective_decision}`);
+  }
+
+  if (
+    expectedOutcome.effective_compact_label &&
+    presentation.effective_compact_label !== expectedOutcome.effective_compact_label
+  ) {
+    mismatches.push(
+      `Expected effective_compact_label ${expectedOutcome.effective_compact_label}, received ${presentation.effective_compact_label}`
+    );
+  }
+
+  if (
+    expectedOutcome.synthesized_warning_codes &&
+    !arraysEqual(presentation.synthesized_warning_codes, expectedOutcome.synthesized_warning_codes)
+  ) {
+    mismatches.push(
+      `Expected synthesized_warning_codes ${expectedOutcome.synthesized_warning_codes.join(", ") || "none"}, received ${presentation.synthesized_warning_codes.join(", ") || "none"}`
+    );
+  }
+
+  if (
+    expectedOutcome.effective_warning_codes &&
+    !arraysEqual(presentation.effective_warning_codes, expectedOutcome.effective_warning_codes)
+  ) {
+    mismatches.push(
+      `Expected effective_warning_codes ${expectedOutcome.effective_warning_codes.join(", ") || "none"}, received ${presentation.effective_warning_codes.join(", ") || "none"}`
+    );
+  }
+
+  if (
+    expectedOutcome.presentation_context?.verified_context_status &&
+    presentation.presentation_context.verified_context_status !== expectedOutcome.presentation_context.verified_context_status
+  ) {
+    mismatches.push(
+      `Expected verified_context_status ${expectedOutcome.presentation_context.verified_context_status}, received ${presentation.presentation_context.verified_context_status}`
+    );
+  }
+
+  if (
+    expectedOutcome.presentation_context?.platform_identity_status &&
+    presentation.presentation_context.platform_identity_status !== expectedOutcome.presentation_context.platform_identity_status
+  ) {
+    mismatches.push(
+      `Expected platform_identity_status ${expectedOutcome.presentation_context.platform_identity_status}, received ${presentation.presentation_context.platform_identity_status}`
+    );
+  }
+
+  return {
+    checked: true,
+    passed: mismatches.length === 0,
+    mismatches
   };
 }

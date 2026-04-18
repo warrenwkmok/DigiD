@@ -10,6 +10,36 @@ Format notes:
 
 ---
 
+## Iteration 19 - Add fixture-backed adapter evidence and presentation audit
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:10 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - added a bounded local `dgd.adapter_evidence` contract so `platform-identity-mismatch` and `artifact-context-missing` no longer depend on manual demo flags
+  - added fixture-backed voice presentation evidence plus `present-evidence` and `present-audit` CLI flows so adapter-facing honesty can be regression-tested locally
+  - kept the boundary explicit by treating adapter evidence as local presentation input over exported verifier contracts, not as a hosted adapter decision service, tenant-aware policy layer, or new signed protocol object
+- changed files:
+  - `packages/verifier/src/presentation.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/index.js`
+  - `apps/demo-cli/src/index.js`
+  - `fixtures/demo/presentation/*.json`
+  - `docs/architecture/adapter-evidence-contract.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `README.md`
+  - `docs/INDEX.md`
+  - `package.json`
+  - `CHANGELOG.md`
+- why it mattered:
+  - this closes the next public-safe adapter gap by making presentation mismatch and context-loss reproducible from checked-in evidence files instead of ad hoc local inputs, while still avoiding any hosted adapter runtime or policy engine in the public repo
+- next likely step at the time:
+  - decide whether the next public-safe adapter slice is a second bounded evidence profile or whether stronger platform-binding assurance belongs in a future signed profile outside the current local contract
+
 ## Iteration 18 - Make adapter-facing guardrails executable locally
 - date: 2026-04-17
 - timestamp: 2026-04-17 13:35 America/Vancouver

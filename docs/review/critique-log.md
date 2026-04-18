@@ -3,6 +3,40 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-006 - Adapter evidence contract critique
+- date: 2026-04-18
+- timestamp: 2026-04-18 00:10 America/Vancouver
+- reviewed slice:
+  - local `dgd.adapter_evidence` contract
+  - fixture-backed voice presentation evidence
+  - demo CLI `present-evidence` and `present-audit` flows
+- strengths:
+  - DigiD now turns presentation mismatch and context-loss states into reproducible local fixtures instead of leaving them as demo-only flags
+  - the new slice keeps the core verifier result separate from adapter-local evidence, which is the right line for public-safe adapter experimentation
+  - presentation expectations are now auditable, so adapter honesty can regress visibly without any hosted conformance service
+- concerns:
+  - the evidence shape must stay minimal or it will drift into a channel-specific policy matrix
+  - one voice-sidecar profile is enough for now; the public repo should resist growing multiple adapter contracts before the current one proves stable
+  - later commercial profiles may still need a stronger signed or countersigned platform-binding primitive, but that should not be smuggled into this local evidence contract by drift
+- protocol concerns:
+  - keeping adapter evidence outside the signed DigiD object model avoids overstating what the protocol itself currently proves
+  - future signed platform-binding work, if any, should be introduced deliberately as a separate protocol decision rather than leaking in through presentation fixtures
+- adoption concerns:
+  - the new fixture-backed evidence loop makes voice, Slack, email, and transcript adapter experiments more reproducible without crossing into real adapter runtime code
+  - the next public-safe step should stay focused on one bounded adapter profile and local conformance, not hosted adapter APIs
+- recommended changes:
+  1. keep adapter evidence v0.1 limited to context and binding status, not richer business rules
+  2. use fixture-backed presentation audit before adding any second adapter family
+  3. move any hosted adapter conformance or tenant-aware rendering workflow private before implementation
+
+## Status
+- applied in this iteration:
+  - local adapter evidence contract
+  - fixture-backed presentation audit loop
+- deferred to next loops:
+  - any signed platform-binding primitive
+  - any hosted adapter conformance surface
+
 ## CL-005 - Local presentation guardrail critique
 - date: 2026-04-17
 - timestamp: 2026-04-17 13:35 America/Vancouver

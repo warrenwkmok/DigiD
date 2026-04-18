@@ -55,6 +55,14 @@ export function derivePortableResultContract(result) {
       positive_compact_label_without_details: positiveCompactAllowed,
       context_binding: deriveContextBinding(interactionClass),
       synthesize_warning_codes_on_context_loss: deriveContextLossWarnings(interactionClass),
+      adapter_evidence: {
+        contract_type: "dgd.adapter_evidence",
+        local_only: true,
+        required_fields: [
+          "presentation_context.verified_context_status",
+          "platform_identity.binding_status"
+        ]
+      },
       platform_identity: platformMismatchRelevant
         ? {
             mismatch_state_required: true,

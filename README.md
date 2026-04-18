@@ -78,7 +78,7 @@ DigiD now includes a runnable verifier-first MVP slice:
 - a protocol package for canonicalization, shape validation, lineage checks, and signature verification
 - a verifier package that resolves event-time vs current-time trust outcomes
 - a demo CLI that renders compact trust banners, expanded verification details, portable result contracts, manifest-audit output, and local presentation-guardrail simulations
-- a portable local verifier result contract plus a local-only presentation guardrail evaluator for future adapter experiments without shipping hosted adapter decision services
+- a portable local verifier result contract plus a fixture-backed local adapter evidence contract so future adapter experiments can trigger mismatch/context-loss deterministically without shipping hosted adapter decision services
 
 ## Run the demo
 
@@ -117,6 +117,13 @@ Apply local presentation guardrails to simulate a platform mismatch or copied ar
 ```bash
 node apps/demo-cli/src/index.js present fixtures/demo/manifests/voice.happy-path.manifest.json --platform-mismatch
 node apps/demo-cli/src/index.js present fixtures/demo/manifests/voice.happy-path.manifest.json --context-loss
+```
+
+Apply fixture-backed adapter evidence and audit presentation expectations:
+
+```bash
+node apps/demo-cli/src/index.js present-evidence fixtures/demo/presentation/voice.platform-mismatch.presentation.json
+node apps/demo-cli/src/index.js present-audit fixtures/demo/presentation
 ```
 
 ## Active review loop
