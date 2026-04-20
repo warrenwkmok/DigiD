@@ -7,6 +7,10 @@ export function deriveCompactBanner(result) {
     return "Delegation no longer active";
   }
 
+  if (warningCodes.has("signing-key-revoked-current-time")) {
+    return "Signing key revoked";
+  }
+
   if (warningCodes.has("signing-key-inactive-current-time")) {
     return "Signing key no longer active";
   }
@@ -73,6 +77,8 @@ export function renderExpandedDetails(result) {
     ["Signing key purpose", result.checks.signing_key_purpose_status ?? "unknown"],
     ["Signing key event-time", result.checks.signing_key_event_time_status ?? "unknown"],
     ["Signing key current-time", result.checks.signing_key_current_time_status ?? "unknown"],
+    ["Signing key revocation event-time", result.checks.signing_key_revocation_event_time_status ?? "unknown"],
+    ["Signing key revocation current-time", result.checks.signing_key_revocation_current_time_status ?? "unknown"],
     ["Issuer trust", result.checks.issuer_trust_status ?? "unknown"],
     ["Event-time valid", String(result.checks.event_time_valid)],
     ["Current-time valid", String(result.checks.current_time_valid)],

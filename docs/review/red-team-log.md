@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-012 - Retroactive revocation and repudiation-by-backdating
+- date: 2026-04-20
+- timestamp: 2026-04-20 05:33 America/Vancouver
+- reviewed slice:
+  - revocation timing posture (`created_at` vs `revoked_at`) and key revocation targeting by `kid`
+  - verifier warning vocabulary for backdated revocation claims (`revocation-backdated`)
+- attack scenarios:
+  - repudiation-by-backdating: an issuer publishes a revocation statement after the fact with `revoked_at` set earlier than issuance and hopes verifiers treat it as rewriting event-time validity, letting an issuer deny or suppress previously "valid" communications
+  - selective history edits: a compromised issuer selectively backdates only some keys/delegations to invalidate specific signed artifacts while leaving others apparently clean
+  - target ambiguity: revocation statements target keys by `kid`; if `kid` conventions are not globally unique and unambiguous across issuer/subject contexts, an attacker can craft collisions that let revocations hit the wrong key
+- recommended mitigations:
+  1. require signed `created_at` on revocations and default to non-retroactive effective timing (`max(revoked_at, created_at)` with small skew allowance)
+  2. surface a stable warning (`revocation-backdated`) whenever a revocation claims an effective time that significantly predates its issuance
+  3. keep revocation distribution services, issuer admin tooling, and compromise response workflows as private-boundary candidates outside this public repo
+
 ## RT-011 - Signing key lifecycle and "still valid" badge abuse
 - date: 2026-04-20
 - timestamp: 2026-04-20 02:36 America/Vancouver

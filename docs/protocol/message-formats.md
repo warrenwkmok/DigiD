@@ -373,7 +373,7 @@ Unless an event type says otherwise:
 | `voice.session.ended` | `reason`, `duration_ms` | `session_ended_at` | `duration_ms` SHOULD agree with communication timestamps when both exist |
 | `artifact.recorded` | `artifact_id`, `artifact_type`, `content_digest` | `content_length`, `codec`, `duration_ms` | `artifact_id` SHOULD resolve to the recorded artifact or manifest object |
 | `verification.performed` | `decision`, `resolved_trust_state`, `verification_mode`, `revocation_status`, `warning_codes` | `freshness_status`, `replay_status` | This event records verifier output, not signer authority |
-| `key.revoked` | `revoked_kid`, `reason_code`, `revoked_at` | `replacement_kid` | `revoked_kid` MUST identify the specific signing key |
+| `key.revoked` | `revoked_kid`, `reason_code`, `revoked_at` | `replacement_kid` | For verifier-grade revocation, prefer a signed `dgd.revocation` targeting `dgd.signing_key` with `target_object_id = revoked_kid` |
 | `attestation.revoked` | `revoked_object_id`, `reason_code`, `revoked_at` | `subject_id` | `revoked_object_id` MUST resolve to a `dgd.attestation` |
 | `delegation.revoked` | `revoked_object_id`, `reason_code`, `revoked_at` | `delegate_id` | `revoked_object_id` MUST resolve to a `dgd.delegation` |
 

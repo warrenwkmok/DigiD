@@ -124,5 +124,9 @@ Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `JCS` + `
 Still open: how DigiD introduces additional suites without letting issuers choose weaker algorithms, how suite negotiation/policy should be receiver-controlled, and whether DigiD should publish a stricter canonicalization profile (full RFC 8785 JCS compliance constraints) before any multi-language verifier implementations appear.
 
 ## OQ-033 - How should DigiD represent key revocation time precisely?
-Working resolution for v0.3: treat `keys[].status` as an operational current-time posture signal and `not_before`/`expires_at` as the explicit signed window for event-time validity; verifiers must not infer a precise historical revocation moment from `status: revoked` alone.
-Still open: whether to add a signed `revoked_at` (or equivalent) either as a first-class key lifecycle object (ex: `dgd.key_revocation`) or as a signed append-only key event model, and where the public/private boundary should sit for key compromise workflows and operational key-management tooling.
+Working resolution for v0.3: keep `keys[].status` as an operational current-time posture signal, keep `not_before`/`expires_at` as the explicit signed window for event-time validity, and represent signed key revocation timing via `dgd.revocation` targeting the signing key (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`).
+Still open: whether DigiD ever needs a richer append-only key event model beyond `dgd.revocation` (ex: rotation, compromise, recovery) and where the public/private boundary should sit for compromise workflows, issuer tooling, and operational revocation distribution.
+
+## OQ-034 - Should DigiD allow retroactive revocation claims?
+Working resolution for v0.3 reference verifier: default to non-retroactive revocation posture by treating effective revocation time as `max(revoked_at, created_at)` (with small clock-skew allowance) and surfacing a warning when `revoked_at` significantly predates `created_at`.
+Still open: whether any profile should permit truly retroactive revocation for event-time evaluation (and under what evidence), or whether retroactive revocation must always be treated as a disputed/repudiation-adjacent signal that degrades trust instead of rewriting history.

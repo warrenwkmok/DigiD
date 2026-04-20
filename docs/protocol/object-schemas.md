@@ -161,6 +161,7 @@ The signer for each object family MUST be determinable from signed fields alone,
 Notes:
 - `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
 - the signature is calculated over the object with `proof` removed
+- `proof.created_at` is metadata and is not itself signed; verifiers should rely on signed top-level timestamps like `created_at` on the object family being evaluated
 - verifiers should reject unknown critical proof parameters
 - the first implementation profile should only accept the `Ed25519` signing algorithm and MUST reject any mismatch between `proof.type` and the resolved signer key record `keys[].algorithm`
 - `proof.kid` must resolve unambiguously to the signing identity during verification
@@ -584,6 +585,7 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
   "reason_code": "authorization-ended",
   "reason_detail": "Agent contract terminated",
   "revoked_at": "2026-05-01T00:00:00Z",
+  "created_at": "2026-05-01T00:00:01Z",
   "proof": {
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
@@ -596,8 +598,16 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
 
 ### Revocation constraints
 - `target_object_type` MUST match the referenced object's family
+- `created_at` MUST be present and MUST be treated as the signed issuance time for the revocation statement
 - the revocation issuer MUST be authorized to revoke the target family
 - once active, a revocation object MUST be treated as append-only
+
+### Revocation timing posture (v0.3 reference verifier)
+- `revoked_at` is the claimed effective time
+- to prevent silent retroactive revocation, the v0.3 reference verifier SHOULD treat the effective revocation time as `max(revoked_at, created_at)` with a small clock-skew allowance and MUST surface a warning when `revoked_at` significantly predates `created_at`
+
+### Key revocation targeting
+For key revocation, `target_object_type` SHOULD be `dgd.signing_key` and `target_object_id` SHOULD equal the key `kid` string that appears in `proof.kid`.
 
 ## Resolution order for the first implementation
 

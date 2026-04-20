@@ -24,6 +24,7 @@ import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
 
 const DIGID_V03_CRYPTOSUITE = "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3";
+const REVOCATION_BACKDATE_SKEW_SECONDS = 300;
 
 function resolveSignerId(document, graph) {
   if (document.envelope_type === "dgd.message") {
@@ -114,6 +115,31 @@ function checkEventPayloadDigests(envelopes) {
 
 function buildWarning(code, message) {
   return { code, message };
+}
+
+function resolveEffectiveRevokedAt(revocation, warnings) {
+  const revokedAt = asInstant(revocation?.revoked_at ?? null);
+  if (!revokedAt) {
+    return null;
+  }
+
+  const createdAt = asInstant(revocation?.created_at ?? null);
+  if (!createdAt) {
+    warnings.push(buildWarning("revocation-created-at-missing", "Revocation missing created_at; effective timing is ambiguous"));
+    return revokedAt;
+  }
+
+  const maxSkewMs = REVOCATION_BACKDATE_SKEW_SECONDS * 1000;
+  if (revokedAt < createdAt - maxSkewMs) {
+    warnings.push(
+      buildWarning(
+        "revocation-backdated",
+        "Revocation revoked_at predates issuance; treating effective revocation time as created_at"
+      )
+    );
+  }
+
+  return revokedAt < createdAt ? createdAt : revokedAt;
 }
 
 function parseDigestAlgorithm(value) {
@@ -244,7 +270,13 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     graph.roles.get("human_attestation") ??
     graph.objects.find((candidate) => candidate.object_type === "dgd.attestation" && candidate.subject_id === signerIdentity?.object_id);
   const delegation = communication?.delegation_id ? graph.byId.get(communication.delegation_id) : null;
-  const revocation = graph.objects.find((candidate) => candidate.object_type === "dgd.revocation" && candidate.target_object_id === delegation?.object_id);
+  const delegationRevocation = graph.objects.find(
+    (candidate) =>
+      candidate.object_type === "dgd.revocation" &&
+      candidate.target_object_type === "dgd.delegation" &&
+      candidate.target_object_id === delegation?.object_id
+  );
+  const delegationRevocationEffectiveAt = delegationRevocation ? resolveEffectiveRevokedAt(delegationRevocation, warnings) : null;
   const eventEnvelope = graph.envelopes.find((candidate) => candidate.envelope_type === "dgd.event");
   const eventTime = asInstant(eventEnvelope?.created_at ?? communication?.timestamps?.session_started_at ?? communication?.created_at);
   const policy = resolveVerifierPolicy(manifest, communication);
@@ -275,14 +307,38 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       ? signerPinned
       : Boolean(attestation && attestationActiveNow && attestationIssuerTrusted);
   const delegationRequired = Boolean(communication?.operator_id || communication?.delegation_id);
-  const delegationActiveAtEventTime = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, eventTime) && (!revocation || eventTime < asInstant(revocation.revoked_at))) : true;
-  const delegationActiveNow = delegationRequired ? Boolean(delegation && isActiveInWindow(delegation, verificationTime) && (!revocation || verificationTime < asInstant(revocation.revoked_at))) : true;
+  const delegationActiveAtEventTime = delegationRequired
+    ? Boolean(delegation && isActiveInWindow(delegation, eventTime) && (!delegationRevocationEffectiveAt || eventTime < delegationRevocationEffectiveAt))
+    : true;
+  const delegationActiveNow = delegationRequired
+    ? Boolean(
+        delegation &&
+          isActiveInWindow(delegation, verificationTime) &&
+          (!delegationRevocationEffectiveAt || verificationTime < delegationRevocationEffectiveAt)
+      )
+    : true;
   const freshnessStatus = evaluateFreshness(delegation ?? attestation ?? signerIdentity?.keys?.[0], verificationTime, maxAgeSeconds);
   const ownerBinding = evaluateOwnerBinding({ signerIdentity, operatorIdentity, attestation, delegation, communication });
   const authorityScope = evaluateDelegationScope({ communication, delegation, envelopes: graph.envelopes });
-  const revocationStatus = revocation ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
+  const delegationRevokedNow = Boolean(delegationRevocationEffectiveAt && verificationTime >= delegationRevocationEffectiveAt);
+  const revocationStatus = delegationRevokedNow ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
 
   const communicationCrypto = communication ? graph.cryptoById.get(communication.object_id) : null;
+  const signingKeyKid = communicationCrypto?.kid ?? null;
+  const signingKeyRevocation = signingKeyKid
+    ? graph.objects.find(
+        (candidate) =>
+          candidate.object_type === "dgd.revocation" &&
+          candidate.target_object_type === "dgd.signing_key" &&
+          candidate.target_object_id === signingKeyKid
+      )
+    : null;
+  const signingKeyRevocationEffectiveAt = signingKeyRevocation ? resolveEffectiveRevokedAt(signingKeyRevocation, warnings) : null;
+  const signingKeyRevokedAtEventTime = Boolean(signingKeyRevocationEffectiveAt && eventTime >= signingKeyRevocationEffectiveAt);
+  const signingKeyRevokedNow = Boolean(signingKeyRevocationEffectiveAt && verificationTime >= signingKeyRevocationEffectiveAt);
+  const signingKeyRevocationEventTimeStatus = !signingKeyKid ? "unknown" : signingKeyRevokedAtEventTime ? "revoked" : "clear";
+  const signingKeyRevocationCurrentTimeStatus = !signingKeyKid ? "unknown" : signingKeyRevokedNow ? "revoked" : "clear";
+
   const signingKeyLifecycle = evaluateSigningKeyLifecycle(
     communicationCrypto
       ? {
@@ -296,17 +352,25 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     { eventTime, verificationTime, requiredPurpose: "assertion" }
   );
   const signingKeyPurposeValid = signingKeyLifecycle.purpose_status === "authorized";
-  const signingKeyValidAtEventTime = signingKeyPurposeValid && signingKeyLifecycle.event_time_status === "valid";
-  const signingKeyActiveNow = signingKeyPurposeValid && signingKeyLifecycle.current_time_status === "active";
+  const signingKeyValidAtEventTime =
+    signingKeyPurposeValid && signingKeyLifecycle.event_time_status === "valid" && signingKeyRevocationEventTimeStatus !== "revoked";
+  const signingKeyActiveNow =
+    signingKeyPurposeValid && signingKeyLifecycle.current_time_status === "active" && signingKeyRevocationCurrentTimeStatus !== "revoked";
 
   if (communication && !signingKeyPurposeValid) {
     errors.push(`${communication.object_id}: Signing key is not authorized for assertion`);
   } else if (communication && signingKeyLifecycle.event_time_status !== "valid") {
     errors.push(`${communication.object_id}: Signing key was not valid at event time`);
+  } else if (communication && signingKeyRevocationEventTimeStatus === "revoked") {
+    errors.push(`${communication.object_id}: Signing key was revoked at event time`);
   }
 
   if (communication && signingKeyValidAtEventTime && !signingKeyActiveNow) {
-    warnings.push(buildWarning("signing-key-inactive-current-time", "Signing key no longer active"));
+    if (signingKeyRevocationCurrentTimeStatus === "revoked") {
+      warnings.push(buildWarning("signing-key-revoked-current-time", "Signing key revoked"));
+    } else {
+      warnings.push(buildWarning("signing-key-inactive-current-time", "Signing key no longer active"));
+    }
   }
 
   if (attestation && !attestationIssuerTrusted) {
@@ -422,6 +486,9 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signing_key_event_time_reasons: signingKeyLifecycle.event_time_reasons,
       signing_key_current_time_status: signingKeyLifecycle.current_time_status,
       signing_key_current_time_reasons: signingKeyLifecycle.current_time_reasons,
+      signing_key_revocation_event_time_status: signingKeyRevocationEventTimeStatus,
+      signing_key_revocation_current_time_status: signingKeyRevocationCurrentTimeStatus,
+      signing_key_revocation_effective_at: signingKeyRevocationEffectiveAt ? new Date(signingKeyRevocationEffectiveAt).toISOString() : null,
       digest_algorithms: [...digestAlgorithms].sort(),
       owner_binding_status: ownerBinding.status,
       owner_binding_reasons: ownerBinding.reasons,

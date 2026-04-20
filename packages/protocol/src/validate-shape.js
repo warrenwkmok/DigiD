@@ -4,7 +4,7 @@ const objectRequiredFields = {
   "dgd.delegation": ["object_type", "schema_version", "object_id", "issuer_id", "delegate_id", "delegate_class", "status", "authority", "valid_from", "proof"],
   "dgd.communication": ["object_type", "schema_version", "object_id", "status", "channel", "channel_subtype", "session_id", "sender", "purpose", "payload", "timestamps", "proof"],
   "dgd.session": ["object_type", "schema_version", "object_id", "status", "session_type", "communication_id", "channel", "sequence_scope", "timestamps", "proof"],
-  "dgd.revocation": ["object_type", "schema_version", "object_id", "issuer_id", "target_object_id", "target_object_type", "status", "revoked_at", "proof"],
+  "dgd.revocation": ["object_type", "schema_version", "object_id", "issuer_id", "target_object_id", "target_object_type", "status", "revoked_at", "created_at", "proof"],
   "dgd.artifact": ["object_type", "schema_version", "object_id", "status", "artifact_type", "communication_id", "payload", "created_at", "proof"],
   "dgd.verification_result": ["object_type", "schema_version", "object_id", "subject_id", "status", "verified_at", "decision", "verification_mode", "checks", "resolved_trust_state", "display_summary", "warnings", "errors"]
 };

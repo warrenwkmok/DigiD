@@ -82,8 +82,8 @@ For v0.3, treat key lifecycle as two different questions:
 - **event-time validity**: was the key within its declared `not_before`/`expires_at` window when the artifact was signed?
 - **current-time operational status**: is the key currently usable for making a live trust claim (`status: active` and within the window at verification time)?
 
-Because v0.3 key records do not yet carry a signed `revoked_at` timestamp, verifiers SHOULD NOT treat a present-tense `status: revoked` as cryptographic proof that the key was revoked at some specific past time.
-It is an operational posture signal that affects current-time trust.
+Because v0.3 key records do not carry a signed `revoked_at` field inside `keys[]`, verifiers SHOULD NOT treat a present-tense `status: revoked` as cryptographic proof that the key was revoked at some specific past time.
+Use a signed `dgd.revocation` object targeting the signing key (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`) when a verifier needs a signed revocation-effective time.
 
 Recommended verifier posture:
 - reject current-time trust when the resolved signing key is `status: revoked` or `status: suspended`
@@ -134,6 +134,10 @@ Verifier guidance:
 - expired keys SHOULD fail current-time trust resolution and MAY remain historically valid for event-time review
 - suspended keys SHOULD produce degraded trust unless the verifier profile requires hard reject
 - recovery after key compromise MUST use a new key identifier, not silent key replacement
+
+Revocation timing posture:
+- a `dgd.revocation` MUST carry signed `created_at` (issuance time) and `revoked_at` (claimed effective time)
+- the v0.3 reference verifier SHOULD treat effective revocation time as `max(revoked_at, created_at)` (with small clock-skew allowance) and surface `revocation-backdated` when a revocation claims an earlier effective time
 
 ## What gets signed
 

@@ -410,3 +410,15 @@ Every meaningful critique should end up in one of these states:
 - action taken: Tightened the signing, object-schema, and normative protocol docs so delegated-agent trust now requires controller binding, owner-signed attestation, active delegation, and key-to-identity resolution as one coherent chain.
 - linked docs: `docs/protocol/signing-and-provenance.md`, `docs/protocol/object-schemas.md`, `docs/protocol/normative-protocol-draft.md`
 - notes: The implementation should enforce this more explicitly in verifier output and future key-binding artifacts, not only in docs.
+
+## DF-024 - Add signed key revocation timing posture (non-retroactive by default)
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 05:33 America/Vancouver
+- area: protocol
+- severity: high
+- status: applied
+- summary: DigiD needed a verifier-grade way to represent key revocation timing without implying that `keys[].status: revoked` is historical proof or drifting into private key-management tooling.
+- action taken: Required `created_at` on `dgd.revocation`, clarified key revocation targeting (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`), and adopted a v0.3 reference verifier posture that treats effective revocation time as `max(revoked_at, created_at)` with an explicit `revocation-backdated` warning when a revocation claims an earlier effective time.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/review/open-questions.md`
+- notes: This stays public-safe by focusing on signed protocol semantics and reference verifier behavior, not issuer consoles, compromise workflows, or revocation distribution services.

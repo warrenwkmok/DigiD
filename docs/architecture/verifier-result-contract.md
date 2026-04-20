@@ -57,6 +57,7 @@ Adapters or local demos consuming this contract SHOULD preserve:
 - machine-readable warning codes
 - issuer-trust status
 - signing-key purpose + lifecycle status (at least current-time status)
+- signing-key revocation diagnostics when present (event-time vs current-time)
 - owner-binding status and reasons
 - authority-scope status and reasons
 - revocation, freshness, and replay status

@@ -186,6 +186,17 @@ Default v0.3 thresholds:
 
 `clear` MUST NOT be shown when the verifier cannot prove freshness within profile limits.
 
+### Revocation timing posture (v0.3 reference verifier)
+
+For the v0.3 reference verifier:
+- `dgd.revocation.created_at` MUST be present and is treated as the signed issuance time of the revocation statement
+- `dgd.revocation.revoked_at` is the claimed effective revocation time
+- to prevent silent retroactive revocation, verifiers SHOULD treat the effective revocation time as `max(revoked_at, created_at)` with a small clock-skew allowance and SHOULD surface an explicit warning when `revoked_at` significantly predates `created_at`
+
+For signing key revocation, a verifier SHOULD accept `dgd.revocation` objects with:
+- `target_object_type: dgd.signing_key`
+- `target_object_id: <kid>` (matching the signing key `kid` used in `proof.kid`)
+
 ## Verification result minimum output
 
 A conforming verifier result MUST include:
@@ -225,6 +236,8 @@ At minimum, the profile should support:
 - `revocation-unknown`
 - `delegation-expired-current-time`
 - `key-expired-current-time`
+- `signing-key-revoked-current-time`
+- `revocation-backdated`
 - `lineage-conflict`
 - `replay-suspected`
 - `authority-incomplete`

@@ -3,6 +3,24 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-012 - Signed revocation timing posture + signing-key revocation critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 05:33 America/Vancouver
+- reviewed slice:
+  - requiring `created_at` on `dgd.revocation` and clarifying revocation effective-time semantics
+  - adding first-class signing-key revocation diagnostics to verifier outputs and portable result contracts
+- strengths:
+  - closes a common trust gap: key revocation cannot rely on unsafely interpreting `keys[].status` as historical proof
+  - preserves the core DigiD wedge (communications trust under authority) by making key revocation visible without collapsing into generic "authenticated agent" language
+  - stays public-safe by focusing on signed protocol semantics + reference verifier behavior, not issuer consoles or operational key-management tooling
+- concerns:
+  - non-retroactive default (`max(revoked_at, created_at)`) avoids silent history rewrites, but it also means "revocation discovered late" will not invalidate event-time conclusions; products must present this clearly to avoid overconfidence in historical claims
+  - key revocation targeting by `kid` must remain unambiguous and globally unique; any future multi-key or delegated-custody profiles should tighten key-id conventions rather than loosening verifier matching
+- recommended changes:
+  1. keep revocation timing posture explicit in the normative draft and warning vocabulary (`revocation-backdated`) so adapters can’t hide revocation timing ambiguity
+  2. add a deterministic demo-only fixture key strategy before adding signed negative variants that exercise key revocation and backdating behavior
+  3. keep compromise workflows, issuer admin consoles, and revocation distribution services private-boundary candidates outside this repo
+
 ## CL-011 - Signing key lifecycle enforcement critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 02:36 America/Vancouver
