@@ -10,6 +10,38 @@ Format notes:
 
 ---
 
+## Iteration 24 - Enforce signing-key lifecycle posture in verifier outputs
+- date: 2026-04-20
+- timestamp: 2026-04-20 02:36 America/Vancouver
+- commit: `4c8ba29`
+- summary:
+  - made signing-key purpose and lifecycle posture first-class in the reference verifier: keys must authorize `assertion`, be window-valid at event time, and be operationally `active` for current-time trust
+  - extended the portable verifier result contract and compact banner logic so adapters cannot silently launder high-trust states while hiding key lifecycle degradation
+  - tightened protocol/docs posture around `keys[].status` vs `not_before`/`expires_at`, and captured the missing signed `revoked_at` timing model as an explicit open question
+- changed files:
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/key-lifecycle.js`
+  - `packages/verifier/src/display.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/test/key-lifecycle.test.js`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/architecture/reference-verifier.md`
+  - `docs/architecture/verifier-policy-profile.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/mvp/first-demo-flow.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - DigiD’s wedge is communications trust under owner-bound authority. A mathematically valid signature is not enough; verifiers and adapters must clearly surface whether the signing key is still usable for live trust decisions.
+  - this stays public-safe by focusing on protocol posture, reference verifier logic, and fixture-backed UX guardrails rather than any hosted key-management, revocation distribution, or issuer console infrastructure.
+- next likely step at the time:
+  - decide how DigiD represents key revocation timing precisely (signed `revoked_at` and/or a key event model) without turning the public repo into operational key-management tooling.
+
 ## Iteration 23 - Enforce cryptosuite disclosure + reject algorithm mismatch
 - date: 2026-04-19
 - timestamp: 2026-04-19 23:28 America/Vancouver
