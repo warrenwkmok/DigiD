@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import {
   digestCanonicalPayload,
+  DIGID_V03_CRYPTOSUITE_ID,
+  DIGID_V03_DIGEST_ALGORITHM,
   parseDigiDEnvelope,
   parseDigiDObject,
   validateCommunicationLineage,
@@ -23,7 +25,6 @@ import { evaluateSigningKeyLifecycle } from "./key-lifecycle.js";
 import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
 
-const DIGID_V03_CRYPTOSUITE = "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3";
 const REVOCATION_BACKDATE_SKEW_SECONDS = 300;
 
 function resolveSignerId(document, graph) {
@@ -155,6 +156,37 @@ function parseDigestAlgorithm(value) {
   return value.slice(0, index);
 }
 
+function validateDigestValue(value, label, errors) {
+  if (!value) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    errors.push(`${label} digest must be a string`);
+    return null;
+  }
+
+  const index = value.indexOf(":");
+  if (index <= 0) {
+    errors.push(`${label} digest missing algorithm prefix`);
+    return null;
+  }
+
+  const algorithm = value.slice(0, index);
+  const hex = value.slice(index + 1);
+
+  if (algorithm !== DIGID_V03_DIGEST_ALGORITHM) {
+    errors.push(`${label} digest uses unsupported algorithm: ${algorithm}`);
+    return algorithm;
+  }
+
+  if (!/^[0-9a-f]{64}$/i.test(hex)) {
+    errors.push(`${label} digest must be 64 hex chars for ${algorithm}`);
+  }
+
+  return algorithm;
+}
+
 export async function verifyFixtureManifest(manifestPath, options = {}) {
   const { manifest, repoRoot } = await loadFixtureManifest(manifestPath);
   const verificationTime = asInstant(options.verificationTime ?? manifest.verification_time ?? "2026-04-15T00:05:00Z");
@@ -256,10 +288,26 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const digestAlgorithms = new Set();
   for (const envelope of graph.envelopes) {
     if (envelope.envelope_type === "dgd.event") {
-      const digestAlgorithm = parseDigestAlgorithm(envelope.payload_digest);
+      const digestAlgorithm = validateDigestValue(envelope.payload_digest, `${envelope.envelope_id}.payload_digest`, errors);
       if (digestAlgorithm) {
         digestAlgorithms.add(digestAlgorithm);
       }
+      continue;
+    }
+
+    if (envelope.envelope_type === "dgd.message") {
+      const contentDigest = envelope.payload?.content_digest ?? null;
+      const digestAlgorithm = validateDigestValue(contentDigest, `${envelope.envelope_id}.payload.content_digest`, errors);
+      if (digestAlgorithm) {
+        digestAlgorithms.add(digestAlgorithm);
+      }
+    }
+  }
+
+  if (communication?.payload?.content_digest) {
+    const digestAlgorithm = validateDigestValue(communication.payload.content_digest, `${communication.object_id}.payload.content_digest`, errors);
+    if (digestAlgorithm) {
+      digestAlgorithms.add(digestAlgorithm);
     }
   }
 
@@ -474,7 +522,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signature_valid: signatureValid,
       event_time_valid: eventTimeValid,
       current_time_valid: currentTimeValid,
-      crypto_suite: DIGID_V03_CRYPTOSUITE,
+      crypto_suite: DIGID_V03_CRYPTOSUITE_ID,
       signature_proof_type: communicationCrypto?.proof_type ?? null,
       canonicalization: communicationCrypto?.canonicalization ?? null,
       signing_key_kid: communicationCrypto?.kid ?? null,

@@ -15,7 +15,7 @@
   },
   "payload": {
     "content_type": "application/dgd+json",
-    "content_digest": "sha256:1f2ca09a627ed1a613bb9df8062eec31fdf168293eec9a01097b891769213b70",
+    "content_digest": "sha256:88827fdaab15ee50de94237d8d1a3bab7df6be93a929b1a834ac0b638bc81be1",
     "content_length": 96,
     "summary": "Policy update from Globex Corporate",
     "purpose": "policy-update"
@@ -25,6 +25,6 @@
     "kid": "dgd:key:org_globex:key-2026-01",
     "created_at": "2026-04-15T00:30:11.000Z",
     "canonicalization": "JCS",
-    "signature": "ZmszAO0OdTUhDmRg06fZdfylHgknNC4baugIHg/6DNpsNNzyNg0kiqTLZ92ZT1Aa/TWXor7h1eEZfp0A2Q6uBg=="
+    "signature": "A/RXExKzEjHJBWgvpy0nNGSXDkmwtTCnzrxb43qS67Vf+EkuBhPo45Bg/++g7LgnvyoJe4wdaeHfwtJvt0oDDw=="
   }
 }

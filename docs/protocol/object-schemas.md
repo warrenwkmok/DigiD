@@ -165,7 +165,8 @@ Notes:
 - verifiers should reject unknown critical proof parameters
 - the first implementation profile should only accept the `Ed25519` signing algorithm and MUST reject any mismatch between `proof.type` and the resolved signer key record `keys[].algorithm`
 - `proof.kid` must resolve unambiguously to the signing identity during verification
-- `keys[].public_key` is base64-encoded DER `spki` (`SubjectPublicKeyInfo`) for the referenced key in the v0.3 reference profile
+- `keys[].public_key_encoding` MUST be `spki-der-base64` in the v0.3 reference profile
+- `keys[].public_key` MUST be base64-encoded DER `spki` (`SubjectPublicKeyInfo`) for the referenced key in the v0.3 reference profile
 - verifiers SHOULD enforce key purpose and lifecycle posture in addition to signature math: `keys[].purposes` must authorize `assertion`, the key must be within its declared `not_before`/`expires_at` window at sign time, and current-time trust should only render when the key is operationally `status: active` at verification time
 - signer resolution for the first profile is family-specific and MUST follow this matrix:
 
@@ -202,6 +203,7 @@ Represents a persistent subject capable of holding keys and appearing in trust d
       "kid": "dgd:key:agent_01:key-2026-04",
       "algorithm": "Ed25519",
       "public_key": "z6Mk...",
+      "public_key_encoding": "spki-der-base64",
       "status": "active",
       "purposes": ["assertion", "authentication"],
       "created_at": "2026-04-15T00:00:00Z",
@@ -243,6 +245,7 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - `display_name` is required for end-user rendered identities unless the identity class is intentionally pseudonymous
 - `keys[].kid` values MUST be unique within the identity object
 - `keys[].purposes` MUST include `assertion` for any key used to sign DigiD objects or envelopes
+- key records MUST disclose `public_key_encoding` so multi-language implementations do not guess key parsing rules
 - if `controller.controller_id` differs from `object_id`, verifier UX SHOULD avoid presenting the identity as self-controlled
 - for agent or service identities that are not self-controlled, high-trust verification MUST depend on a signed owner-binding path, not on the agent key alone
 - the first delegated-agent profile SHOULD treat controller binding, agent attestation, and active delegation as a combined ownership proof chain from the controlling human or organization to the agent signing key

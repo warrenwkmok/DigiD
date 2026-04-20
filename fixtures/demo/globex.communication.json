@@ -14,7 +14,7 @@
   "purpose": "policy-update",
   "payload": {
     "content_type": "session-manifest",
-    "content_digest": "sha256:bc58138482a1c5cf2396251a85788a940cd18c99a64dcd5eae609950c19d0fad",
+    "content_digest": "sha256:73f6d0fc74ff4d0a94153438c94b6135368f9acff2f21984d25f9a17c3a4d3fe",
     "content_length": 128,
     "media_mode": "async-message"
   },
@@ -29,6 +29,6 @@
     "kid": "dgd:key:org_globex:key-2026-01",
     "created_at": "2026-04-15T00:30:05.000Z",
     "canonicalization": "JCS",
-    "signature": "plX4KrFpUGLI2SBh7GeN0J/5P6IpaugOVk65/b4oTdhgDp/ogOufSXIU8fNjvSrbN3CaBT2yHE6aIZDcTItZDA=="
+    "signature": "6hYJ1BZGyFivXcPtqEhPT9+7vuu+oQy3BHx66oNNre0GuvKMjaKa42TjTwOIhLJzmmdJacwsJodS1BOvZ5DMBQ=="
   }
 }

@@ -1,9 +1,12 @@
 import { createPublicKey, verify } from "node:crypto";
 import { canonicalizeForProof, stripProof } from "./canonicalize.js";
 
-const SUPPORTED_PROOF_TYPE = "ed25519-2020";
-const SUPPORTED_CANONICALIZATION = "JCS";
-const SUPPORTED_KEY_ALGORITHM = "Ed25519";
+import {
+  DIGID_V03_CANONICALIZATION,
+  DIGID_V03_KEY_ALGORITHM,
+  DIGID_V03_PROOF_TYPE,
+  DIGID_V03_PUBLIC_KEY_ENCODING
+} from "./cryptosuite.js";
 
 function resolvePublicKey(publicKeyDerBase64) {
   try {
@@ -22,11 +25,11 @@ export function verifyProof(document, signerIdentity) {
     throw new Error("Missing proof");
   }
 
-  if (document.proof.type !== SUPPORTED_PROOF_TYPE) {
+  if (document.proof.type !== DIGID_V03_PROOF_TYPE) {
     throw new Error(`Unsupported proof type: ${document.proof.type}`);
   }
 
-  if (document.proof.canonicalization !== SUPPORTED_CANONICALIZATION) {
+  if (document.proof.canonicalization !== DIGID_V03_CANONICALIZATION) {
     throw new Error(`Unsupported canonicalization: ${document.proof.canonicalization}`);
   }
 
@@ -40,12 +43,20 @@ export function verifyProof(document, signerIdentity) {
     throw new Error(`Signer key ${keyRecord.kid} is missing algorithm disclosure`);
   }
 
-  if (keyRecord.algorithm !== SUPPORTED_KEY_ALGORITHM) {
+  if (keyRecord.algorithm !== DIGID_V03_KEY_ALGORITHM) {
     throw new Error(`Unsupported key algorithm for ${keyRecord.kid}: ${keyRecord.algorithm}`);
   }
 
   if (!keyRecord.public_key || typeof keyRecord.public_key !== "string") {
     throw new Error(`Signer key ${keyRecord.kid} is missing public_key`);
+  }
+
+  if (!keyRecord.public_key_encoding) {
+    throw new Error(`Signer key ${keyRecord.kid} is missing public_key_encoding disclosure`);
+  }
+
+  if (keyRecord.public_key_encoding !== DIGID_V03_PUBLIC_KEY_ENCODING) {
+    throw new Error(`Unsupported public_key_encoding for ${keyRecord.kid}: ${keyRecord.public_key_encoding}`);
   }
 
   const verified = verify(

@@ -59,6 +59,7 @@ For v0.3 profile:
 - `proof.type` MUST be `ed25519-2020`
 - `proof.canonicalization` MUST be `JCS`
 - resolved signer key record `keys[].algorithm` MUST be `Ed25519`
+- resolved signer key record `keys[].public_key_encoding` MUST be `spki-der-base64`
 - verifiers MUST reject proofs whose `proof.type` is incompatible with the resolved key algorithm (no algorithm downgrades or ambiguity)
 - the signature input MUST be the full JSON object with `proof` removed
 - detached binary payloads MUST be referenced by digest, not embedded in the signing rule itself
@@ -69,6 +70,7 @@ A verifier MUST reject:
 - unsupported canonicalization methods
 - signatures whose `kid` cannot be resolved
 - signatures whose resolved signing key is not authorized for `assertion`
+- signatures whose resolved signing key has missing or unsupported `public_key_encoding`
 - signatures whose resolved signing key is outside its declared `not_before`/`expires_at` window at sign time
 - current-time trust claims when the resolved signing key is not operationally `status: active` at verification time
 

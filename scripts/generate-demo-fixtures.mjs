@@ -2,7 +2,15 @@ import { generateKeyPairSync, sign, createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { canonicalizeForProof, digestCanonicalPayload, stripProof } from "../packages/protocol/src/index.js";
+import {
+  canonicalizeForProof,
+  DIGID_V03_CANONICALIZATION,
+  DIGID_V03_KEY_ALGORITHM,
+  DIGID_V03_PROOF_TYPE,
+  DIGID_V03_PUBLIC_KEY_ENCODING,
+  digestCanonicalPayload,
+  stripProof
+} from "../packages/protocol/src/index.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -17,7 +25,8 @@ function sha256(value) {
 function keyRecord(identityId, suffix, privateKey, publicKey) {
   return {
     kid: `dgd:key:${identityId.split(":").pop()}:${suffix}`,
-    algorithm: "Ed25519",
+    algorithm: DIGID_V03_KEY_ALGORITHM,
+    public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
     public_key: publicKey.export({ format: "der", type: "spki" }).toString("base64"),
     private_key: privateKey.export({ format: "der", type: "pkcs8" }).toString("base64")
   };
@@ -38,10 +47,10 @@ function signDocument(document, key) {
   return {
     ...proofless,
     proof: {
-      type: "ed25519-2020",
+      type: DIGID_V03_PROOF_TYPE,
       kid: key.kid,
       created_at: proofless.created_at ?? proofless.timestamps?.created_at ?? iso("2026-04-15T00:00:00Z"),
-      canonicalization: "JCS",
+      canonicalization: DIGID_V03_CANONICALIZATION,
       signature
     }
   };
@@ -49,6 +58,7 @@ function signDocument(document, key) {
 
 function buildKeys() {
   const org = generateKeyPairSync("ed25519");
+  const globex = generateKeyPairSync("ed25519");
   const rogueOrg = generateKeyPairSync("ed25519");
   const agent = generateKeyPairSync("ed25519");
   const human = generateKeyPairSync("ed25519");
@@ -56,6 +66,7 @@ function buildKeys() {
 
   return {
     org: keyRecord("dgd:identity:org_acme", "key-2026-01", org.privateKey, org.publicKey),
+    globex: keyRecord("dgd:identity:org_globex", "key-2026-01", globex.privateKey, globex.publicKey),
     rogueOrg: keyRecord("dgd:identity:org_northwind", "key-2026-01", rogueOrg.privateKey, rogueOrg.publicKey),
     agent: keyRecord("dgd:identity:agent_01", "key-2026-04", agent.privateKey, agent.publicKey),
     human: keyRecord("dgd:identity:human_01", "key-2026-04", human.privateKey, human.publicKey),
@@ -99,8 +110,9 @@ function buildDelegatedVoiceFixtures(keys) {
     keys: [
       {
         kid: keys.org.kid,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.org.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:00:00Z"),
@@ -132,8 +144,9 @@ function buildDelegatedVoiceFixtures(keys) {
     keys: [
       {
         kid: keys.agent.kid,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.agent.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:00:00Z"),
@@ -462,8 +475,9 @@ function buildDirectHumanFixtures(keys) {
     keys: [
       {
         kid: keys.human.kid,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.human.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:00:00Z"),
@@ -622,8 +636,9 @@ function buildUnverifiedFixtures(keys) {
     keys: [
       {
         kid: keys.unverified.kid,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.unverified.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:00:00Z"),
@@ -761,8 +776,9 @@ function buildOwnerBindingMismatchFixtures(keys) {
     keys: [
       {
         kid: `${keys.org.kid}:owner-binding`,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.org.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:20:00Z"),
@@ -797,8 +813,9 @@ function buildOwnerBindingMismatchFixtures(keys) {
     keys: [
       {
         kid: keys.rogueOrg.kid,
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.rogueOrg.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:20:00Z"),
@@ -830,8 +847,9 @@ function buildOwnerBindingMismatchFixtures(keys) {
     keys: [
       {
         kid: "dgd:key:agent_owner_binding_01:key-2026-04",
-        algorithm: "Ed25519",
+        algorithm: DIGID_V03_KEY_ALGORITHM,
         public_key: keys.agent.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
         status: "active",
         purposes: ["assertion"],
         created_at: iso("2026-04-15T00:20:00Z"),
@@ -1033,6 +1051,122 @@ function buildOwnerBindingMismatchFixtures(keys) {
     "fixtures/demo/owner-binding/voice.session.json": session,
     "fixtures/demo/owner-binding/events/voice.session.started.json": startedEvent,
     "fixtures/demo/owner-binding/messages/voice.session.announcement.json": announcementMessage
+  };
+}
+
+function buildVerifiedOrganizationMessageFixtures(keys) {
+  const identity = signDocument({
+    object_type: "dgd.identity",
+    schema_version: "0.3",
+    object_id: "dgd:identity:org_globex",
+    identity_class: "organization",
+    display_name: "Globex Corporate",
+    verification_state: "verified-organization",
+    status: "active",
+    keys: [
+      {
+        kid: keys.globex.kid,
+        algorithm: DIGID_V03_KEY_ALGORITHM,
+        public_key: keys.globex.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:30:00Z"),
+        not_before: iso("2026-04-15T00:30:00Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:34:00Z")
+      }
+    ],
+    controller: {
+      controller_id: "dgd:identity:org_globex",
+      relationship: "self-controlled"
+    },
+    disclosure: {
+      display_level: "standard",
+      real_world_identity_disclosed: true,
+      supports_selective_disclosure: false
+    },
+    created_at: iso("2026-04-15T00:30:00Z")
+  }, keys.globex);
+
+  const communication = signDocument({
+    object_type: "dgd.communication",
+    schema_version: "0.3",
+    object_id: "dgd:communication:message_globex_01",
+    status: "active",
+    channel: "message",
+    channel_subtype: "broadcast",
+    session_id: "dgd:session:message_globex_01",
+    sender: {
+      identity_id: "dgd:identity:org_globex",
+      identity_class: "organization",
+      verification_state: "verified-organization"
+    },
+    purpose: "policy-update",
+    payload: {
+      content_type: "session-manifest",
+      content_digest: sha256("globex-policy-update-manifest"),
+      content_length: 128,
+      media_mode: "async-message"
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:30:05Z"),
+      session_started_at: iso("2026-04-15T00:30:05Z"),
+      session_ended_at: null
+    },
+    created_at: iso("2026-04-15T00:30:05Z")
+  }, keys.globex);
+
+  const session = signDocument({
+    object_type: "dgd.session",
+    schema_version: "0.3",
+    object_id: "dgd:session:message_globex_01",
+    status: "active",
+    session_type: "message.thread",
+    communication_id: "dgd:communication:message_globex_01",
+    channel: "message",
+    sequence_scope: {
+      scope_type: "conversation",
+      scope_id: "dgd:session:message_globex_01",
+      next_expected_sequence: 1
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:30:05Z"),
+      started_at: iso("2026-04-15T00:30:05Z"),
+      ended_at: null
+    },
+    created_at: iso("2026-04-15T00:30:05Z")
+  }, keys.globex);
+
+  const policyMessage = signDocument({
+    envelope_type: "dgd.message",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:msg_globex_policy_update_01",
+    message_type: "message.policy.update",
+    subject_id: "dgd:communication:message_globex_01",
+    channel: "message",
+    sender_id: "dgd:identity:org_globex",
+    conversation_id: "dgd:session:message_globex_01",
+    created_at: iso("2026-04-15T00:30:11Z"),
+    purpose: "policy-update",
+    verification_context: {
+      verification_mode: "current_time",
+      revocation_max_age_seconds: 3600
+    },
+    payload: {
+      content_type: "application/dgd+json",
+      content_digest: sha256("globex-policy-update-message"),
+      content_length: 96,
+      summary: "Policy update from Globex Corporate",
+      purpose: "policy-update"
+    }
+  }, keys.globex);
+
+  return {
+    "fixtures/demo/globex.identity.json": identity,
+    "fixtures/demo/globex.communication.json": communication,
+    "fixtures/demo/globex.session.json": session,
+    "fixtures/demo/messages/globex.policy-update.message.json": policyMessage
   };
 }
 
@@ -1340,6 +1474,46 @@ function buildManifests() {
           replay_status: "clear"
         }
       }
+    },
+    "fixtures/demo/manifests/message.verified-organization.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:message_verified_organization",
+      scenario_id: "message-verified-organization",
+      scenario_class: "verified-organization-message",
+      description: "Pinned verified organization message for Globex Corporate",
+      lineage_group: "demo-message-globex-01",
+      verification_time: iso("2026-04-15T00:35:00Z"),
+      verification_defaults: { mode: "current_time", revocation_max_age_seconds: 3600, trusted_issuer_ids: ["dgd:identity:org_globex"] },
+      objects: [
+        { role: "organization_identity", object_type: "dgd.identity", path: "fixtures/demo/globex.identity.json", required: true, stable_across_lineage: true },
+        { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/globex.communication.json", required: true, stable_across_lineage: true },
+        { role: "session_object", object_type: "dgd.session", path: "fixtures/demo/globex.session.json", required: true, stable_across_lineage: true },
+        {
+          role: "policy_message",
+          object_type: "dgd.message",
+          path: "fixtures/demo/messages/globex.policy-update.message.json",
+          required: true,
+          stable_across_lineage: true
+        }
+      ],
+      expected_outcome: {
+        compact_label: "Verified organization",
+        decision: "allow-with-trust-indicator",
+        resolved_trust_state: "verified-organization",
+        warning_codes: [],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: true,
+          owner_binding_status: "not-required",
+          authority_scope_status: "not-required",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
+      }
     }
   };
 }
@@ -1352,6 +1526,7 @@ async function main() {
     ...buildScopeConflictFixtures(keys),
     ...buildDirectHumanFixtures(keys),
     ...buildUnverifiedFixtures(keys),
+    ...buildVerifiedOrganizationMessageFixtures(keys),
     ...buildOwnerBindingMismatchFixtures(keys),
     ...buildManifests()
   };

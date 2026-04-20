@@ -10,7 +10,8 @@
     {
       "kid": "dgd:key:org_northwind:key-2026-01",
       "algorithm": "Ed25519",
-      "public_key": "MCowBQYDK2VwAyEAtLKloBPLnPgNfALE86Dpns+vdk8oU+JeUYoHU6Z9RRs=",
+      "public_key": "MCowBQYDK2VwAyEAZPwnNx/cCeZnLGg/GYjd/pj/KFh4Fd8BSodHJSVLcDo=",
+      "public_key_encoding": "spki-der-base64",
       "status": "active",
       "purposes": [
         "assertion"
@@ -36,6 +37,6 @@
     "kid": "dgd:key:org_northwind:key-2026-01",
     "created_at": "2026-04-15T00:20:00.000Z",
     "canonicalization": "JCS",
-    "signature": "kvUwH27rxTAjl9Vu6y+3cE86NAFydJKwAiftAs30h1FW9U2VaFIXHKDNn1a97ikCtVd9ABUyshl+u94lHdTMDA=="
+    "signature": "Uf+aoUw1A15EdlWc5KXnIA3p14kEjhB8rljzPqOswnZhTp1p4ksABqGjbPCwagM/vjHoLYACmm8DMl3yeZ7KCw=="
   }
 }

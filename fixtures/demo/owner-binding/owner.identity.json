@@ -10,7 +10,8 @@
     {
       "kid": "dgd:key:org_acme:key-2026-01:owner-binding",
       "algorithm": "Ed25519",
-      "public_key": "MCowBQYDK2VwAyEAYxqsQuZYodgrd5LUhtcfbb1aMHsFe6IqvQVerQqRIck=",
+      "public_key": "MCowBQYDK2VwAyEAvRdeuVAGptkfAWWd5JHoUBCnCYnSwJ8rfLhjmY81Dcg=",
+      "public_key_encoding": "spki-der-base64",
       "status": "active",
       "purposes": [
         "assertion"
@@ -36,6 +37,6 @@
     "kid": "dgd:key:org_acme:key-2026-01:owner-binding",
     "created_at": "2026-04-15T00:20:00.000Z",
     "canonicalization": "JCS",
-    "signature": "2YhMoed4M/oMrPjbQAIotLj5JEQDgWxBKCGTjZrjMelFOPpNqajOPlgBOhntFbyW+2HACO+2M0p2d/0IdRF8CA=="
+    "signature": "Y0aIprJ/9y3a9eGJxq/EnC6pflkiUQwioziCjK1UKuZYElHk5MLYzE1iE06x1wP+W3x3wss9jsUkdqGiLsnCAA=="
   }
 }

@@ -3,6 +3,24 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-013 - Key encoding disclosure + digest prefix allowlisting critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 08:33 America/Vancouver
+- reviewed slice:
+  - requiring `keys[].public_key_encoding` disclosure for v0.3 key parsing stability
+  - verifier enforcement of digest algorithm prefixes and sha256-only posture in the v0.3 cryptosuite
+- strengths:
+  - removes a multi-implementation ambiguity: verifiers no longer guess how to parse `keys[].public_key` bytes
+  - keeps cryptographic agility honest: digest prefixes are treated as signed parameters that must match the v0.3 suite, not as "whatever parses"
+  - improves adapter-facing clarity: digest and key encoding mismatches surface as explicit diagnostics rather than collapsing into generic verification failure
+- concerns:
+  - key encoding disclosure increases schema friction; fixtures and issuers must now be consistent about `spki-der-base64`, and future suite work will need a disciplined migration story
+  - digest-prefix validation without detached-content verification still leaves integrity gaps for raw payload bytes; that is acceptable for the current fixture-driven demo but must be called out in future adapter profiles
+- recommended changes:
+  1. keep v0.3 locked to one key encoding and digest algorithm, and reject mismatches instead of downgrading into "warning-only" behavior
+  2. if a future profile adds alternate key encodings or suites, make acceptance receiver-controlled and versioned (no implicit fallback parsing)
+  3. keep key management workflows and encoding migration tooling out of this repo's current reference scope
+
 ## CL-012 - Signed revocation timing posture + signing-key revocation critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 05:33 America/Vancouver

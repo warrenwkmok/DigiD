@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-013 - Key encoding confusion and digest-prefix downgrade attacks
+- date: 2026-04-20
+- timestamp: 2026-04-20 08:33 America/Vancouver
+- reviewed slice:
+  - key record encoding disclosure (`keys[].public_key_encoding`) and verifier enforcement
+  - digest-prefix allowlisting and sha256-only posture for v0.3
+- attack scenarios:
+  - key encoding confusion: a sender publishes a `public_key` that can be interpreted in multiple ways across implementations (or causes a fallback parser path), leading to inconsistent verification results and potential badge laundering when one verifier "accepts" what another rejects
+  - digest-prefix downgrade: a sender supplies `content_digest` strings with non-sha256 prefixes or malformed hex, hoping a verifier treats them as informational metadata rather than a strict binding parameter for detached content
+  - verifier drift across languages: different SDKs accept different encodings/prefixes and an attacker exploits that split to target specific receivers
+- recommended mitigations:
+  1. require explicit key encoding disclosure and reject unsupported encodings (no implicit parsing fallbacks)
+  2. treat digest prefixes as strict, signed parameters and enforce sha256-only in v0.3
+  3. keep multi-suite/key-encoding support receiver-controlled and versioned if it ever appears
+
 ## RT-012 - Retroactive revocation and repudiation-by-backdating
 - date: 2026-04-20
 - timestamp: 2026-04-20 05:33 America/Vancouver

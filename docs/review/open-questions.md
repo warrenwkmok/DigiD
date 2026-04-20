@@ -130,3 +130,7 @@ Still open: whether DigiD ever needs a richer append-only key event model beyond
 ## OQ-034 - Should DigiD allow retroactive revocation claims?
 Working resolution for v0.3 reference verifier: default to non-retroactive revocation posture by treating effective revocation time as `max(revoked_at, created_at)` (with small clock-skew allowance) and surfacing a warning when `revoked_at` significantly predates `created_at`.
 Still open: whether any profile should permit truly retroactive revocation for event-time evaluation (and under what evidence), or whether retroactive revocation must always be treated as a disputed/repudiation-adjacent signal that degrades trust instead of rewriting history.
+
+## OQ-035 - How should DigiD evolve key encodings without verifier drift?
+Working resolution for v0.3: require `keys[].public_key_encoding = "spki-der-base64"` and reject any unsupported encoding instead of guessing.
+Still open: how DigiD introduces additional key encodings (or alternate signature suites) without cross-language verifier divergence, and how receiver policy should express allowlists without turning into a full operational policy engine in this reference repo.

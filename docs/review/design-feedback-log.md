@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-033 - Require key encoding disclosure + digest allowlist enforcement
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 08:33 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: DigiD v0.3 already locked the cryptosuite, but implementations could still guess key parsing rules or treat digest prefixes as "best effort". That creates room for encoding confusion, inconsistent verifier behavior across languages, and UI/adapter laundering of crypto mismatches as generic "signature failed".
+- action taken: Required `keys[].public_key_encoding = "spki-der-base64"` on identity key records, enforced it in `verifyProof`, centralized v0.3 cryptosuite constants in `packages/protocol`, and added verifier validation for digest-prefix shape and digest algorithm allowlisting.
+- linked docs: `packages/protocol/src/cryptosuite.js`, `packages/protocol/src/signatures.js`, `packages/verifier/src/verify-manifest.js`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/object-schemas.md`, `docs/protocol/normative-protocol-draft.md`
+- notes: This is still reference-scoped: it is protocol disclosure + verifier enforcement, not issuer key-management tooling or hosted trust policy infrastructure.
+
 ## DF-032 - Enforce cryptosuite disclosure and algorithm mismatch rejection
 - source: `2026-04-19 DigiD 3h loop`
 - date: 2026-04-19

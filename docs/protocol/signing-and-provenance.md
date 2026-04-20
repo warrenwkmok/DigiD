@@ -61,7 +61,9 @@ DigiD v0.3 intentionally supports **one** cryptographic suite so verifiers canno
 ### Public key encoding disclosure
 
 For the reference v0.3 profile:
-- `keys[].public_key` is a base64-encoded DER `SubjectPublicKeyInfo` (`spki`) public key.
+- `keys[].public_key_encoding` MUST be `spki-der-base64`
+- `keys[].public_key` MUST be a base64-encoded DER `SubjectPublicKeyInfo` (`spki`) public key
+- verifiers MUST reject missing or unsupported `public_key_encoding` to prevent encoding confusion across implementations
 
 ### Verifier UX posture for cryptography
 - compact trust labels MUST NOT mention cryptographic algorithms.

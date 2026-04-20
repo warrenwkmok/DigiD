@@ -10,10 +10,45 @@ Format notes:
 
 ---
 
+## Iteration 27 - Require key encoding disclosure + digest allowlisting
+- date: 2026-04-20
+- timestamp: 2026-04-20 08:33 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - centralized the v0.3 cryptosuite constants in `packages/protocol` so verifier and fixture tooling share one canonical suite definition
+  - required explicit key parsing disclosure via `keys[].public_key_encoding = "spki-der-base64"` and enforced it in signature verification
+  - tightened digest handling by validating digest-prefix shape and enforcing the v0.3 sha256-only posture for detached-content and event payload digests
+- changed files:
+  - `packages/protocol/src/cryptosuite.js`
+  - `packages/protocol/src/index.js`
+  - `packages/protocol/src/signatures.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/agent.identity.json`
+  - `fixtures/demo/globex.identity.json`
+  - `fixtures/demo/human.identity.json`
+  - `fixtures/demo/org.identity.json`
+  - `fixtures/demo/unverified.identity.json`
+  - `fixtures/demo/owner-binding/agent.identity.json`
+  - `fixtures/demo/owner-binding/owner.identity.json`
+  - `fixtures/demo/owner-binding/rogue-org.identity.json`
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+  - `CHANGELOG.md`
+- why it mattered:
+  - DigiD’s wedge depends on consistent verifier behavior. Explicit key encoding disclosure and digest allowlisting reduce cross-language drift and prevent "best effort" crypto parsing from becoming an exploit path or adapter laundering opportunity.
+- next likely step at the time:
+  - add one negative fixture that proves key-encoding or digest-policy rejections without regenerating the full corpus, using a deterministic demo-only key strategy (and keep any operational key tooling outside the reference repo scope)
+
 ## Iteration 26 - Normalize public docs to reference-scope language
 - date: 2026-04-20
 - timestamp: 2026-04-20 10:20 America/Vancouver
-- commit: `uncommitted`
+- commit: `edd16e8`
 - summary:
   - removed explicit open/closed, monetization-boundary, and private-repo strategy wording from public-facing docs and review logs
   - normalized public repo language around `reference repo`, `reference scope`, `local demo`, and `later implementation phase`
