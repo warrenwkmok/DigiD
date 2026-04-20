@@ -10,6 +10,37 @@ Format notes:
 
 ---
 
+## Iteration 29 - Bind delegated signing keys in issuer artifacts
+- date: 2026-04-20
+- timestamp: 2026-04-20 14:34 America/Vancouver
+- commit: `1226ddb`
+- summary:
+  - introduced issuer-signed key binding blocks on `dgd.attestation` and `dgd.delegation` so delegated authority is bound to a specific delegate signing key (`subject_key` / `delegate_key` with `kid` + `public_key_digest`)
+  - enforced key binding in the reference verifier for delegated agent flows and exposed stable `key_binding_status` + `key_binding_reasons` in verifier outputs and portable result contracts
+  - added a signed negative fixture manifest (`voice.key-binding-mismatch`) proving that a valid signature with mismatched key binding yields a deterministic degraded-trust downgrade
+- changed files:
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/signing-and-provenance.md`
+  - `packages/verifier/src/policy.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/agent.attestation.json`
+  - `fixtures/demo/agent.delegation.json`
+  - `fixtures/demo/key-binding-mismatch/agent.attestation.json`
+  - `fixtures/demo/manifests/voice.key-binding-mismatch.manifest.json`
+  - `fixtures/demo/owner-binding/agent.attestation.json`
+  - `fixtures/demo/owner-binding/agent.delegation.json`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - DigiD’s wedge depends on receivers understanding not just that a signature is valid, but whose authority that signature is operating under. Binding delegated authority to a concrete signing key prevents "signature valid" from silently drifting across keys during rotation or mis-issuance, and gives verifiers a clean downgrade path when authority does not match the key used.
+- next likely step at the time:
+  - decide how key rotation overlap should work without widening delegated authority by accident (binding sets, explicit re-issuance cadence by artifact type, or a later signed key-authorization object), and clarify which verifier profiles require key binding vs treat it as advisory
+
 ## Iteration 28 - Proof cryptosuite disclosure + deterministic demo fixtures
 - date: 2026-04-20
 - timestamp: 2026-04-20 11:35 America/Vancouver
