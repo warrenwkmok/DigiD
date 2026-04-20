@@ -16,7 +16,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - recommended mitigations:
   1. require signed `created_at` on revocations and default to non-retroactive effective timing (`max(revoked_at, created_at)` with small skew allowance)
   2. surface a stable warning (`revocation-backdated`) whenever a revocation claims an effective time that significantly predates its issuance
-  3. keep revocation distribution services, issuer admin tooling, and compromise response workflows as private-boundary candidates outside this public repo
+  3. keep revocation distribution services, issuer admin tooling, and compromise response workflows as outside this reference repo's current scope
 
 ## RT-011 - Signing key lifecycle and "still valid" badge abuse
 - date: 2026-04-20
@@ -31,7 +31,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - recommended mitigations:
   1. enforce key purpose and lifecycle posture in the verifier and expose it in stable machine-readable checks
   2. require adapters to preserve signing-key lifecycle fields and to surface warnings when current-time key status blocks a live trust claim
-  3. keep key compromise workflows, key-management operations, and revocation distribution infrastructure private-boundary candidates outside this public repo
+  3. keep key compromise workflows, key-management operations, and revocation distribution infrastructure outside this reference repo's current scope
 
 ## RT-010 - Cryptosuite downgrade and algorithm-confusion red-team pass
 - date: 2026-04-19
@@ -46,7 +46,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - UI misdirection: a product exposes cryptographic details in primary trust badges, training users to trust the presence of crypto jargon rather than the authority and policy checks DigiD actually performs
 - integration risks:
   - multi-suite support is a policy surface: without receiver-controlled suite allowlists and explicit downgrade behavior, "crypto agility" becomes an exploit path
-  - any hosted key assurance scoring, issuer key lifecycle dashboards, or enterprise crypto policy engines are private-boundary candidates and should not be implemented in this public repo
+  - any hosted key assurance scoring, issuer key lifecycle dashboards, or enterprise crypto policy engines are outside this repo's current scope
 - recommended mitigations:
   1. keep v0.3 locked to one suite and reject mismatches or missing key algorithm disclosure
   2. if/when multiple suites exist, make acceptance receiver-controlled (explicit allowlist) and keep UX stable (suite id in debug, not marketing badges)
@@ -62,12 +62,12 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - attack scenarios:
   - a malicious sender presents a perfectly signed agent interaction for a real organization, but switches the communication purpose to one the delegation never authorized and relies on generic UI copy to hide the difference
   - an adapter preserves the positive actor/org identity chips while suppressing the authority-scope reason, leading receivers to assume the communication is still within delegated bounds
-  - future product work starts encoding customer-specific restriction matrices in the public repo under the guise of `better scope diagnostics`
+  - future product work starts encoding customer-specific restriction matrices in the reference repo under the guise of `better scope diagnostics`
 - integration risks:
-  - scope diagnostics are public-safe only while they stay transparent, signed-input-derived, and fixture-audited
-  - any admin workflow for defining delegation templates, custom restriction catalogs, or tenant policy exceptions belongs on the private side of the boundary
+  - scope diagnostics are appropriate only while they stay transparent, signed-input-derived, and fixture-audited
+  - any admin workflow for defining delegation templates, custom restriction catalogs, or tenant policy exceptions belongs outside the current reference scope
 - exploitability notes:
-  - the new fixture materially hardens the public verifier because an attacker can no longer rely on the current repo having only generic or missing regression coverage for delegation scope conflicts
+  - the new fixture materially hardens the verifier because an attacker can no longer rely on the current repo having only generic or missing regression coverage for delegation scope conflicts
   - preserving `purpose not delegated` in compact copy reduces the chance that a receiver treats the warning as generic noise
 - recommended mitigations:
   1. keep scope-conflict copy derived strictly from signed purpose/channel/action inputs
@@ -86,7 +86,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - a UI treats "pinned" as universally verified and hides the fact that the trust root is locally configured, leading users to overgeneralize the meaning of "verified organization"
   - a malicious actor uses a lookalike org display name and relies on a receiver pinning the wrong org id (social engineering / misbinding)
 - integration risks:
-  - any workflow for acquiring, distributing, or administering pinned org roots is boundary-sensitive and should not be implemented as a hosted public service in this repo
+  - any workflow for acquiring, distributing, or administering pinned org roots is scope-sensitive and should not be implemented as a hosted public service in this repo
   - if adapters suppress `issuer-untrusted` or similar warnings while keeping positive trust chips, they recreate the "fake verified ecosystem" attack path
 - recommended mitigations:
   1. treat pinned trust roots as receiver-side configuration only; never accept them from sender inputs in real deployments
@@ -105,7 +105,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - an integration accidentally accepts a sender-supplied manifest (or equivalent policy input) that smuggles in a malicious issuer allowlist and upgrades trust incorrectly
   - a UI collapses high-trust states back into generic "verified agent" language, masking which authority actually backs the communication
 - integration risks:
-  - issuer trust is now explicitly policy-bound; any future hosted policy registry, issuer administration, or enterprise trust-root workflow is a private-boundary candidate and should not be implemented in this public repo
+  - issuer trust is now explicitly policy-bound; any future hosted policy registry, issuer administration, or enterprise trust-root workflow is outside this repo's current scope
   - if adapters drop `issuer-untrusted` warnings while keeping a positive label, they recreate the original exploit path
 - exploitability notes:
   - adding the `issuer-untrusted` scenario is a strong regression guardrail: it proves the verifier refuses to upgrade trust without an explicit trusted issuer anchor
@@ -131,7 +131,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - a future platform-binding primitive may need signing or countersigning, but conflating that future need with the current local evidence contract would blur protocol and presentation responsibilities
 - exploitability notes:
   - this slice materially hardens the current public reference surface because mismatch and context-loss can now be regression-tested from checked-in evidence files instead of manual flags
-  - the commercial moat still depends on keeping conformance, tenancy, and rollout tooling outside the public repo
+  - conformance, tenancy, and rollout tooling should remain outside the current reference scope
 - recommended mitigations:
   1. keep adapter evidence schema small and local-only
   2. require fixture-backed presentation audit before expanding to a second adapter family
@@ -143,7 +143,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - presentation expectation audit over local evidence files
 - planned:
   - boundary decision for any future signed platform-binding object
-  - private-boundary split before hosted adapter conformance work
+  - no hosted adapter conformance work in the current reference scope
 
 ## RT-005 - Presentation guardrail red-team pass
 - date: 2026-04-17
@@ -153,17 +153,17 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - CLI simulation of platform mismatch and context loss
 - attack scenarios:
   - a future adapter reuses the positive verifier contract but never applies mismatch or context-loss degradation when the surrounding surface changes
-  - presentation warning synthesis logic quietly migrates into a hosted public API, giving away monetizable adapter decision behavior and tenant-specific UX control
+  - presentation warning synthesis logic quietly migrates into a hosted API, absorbing adapter decision behavior and tenant-specific UX control
   - a copied artifact inherits a positive compact label because downstream tooling treats verifier output as screenshot-safe by default
 - integration risks:
-  - the public repo still lacks a standardized evidence shape for platform-native identity binding, so different adapters could simulate mismatch inconsistently
+  - the reference repo still lacks a standardized evidence shape for platform-native identity binding, so different adapters could simulate mismatch inconsistently
   - warning synthesis logic could become too channel-specific if it keeps expanding without a bounded adapter profile contract
 - exploitability notes:
   - this slice materially hardens the current public reference surface by making out-of-context and platform-mismatch degradation executable
-  - the commercial moat still depends on not open-sourcing hosted adapter runtimes, policy administration, or enterprise trust-decision operations
+  - hosted adapter runtimes, policy administration, or enterprise trust-decision operations should remain outside the current reference scope
 - recommended mitigations:
   1. standardize a narrow adapter evidence input before adding more presentation cases
-  2. keep guardrail evaluation local and transparent in the public repo
+  2. keep guardrail evaluation local and transparent in the reference repo
   3. move any hosted adapter conformance services, tenant-aware rendering APIs, or enterprise rollout tooling private before implementation
 
 ## Status
@@ -181,17 +181,17 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - attack scenarios:
   - an adapter inherits the portable result contract but supplies platform identity as an unstated local flag, so mismatch becomes a UI choice instead of a signed evidence check
   - a forwarded or quoted artifact still looks verifiable because the current public contract can synthesize `platform-identity-mismatch` and `artifact-context-missing`, but it cannot yet prove a channel-specific binding object for Slack, email, or other adapters
-  - hosted adapter logic could be introduced later under the guise of "profile conformance" and gradually absorb trust-decision behavior that should stay local or private-boundary
+  - hosted adapter logic could be introduced later under the guise of "profile conformance" and gradually absorb trust-decision behavior that should stay local to the reference layer
 - integration risks:
   - the docs describe mismatch handling, but the repo still lacks a concrete signed adapter evidence schema for platform-native identity binding
   - without a fixture-backed evidence shape, downstream adapters can implement the right warning text while skipping the real binding test
 - exploitability notes:
   - this is exploitable as a presentation downgrade: a receiver can be shown a positive compact label with no mechanically verified platform-binding proof behind it
-  - the gap is public-safe to close with local fixtures and contract code, but not with a hosted decision service
+  - the gap is appropriate to close with local fixtures and contract code, but not with a hosted decision service
 - recommended mitigations:
   1. add a minimal signed adapter evidence object or fixture-backed profile for platform identity binding
   2. require the public contract to synthesize mismatch only from that evidence object, not from manual flags alone
-  3. keep adapter conformance evaluation local and transparent until the public repo stops being the source of trust decisions
+  3. keep adapter conformance evaluation local and transparent until the reference repo stops being the source of trust decisions
 
 ## Status
 - applied in this iteration:
@@ -201,7 +201,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - local-only conformance checks for mismatch/context loss
 - planned:
   - bounded adapter evidence contract
-  - private-boundary split before any hosted adapter service work
+  - no hosted adapter service work in the current reference scope
 
 ## RT-003 - Portable verifier contract and context-loss red-team pass
 - date: 2026-04-17
@@ -213,17 +213,17 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - attack scenarios:
   - an adapter consumes the exported compact label but drops the warning channel, recreating the same green-badge-overstatement problem in a new form
   - a live trust result is copied into a screenshot, transcript, or forwarded artifact without surfacing context degradation
-  - future hosted API work starts from the exported contract and quietly grows into a public trust-decision service that gives away monetizable platform logic
+  - future hosted API work starts from the exported contract and quietly grows into a trust-decision service that absorbs platform logic
 - integration risks:
   - platform-identity mismatch is still advisory in the contract until fixtures or adapter profiles prove how the mismatch state should be triggered
   - live context-loss warnings now exist in vocabulary, but consuming surfaces could still ignore them unless contract conformance becomes testable
 - exploitability notes:
   - this slice meaningfully hardens the adapter boundary by making warning preservation and context binding explicit
-  - the commercial moat still depends on not open-sourcing hosted verifier operations, tenant policy control, or enterprise workflow surfaces
+  - hosted verifier operations, tenant policy control, or enterprise workflow surfaces should remain outside the current reference scope
 - recommended mitigations:
   1. add at least one mismatch or context-loss fixture scenario before any public adapter implementation
-  2. treat contract conformance tests as the last public-safe adapter surface, not a hosted verifier runtime
-  3. move any multi-tenant verification API, policy admin console, or registry operation code to a private repo before implementation starts
+  2. treat contract conformance tests as the last bounded adapter surface, not a hosted verifier runtime
+  3. keep any multi-tenant verification API, policy admin console, or registry operation code outside this repo before implementation starts
 
 ## Status
 - applied in this iteration:
@@ -243,17 +243,17 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
 - attack scenarios:
   - a verifier regression changes the compact banner or warning set while the fixture metadata still claims the old behavior
   - the owner-binding mismatch path exists in the repo but quietly drops out of the active demo loop because nobody checks it continuously
-  - local audit tooling slowly expands into a hosted verification or regression service that gives away monetizable operational capability
+  - local audit tooling slowly expands into a hosted verification or regression service that absorbs operational capability
 - integration risks:
   - delegation-scope conflict and platform-identity mismatch still do not have equivalent audited negative fixtures
-  - authoring new signed negative cases is still awkward without a clearly public-safe demo-key strategy
+  - authoring new signed negative cases is still awkward without a clearly bounded demo-key strategy
 - exploitability notes:
   - this slice removes an easy way to hide trust-label regressions behind expected fixture text
   - it is still safe as local reference tooling, but it should not become the seed of a public hosted trust-decision platform
 - recommended mitigations:
   1. add the next audited negative fixture around delegation-scope conflict once the demo-key strategy is decided
   2. keep the audit command local-only while the repo remains public
-  3. move any hosted regression dashboards, tenant policy controls, or operational trust pipelines to a private repo before implementation
+  3. keep any hosted regression dashboards, tenant policy controls, or operational trust pipelines outside this repo before implementation
 
 ## Status
 - applied in this iteration:
@@ -261,7 +261,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - runtime-derived compact-banner validation
 - planned:
   - delegation-scope conflict regression coverage
-  - private-boundary split before any hosted regression or verification tooling
+  - no hosted regression or verification tooling in the current reference scope
 
 ## RT-001 - Verifier-first MVP implementation red-team pass
 - date: 2026-04-16
@@ -292,7 +292,7 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - mismatch-state handling
   - artifact-context degradation rules in implementation, not docs only
 
-## RT-002 - Owner-binding and verifier-boundary red-team pass
+## RT-002 - Owner-binding and verifier-scope red-team pass
 - date: 2026-04-17
 - timestamp: 2026-04-17 00:00 America/Vancouver
 - reviewed slice:
@@ -301,22 +301,23 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - CLI exposure of owner-binding and scope diagnostics
 - attack scenarios:
   - an attacker presents a mathematically valid agent signature and counts on a UI collapsing the result back into generic verified-agent language
-  - future API work grows from the public verifier into a hosted trust decision service, unintentionally giving away monetizable operational logic
+  - future API work grows from the reference verifier into a hosted trust decision service, unintentionally absorbing operational logic
   - a platform adapter hides owner-binding or scope warnings while keeping the positive compact label
 - integration risks:
   - owner-binding gaps are now machine-readable, but downstream adapters could still discard the warning channel unless result contracts stay strict
-  - the current public repo should not become the home for hosted policy evaluation, tenant-aware rule management, or registry operations
+  - the current reference repo should not become the home for hosted policy evaluation, tenant-aware rule management, or registry operations
 - exploitability notes:
   - this slice meaningfully reduces trust overstatement inside the reference verifier
-  - the commercial moat still depends on not open-sourcing the operational platform that would turn these checks into a production trust service
+  - the operational platform that would turn these checks into a production trust service is outside this repo's scope
 - recommended mitigations:
   1. preserve owner-binding and authority-scope result fields in any future adapter contract
   2. keep any future verifier API local-only or clearly demo-scoped while the repo remains public
-  3. move hosted verifier services, enterprise policy administration, and trust-registry operations to a private repo before implementation starts
+  3. keep hosted verifier services, enterprise policy administration, and trust-registry operations outside this repo before implementation starts
 
 ## Status
 - applied in this iteration:
   - owner-binding warnings in the reference verifier
 - planned:
   - adapter-facing mismatch-state contracts
-  - private-boundary split before hosted service work
+  - no hosted service work in the current reference scope
+

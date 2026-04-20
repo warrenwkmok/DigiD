@@ -2,23 +2,23 @@
 
 ## Purpose
 
-The public DigiD repo should expose one portable, local-first verifier result contract for demos and adapter experiments without turning the repo into a hosted trust-decision platform.
+The DigiD reference repo should expose one portable, local-first verifier result contract for demos and adapter experiments without turning the reference layer into a full trust-decision platform.
 
 This contract exists to keep future adapters from:
 - hiding warning states while keeping a positive compact badge
 - discarding owner-binding or authority-scope diagnostics
 - copying trust banners outside their verified context without degrading the result
 
-## Public-safe boundary
+## Reference scope
 
-Public-safe in this repo:
+In scope for this repo:
 - protocol objects and warning-code vocabulary
 - reference verifier logic
 - fixture manifests and demo scenarios
 - local CLI or library exports of verifier result contracts
 - local-only presentation guardrail evaluation over exported contracts for adapter experiments and UX honesty checks
 
-Private-boundary candidates outside this repo:
+Out of scope for this repo:
 - hosted verifier APIs
 - tenant-aware policy administration
 - trust-registry operations
@@ -41,7 +41,7 @@ A portable verifier result contract SHOULD include:
 - preserved check fields for issuer trust, signing-key lifecycle, owner binding, authority scope, revocation, freshness, and replay posture
 - rendering guardrails that tell adapters what must remain visible
 
-The local public demo may also pair that result with a separate local adapter evidence document:
+The local demo may also pair that result with a separate local adapter evidence document:
 - `evidence_type: dgd.adapter_evidence`
 - one `manifest_path` pointing at the verifier scenario it decorates
 - local presentation-context evidence
@@ -70,7 +70,7 @@ Adapters SHOULD also obey these guardrails:
 
 ## Local adapter evidence contract v0.1
 
-The current public-safe adapter evidence contract should stay minimal.
+The current adapter evidence contract should stay minimal.
 
 Required fields:
 - `evidence_type`
@@ -92,7 +92,7 @@ Optional local context:
 - `platform_identity.native_label`
 - `platform_identity.verified_label`
 
-This shape is intentionally small so DigiD can regression-test adapter honesty without turning the public repo into a tenant-aware policy matrix.
+This shape is intentionally small so DigiD can regression-test adapter honesty without turning the reference layer into a tenant-aware policy matrix.
 
 ## Context-loss handling
 
@@ -110,6 +110,6 @@ This keeps adapters honest about Slack handles, messaging accounts, caller ids, 
 
 ## Relationship to the reference verifier
 
-The public reference verifier may export this contract through a local CLI or library API.
-The public reference verifier may also apply local presentation guardrails over the exported contract using a checked-in local adapter evidence file or explicit local demo flags.
-That remains public-safe because it exposes transparent diagnostics, small evidence contracts, and warning synthesis rules, not tenant-specific hosted policy, adapter orchestration, or operational infrastructure.
+The reference verifier may export this contract through a local CLI or library API.
+The reference verifier may also apply local presentation guardrails over the exported contract using a checked-in local adapter evidence file or explicit local demo flags.
+That remains within reference scope because it exposes transparent diagnostics, small evidence contracts, and warning synthesis rules rather than tenant-specific hosted policy, adapter orchestration, or operational infrastructure.

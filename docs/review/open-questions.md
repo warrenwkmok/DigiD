@@ -87,37 +87,37 @@ Still open: whether the next build slice should automate those roles as local sc
 Working resolution for now: the first delegated-agent profile can rely on the signed identity controller binding plus owner-signed attestation and delegation to bind the agent key back to a human or organization.
 Still open: whether later commercial profiles should introduce a dedicated owner-signed key-binding or key-authorization object so agent key issuance, rotation, and emergency revocation are even more explicit.
 
-## OQ-024 - What is the last public-safe verifier surface before DigiD crosses into private commercial infrastructure?
-Working resolution for now: the public repo can keep shipping protocol, trust-model, fixtures, reference verifier logic, and limited local or demo interfaces that expose transparent diagnostics.
-Still open: exactly where to draw the line between a local verifier API that helps adoption and a hosted verifier service, enterprise policy surface, registry operation layer, or other monetizable platform capability that should move to a private repo before implementation.
+## OQ-024 - How should DigiD evolve reference verifier interfaces without losing scope discipline?
+Working resolution for now: the reference repo can keep shipping protocol, trust-model, fixtures, reference verifier logic, and limited local or demo interfaces that expose transparent diagnostics.
+Still open: exactly where to draw the line between a local verifier API that helps adoption and a broader hosted verifier service, enterprise policy surface, or registry operation layer that belongs to a later implementation phase.
 
 ## OQ-025 - Which adapter-mismatch and context-loss signals belong in the core verifier result contract versus channel-specific adapter profiles?
-Working resolution for now: the public reference verifier should export guardrails for `platform-identity-mismatch` and `artifact-context-missing`, and live surfaces should treat them as first-class warning paths when context or platform binding is lost.
+Working resolution for now: the reference verifier should export guardrails for `platform-identity-mismatch` and `artifact-context-missing`, and live surfaces should treat them as first-class warning paths when context or platform binding is lost.
 Still open: which concrete evidence fields each adapter profile must supply to trigger those warnings deterministically without bloating the core public contract into service-side policy logic.
 
-## OQ-026 - What is the safest public-safe strategy for authoring new signed negative fixtures?
-Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows public so the reference verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure.
+## OQ-026 - What is the safest strategy for authoring new signed negative fixtures?
+Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows in the reference repo so the verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure.
 Still open: whether DigiD should use fixed demo-only signing keys, deterministic seeded keys, or full-corpus regeneration as the intended path for adding new signed negative scenarios such as delegation-scope conflict. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
 
-## OQ-027 - What is the minimum public-safe evidence contract for adapter mismatch and context-loss inputs?
-Working resolution for now: the public repo should use a local `dgd.adapter_evidence` contract with fixture-backed `presentation_context.verified_context_status` and `platform_identity.binding_status` fields so mismatch and context-loss warnings no longer depend on manual flags.
-Still open: which additional evidence fields, if any, are justified per adapter profile without turning the public repo into a tenant-aware policy engine or a channel-specific business-rules matrix.
+## OQ-027 - What is the minimum evidence contract for adapter mismatch and context-loss inputs?
+Working resolution for now: the reference repo should use a local `dgd.adapter_evidence` contract with fixture-backed `presentation_context.verified_context_status` and `platform_identity.binding_status` fields so mismatch and context-loss warnings no longer depend on manual flags.
+Still open: which additional evidence fields, if any, are justified per adapter profile without turning the reference layer into a tenant-aware policy engine or a channel-specific business-rules matrix.
 
 ## OQ-028 - Should future platform-binding evidence stay local-only or become a signed DigiD object?
-Working resolution for now: keep adapter evidence local-only and explicitly outside the signed DigiD protocol object model so the public repo can audit presentation honesty without claiming more protocol proof than DigiD currently has.
+Working resolution for now: keep adapter evidence local-only and explicitly outside the signed DigiD protocol object model so the reference repo can audit presentation honesty without claiming more protocol proof than DigiD currently has.
 Still open: whether commercial or standards-track profiles eventually need a signed or countersigned platform-binding primitive for higher-assurance adapter surfaces.
 
-## OQ-029 - How should verifiers learn which issuers are trusted without a public trust registry?
-Working resolution for the fixture-driven public demo: accept an explicit `trusted_issuer_ids` allowlist as verifier policy input.
-Still open: what the real-world trust-root distribution and administration model should be, and where the public/private boundary sits for issuer discovery, trust registry operations, and enterprise trust-root workflows.
+## OQ-029 - How should verifiers learn which issuers are trusted without a standardized trust registry?
+Working resolution for the fixture-driven demo: accept an explicit `trusted_issuer_ids` allowlist as verifier policy input.
+Still open: what the real-world trust-root distribution and administration model should be for issuer discovery, trust registry operations, and enterprise trust-root workflows.
 
 ## OQ-030 - What does "verified organization" mean outside pinned trust roots?
-Working resolution for the public fixture demo: a verifier may render `verified-organization` when the receiver has explicitly anchored the org identity as a trusted root (pinned id in `trusted_issuer_ids`).
-Still open: whether real deployments should rely on third-party issuer attestations for organizations (and how those issuers are discovered/administered), and which parts of that workflow must move private (trust-root administration, enterprise policy surfaces, registry operations) before implementation.
+Working resolution for the fixture-driven demo: a verifier may render `verified-organization` when the receiver has explicitly anchored the org identity as a trusted root (pinned id in `trusted_issuer_ids`).
+Still open: whether real deployments should rely on third-party issuer attestations for organizations, and how those issuers are discovered and administered.
 
-## OQ-031 - How far should DigiD standardize delegation restriction semantics in the public repo?
-Working resolution for now: the public verifier may preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when it is cleanly derivable from signed inputs, while keeping one stable machine-readable warning code: `delegation-scope-conflict`.
-Still open: whether broader restriction families, customer-specific delegation templates, and richer policy-authoring workflows belong in public protocol docs at all, or should stay private with enterprise policy tooling before implementation.
+## OQ-031 - How far should DigiD standardize delegation restriction semantics in the reference repo?
+Working resolution for now: the verifier may preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when it is cleanly derivable from signed inputs, while keeping one stable machine-readable warning code: `delegation-scope-conflict`.
+Still open: whether broader restriction families, customer-specific delegation templates, and richer policy-authoring workflows belong in protocol docs at all.
 
 ## OQ-032 - How should DigiD evolve cryptographic agility without downgrade or UX confusion?
 Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `JCS` + `sha256`) and require verifiers to reject algorithm mismatches instead of "best-effort" verification.
@@ -125,7 +125,7 @@ Still open: how DigiD introduces additional suites without letting issuers choos
 
 ## OQ-033 - How should DigiD represent key revocation time precisely?
 Working resolution for v0.3: keep `keys[].status` as an operational current-time posture signal, keep `not_before`/`expires_at` as the explicit signed window for event-time validity, and represent signed key revocation timing via `dgd.revocation` targeting the signing key (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`).
-Still open: whether DigiD ever needs a richer append-only key event model beyond `dgd.revocation` (ex: rotation, compromise, recovery) and where the public/private boundary should sit for compromise workflows, issuer tooling, and operational revocation distribution.
+Still open: whether DigiD ever needs a richer append-only key event model beyond `dgd.revocation` (ex: rotation, compromise, recovery) and how compromise workflows, issuer tooling, and operational revocation distribution should be modeled.
 
 ## OQ-034 - Should DigiD allow retroactive revocation claims?
 Working resolution for v0.3 reference verifier: default to non-retroactive revocation posture by treating effective revocation time as `max(revoked_at, created_at)` (with small clock-skew allowance) and surfacing a warning when `revoked_at` significantly predates `created_at`.

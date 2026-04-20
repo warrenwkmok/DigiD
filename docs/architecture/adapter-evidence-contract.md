@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The public DigiD repo needs one bounded way for local adapter experiments to say:
+The DigiD reference repo needs one bounded way for local adapter experiments to say:
 - verified context is still present
 - verified context has been lost
 - platform-native identity still matches the DigiD trust path
@@ -10,15 +10,15 @@ The public DigiD repo needs one bounded way for local adapter experiments to say
 
 This contract exists so those states are reproducible from fixtures instead of ad hoc CLI flags.
 
-## Public-safe boundary
+## Reference scope
 
-This contract is public-safe only because it stays:
+This contract stays within the current reference scope because it is:
 - local
 - transparent
 - fixture-backed
 - narrow
 
-It is not:
+It is not intended to be:
 - a hosted adapter decision API
 - a tenant-aware policy engine
 - a production rollout control plane
@@ -92,7 +92,7 @@ The adapter evidence contract answers what local presentation context the adapte
 - voice sidecar shows a caller label that does not match the verified DigiD identity
 - a verified live result is copied into a transcript, screenshot, or detached artifact view
 
-## Future boundary warning
+## Future scope warning
 
 If this contract starts accumulating:
 - per-tenant override logic
@@ -100,4 +100,4 @@ If this contract starts accumulating:
 - platform-specific business rules
 - workflow state
 
-then DigiD has crossed out of a public-safe local contract and into private product infrastructure.
+then DigiD has crossed beyond a bounded reference contract and into a broader operational system that should be designed separately.

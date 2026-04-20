@@ -12,14 +12,14 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
 - strengths:
   - closes a common trust gap: key revocation cannot rely on unsafely interpreting `keys[].status` as historical proof
   - preserves the core DigiD wedge (communications trust under authority) by making key revocation visible without collapsing into generic "authenticated agent" language
-  - stays public-safe by focusing on signed protocol semantics + reference verifier behavior, not issuer consoles or operational key-management tooling
+  - stays within reference scope by focusing on signed protocol semantics + verifier behavior, not issuer consoles or operational key-management tooling
 - concerns:
   - non-retroactive default (`max(revoked_at, created_at)`) avoids silent history rewrites, but it also means "revocation discovered late" will not invalidate event-time conclusions; products must present this clearly to avoid overconfidence in historical claims
   - key revocation targeting by `kid` must remain unambiguous and globally unique; any future multi-key or delegated-custody profiles should tighten key-id conventions rather than loosening verifier matching
 - recommended changes:
   1. keep revocation timing posture explicit in the normative draft and warning vocabulary (`revocation-backdated`) so adapters can’t hide revocation timing ambiguity
   2. add a deterministic demo-only fixture key strategy before adding signed negative variants that exercise key revocation and backdating behavior
-  3. keep compromise workflows, issuer admin consoles, and revocation distribution services private-boundary candidates outside this repo
+  3. keep compromise workflows, issuer admin consoles, and revocation distribution services outside this repo's current scope
 
 ## CL-011 - Signing key lifecycle enforcement critique
 - date: 2026-04-20
@@ -36,8 +36,8 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - too many lifecycle sub-states could clutter UX; compact badges must keep lifecycle detail in warnings/debug views
 - recommended changes:
   1. keep key lifecycle outputs stable and machine-readable (status + reasons) so adapters cannot "reinterpret" them
-  2. add a signed key revocation timing model (object or event) only when the public/private boundary is clear and fixture-driven validation exists
-  3. keep issuer consoles, key recovery workflows, and operational revocation distribution private-boundary candidates outside this repo
+  2. add a signed key revocation timing model (object or event) only when the reference scope is clear and fixture-driven validation exists
+  3. keep issuer consoles, key recovery workflows, and operational revocation distribution outside this repo's current scope
 
 ## CL-010 - Cryptosuite disclosure and verifier enforcement critique
 - date: 2026-04-19
@@ -56,7 +56,7 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
 - recommended changes:
   1. decide whether to publish a stricter JCS compliance profile (or restricted JSON constraints) before encouraging other language implementations
   2. keep multi-suite support out of v0.3 until downgrade resistance and suite policy UX are explicit
-  3. continue treating hosted key management, issuer consoles, and assurance tooling as private-boundary work before implementation
+  3. continue treating hosted key management, issuer consoles, and assurance tooling as later implementation work
 
 ## CL-009 - Delegation purpose-conflict critique
 - date: 2026-04-18
@@ -70,14 +70,14 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - adds the missing audited negative fixture that earlier critique and red-team passes were already pointing at
   - improves product expression without exploding the warning-code vocabulary or drifting into private policy tooling
 - concerns:
-  - the verifier now has a public-safe way to distinguish purpose, channel, and action conflicts, but richer restriction taxonomies could still spiral into customer-specific policy logic if expanded carelessly
+  - the verifier now has a bounded way to distinguish purpose, channel, and action conflicts, but richer restriction taxonomies could still spiral into customer-specific policy logic if expanded carelessly
   - compact copy should stay constrained to clearly derivable cases; ambiguous multi-reason conflicts should remain generic
 - protocol concerns:
   - the machine-readable warning code should stay `delegation-scope-conflict`; protocol portability would get worse if every scope subtype became a new top-level warning slug
   - signed inputs should remain the only source for reason-specific downgrade wording
 - adoption concerns:
   - this makes the voice wedge more legible for real receivers because `purpose not delegated` is much easier to reason about than a generic scope failure
-  - future enterprise delegation policy consoles or workflow authoring remain private-boundary work and should not be inferred from this public-safe improvement
+  - future enterprise delegation policy consoles or workflow authoring should not be inferred from this reference-scoped improvement
 - recommended changes:
   1. keep scope-conflict subtyping limited to diagnostics and copy derived from signed inputs
   2. add a second audited scope-conflict variant only if it proves a materially different trust decision, not just a new string
@@ -95,7 +95,7 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - keeps the trust model honest by requiring an explicit receiver-side anchor (pinned org id), rather than trusting self-asserted identity metadata
   - broadens the demo wedge from voice-only to a second channel class without adding hosted services or policy surfaces
 - concerns:
-  - pinning an org identity is a powerful receiver policy act; any future UI/workflow around acquiring or managing pinned roots is boundary-sensitive and should not drift into the public repo as a hosted trust registry
+  - pinning an org identity is a powerful receiver policy act; any future UI/workflow around acquiring or managing pinned roots is scope-sensitive and should not drift into the reference repo as a hosted trust registry
   - the verifier should remain explicit that `issuer not trusted` is not "signature failed" and should avoid UI language that implies the issuer is objectively untrustworthy (it is unanchored)
 - protocol concerns:
   - do not let `verification_state` fields become an input to verifier trust-state rendering; the trust-state must remain derived from signed lineage + explicit trust-root policy
@@ -118,17 +118,17 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - improves product expression by separating org-issued agent from generic authenticated/verified agent language
 - concerns:
   - `trusted_issuer_ids` is a demo harness input; it must not drift into a public hosted trust registry or policy-admin surface
-  - the warning vocabulary should remain small; issuer trust should not turn into a sprawling reason-code taxonomy in the public repo
-  - the "who is trusted?" question is now front-and-center and must be treated as a boundary-sensitive product decision
+  - the warning vocabulary should remain small; issuer trust should not turn into a sprawling reason-code taxonomy in the reference repo
+  - the "who is trusted?" question is now front-and-center and must be treated as a scope-sensitive product decision
 - protocol concerns:
   - issuer trust is a policy input, not something the signature chain can self-assert; the verifier must keep rejecting self-contained ecosystems even if they look internally coherent
   - `org-issued-agent` should remain a trust-state classification derived from authority + issuer trust, not a field agents can "declare"
 - adoption concerns:
   - this makes the voice demo more believable in a real receiver environment: if the receiver has not anchored the issuer, the UI degrades instead of showing a strong badge
-  - future enterprise issuance/trust-root workflows likely belong in private commercial tooling before implementation
+  - future enterprise issuance/trust-root workflows likely belong in separate operational tooling before implementation
 - recommended changes:
-  1. keep `trusted_issuer_ids` as the only public trust-anchor input for fixtures; do not add registry operations to the public repo
-  2. treat future issuer discovery, revocation distribution, and trust-root administration as private-boundary candidates
+  1. keep `trusted_issuer_ids` as the only trust-anchor input for fixtures; do not add registry operations to the reference repo
+  2. treat future issuer discovery, revocation distribution, and trust-root administration as later-scope design work
   3. add a short UX note that "issuer not trusted" is about receiver policy, not signature failure
 
 ## Status
@@ -148,18 +148,18 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - demo CLI `present-evidence` and `present-audit` flows
 - strengths:
   - DigiD now turns presentation mismatch and context-loss states into reproducible local fixtures instead of leaving them as demo-only flags
-  - the new slice keeps the core verifier result separate from adapter-local evidence, which is the right line for public-safe adapter experimentation
+  - the new slice keeps the core verifier result separate from adapter-local evidence, which is the right line for bounded adapter experimentation
   - presentation expectations are now auditable, so adapter honesty can regress visibly without any hosted conformance service
 - concerns:
   - the evidence shape must stay minimal or it will drift into a channel-specific policy matrix
-  - one voice-sidecar profile is enough for now; the public repo should resist growing multiple adapter contracts before the current one proves stable
+  - one voice-sidecar profile is enough for now; the reference repo should resist growing multiple adapter contracts before the current one proves stable
   - later commercial profiles may still need a stronger signed or countersigned platform-binding primitive, but that should not be smuggled into this local evidence contract by drift
 - protocol concerns:
   - keeping adapter evidence outside the signed DigiD object model avoids overstating what the protocol itself currently proves
   - future signed platform-binding work, if any, should be introduced deliberately as a separate protocol decision rather than leaking in through presentation fixtures
 - adoption concerns:
   - the new fixture-backed evidence loop makes voice, Slack, email, and transcript adapter experiments more reproducible without crossing into real adapter runtime code
-  - the next public-safe step should stay focused on one bounded adapter profile and local conformance, not hosted adapter APIs
+  - the next step should stay focused on one bounded adapter profile and local conformance, not hosted adapter APIs
 - recommended changes:
   1. keep adapter evidence v0.1 limited to context and binding status, not richer business rules
   2. use fixture-backed presentation audit before adding any second adapter family
@@ -179,25 +179,25 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
 - reviewed slice:
   - local presentation guardrail evaluator over portable verifier contracts
   - demo CLI `present` mode for platform mismatch and context-loss simulation
-  - public/private boundary restatement for adapter-facing warning synthesis
+  - scope restatement for adapter-facing warning synthesis
 - strengths:
   - DigiD now makes adapter-facing honesty checks executable without polluting core signature verification with unsigned presentation metadata
   - `platform-identity-mismatch` and `artifact-context-missing` are now demoable behaviors instead of only aspirational warning codes in docs
-  - the slice preserves the public moat by staying inside local library and CLI ergonomics rather than adding a hosted adapter decision API
+  - the slice stays inside local library and CLI ergonomics rather than adding a hosted adapter decision API
 - concerns:
   - presentation guardrails still depend on manually supplied mismatch/context inputs rather than a standardized per-adapter evidence contract
   - compact-label degradation logic is intentionally small and may need profile-specific wording rules later
-  - the public repo should stop before adding multi-tenant presentation services, hosted adapter conformance pipelines, or policy-admin consoles
+  - the reference repo should stop before adding multi-tenant presentation services, hosted adapter conformance pipelines, or policy-admin consoles
 - protocol concerns:
   - the core verifier result remains cleanly separated from unsigned presentation evidence, which is the right architectural split for now
   - future adapter profiles still need one bounded evidence schema so mismatch states are reproducible across channels
 - adoption concerns:
   - local presentation simulation makes Slack-, voice-, email-, and transcript-surface experiments more honest before any real adapter code lands
-  - the next public-safe step should be evidence-shape design or a narrow fixture-backed adapter profile, not hosted runtime surfaces
+  - the next step should be evidence-shape design or a narrow fixture-backed adapter profile, not hosted runtime surfaces
 - recommended changes:
   1. define a minimal adapter evidence contract before channel-specific simulation gets more complex
-  2. keep presentation guardrail execution local-only in the public repo
-  3. move any hosted adapter decision APIs or enterprise presentation workflows to a private repo before implementation
+  2. keep presentation guardrail execution local-only in the reference repo
+  3. keep any hosted adapter decision APIs or enterprise presentation workflows outside the current reference scope
 
 ## Status
 - applied in this iteration:
@@ -214,21 +214,21 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - portable verifier result contract
   - local CLI export mode
   - isolated owner-binding mismatch fixture family
-  - public/private boundary restatement in architecture docs
+  - scope restatement in architecture docs
 - strengths:
   - the reference verifier now exports a machine-readable contract that future adapters can consume without losing owner-binding, scope, replay, or freshness posture
   - the new owner-binding mismatch scenario isolates a real trust failure without depending on missing-object errors or broad fixture breakage
-  - the slice adds adoption-facing implementation value while staying local-first and public-safe rather than drifting into a hosted verifier service
+  - the slice adds adoption-facing implementation value while staying local-first and reference-scoped rather than drifting into a hosted verifier service
 - concerns:
   - the contract currently tells adapters to synthesize context-loss and platform-mismatch warnings, but it does not yet prove those flows through dedicated adapter-profile fixtures
-  - the public repo still has to stop short of tenant-aware policy administration or hosted decision APIs even if the contract becomes richer
+  - the reference repo still has to stop short of tenant-aware policy administration or hosted decision APIs even if the contract becomes richer
   - the generator now knows about the new fixture family, but the current dirty worktree prevented a full regeneration pass this iteration
 - protocol concerns:
   - warning-code vocabulary is now more complete, but channel-specific mismatch evidence binding is still profile work rather than a resolved core rule
   - result-contract guardrails should remain thin and portable instead of becoming a policy-engine substitute
 - adoption concerns:
   - the export contract makes adapter experimentation more realistic, especially for Slack- or voice-sidecar surfaces
-  - the next slice should either prove mismatch/context-loss rendering through fixtures or stop before the public repo grows service-shaped interfaces
+  - the next slice should either prove mismatch/context-loss rendering through fixtures or stop before the reference repo grows service-shaped interfaces
 - recommended changes:
   1. add one explicit platform-mismatch or context-loss fixture path before any real adapter code appears in this repo
   2. keep result-contract evolution local-first and transparent, not tenant-aware or hosted
@@ -253,11 +253,11 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
 - strengths:
   - the verifier now derives its own compact banner from runtime warnings and trust state instead of inheriting the answer from fixture metadata
   - the checked-in manifests became a real regression suite that asserts warning codes and key verifier checks, not just human-readable scenario intent
-  - the owner-binding mismatch path is now continuously audited as part of the public-safe suite
+  - the owner-binding mismatch path is now continuously audited as part of the reference suite
 - concerns:
   - delegation-scope conflict still lacks equivalent audited negative-fixture coverage
   - adding new signed negative fixtures still depends on settling a cleaner demo-key authoring strategy
-  - the audit command should stay local tooling rather than drift toward a hosted regression or verification service in the public repo
+  - the audit command should stay local tooling rather than drift toward a hosted regression or verification service in the reference repo
 - protocol concerns:
   - manifest expectations are now strong enough to catch verifier drift, but they should stay tied to reference-verifier behavior rather than balloon into adapter- or tenant-specific policy matrices
   - result-contract and manifest expectations now overlap more deliberately, so both contracts need to stay aligned
@@ -265,7 +265,7 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - local audit output makes future adapter experiments safer because trust-label drift becomes visible immediately
   - this still does not prove platform-mismatch or context-loss rendering in any real channel surface
 - recommended changes:
-  1. add a scope-conflict negative fixture once the public-safe signed-fixture authoring path is chosen
+  1. add a scope-conflict negative fixture once the signed-fixture authoring path is chosen
   2. keep portable result contracts and manifest expectations aligned before any adapter-side rendering work
   3. stop before this audit surface turns into a hosted regression or trust-decision platform
 
@@ -320,23 +320,23 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
   - delegated owner-binding enforcement
   - CLI diagnostics for owner binding and authority scope
 - strengths:
-  - the public reference verifier now matches the protocol's delegated-agent trust claim more honestly by requiring an executable owner-binding chain
-  - policy logic is less entangled with manifest loading, which makes the next public-safe verifier work easier to reason about
+  - the reference verifier now matches the protocol's delegated-agent trust claim more honestly by requiring an executable owner-binding chain
+  - policy logic is less entangled with manifest loading, which makes the next verifier work easier to reason about
   - CLI output now shows why a result is degraded without inventing stronger trust language than the verifier actually proved
 - concerns:
   - the repo still lacks a signed negative fixture that isolates owner-binding failure without collapsing into broader missing-object errors
   - policy is extracted, but it is not yet configurable as a profile matrix across future surfaces or adapters
-  - the next API step is now a boundary-sensitive product choice because a hosted verifier surface would begin overlapping private commercial territory
+  - the next API step is now a scope-sensitive product choice because a hosted verifier surface would begin moving beyond the current reference layer
 - protocol concerns:
   - action and scope evaluation remains intentionally small and tied to the current live voice wedge
   - richer restriction and mismatch handling should wait for concrete adapter profiles rather than expanding the public demo into pseudo-production policy code
 - adoption concerns:
   - this slice improves trust honesty, but it still does not prove how platform mismatch states should render on Slack, voice gateways, or enterprise messaging surfaces
-  - if the next iteration builds an API, it should stay local/demo-only unless the work intentionally moves to a private repo
+  - if the next iteration builds an API, it should stay local/demo-only unless the work intentionally moves into a broader implementation phase
 - recommended changes:
   1. add one deterministic negative fixture path for owner-binding or scope-conflict cases without regenerating the full demo corpus blindly
-  2. keep the next public slice limited to local verifier ergonomics or adapter-facing result contracts
-  3. stop before implementing any hosted verifier service, registry operations, billing, tenancy, or enterprise policy orchestration in this public repo
+  2. keep the next slice limited to local verifier ergonomics or adapter-facing result contracts
+  3. stop before implementing any hosted verifier service, registry operations, billing, tenancy, or enterprise policy orchestration in this reference repo
 
 ## Status
 - applied in this iteration:

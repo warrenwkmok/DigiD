@@ -10,6 +10,30 @@ Format notes:
 
 ---
 
+## Iteration 26 - Normalize public docs to reference-scope language
+- date: 2026-04-20
+- timestamp: 2026-04-20 10:20 America/Vancouver
+- commit: `uncommitted`
+- summary:
+  - removed explicit open/closed, monetization-boundary, and private-repo strategy wording from public-facing docs and review logs
+  - normalized public repo language around `reference repo`, `reference scope`, `local demo`, and `later implementation phase`
+  - kept the technical scope intact while making the public documentation read as framework/reference material rather than repo-governance strategy
+- changed files:
+  - `CHANGELOG.md`
+  - `docs/architecture/adapter-evidence-contract.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/reference-verifier.md`
+  - `docs/architecture/system-architecture.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/open-questions.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+- why it mattered:
+  - public readers should see DigiD as a protocol/framework/reference effort, not as a public explanation of internal repo-boundary strategy
+- next likely step at the time:
+  - keep future public documentation focused on protocol, trust, fixtures, and reference behavior while handling implementation-boundary decisions inside the operating workflow instead of in repo prose
+
 ## Iteration 25 - Add signed revocation timing posture + signing-key revocation diagnostics
 - date: 2026-04-20
 - timestamp: 2026-04-20 05:33 America/Vancouver
@@ -35,7 +59,7 @@ Format notes:
   - `docs/review/open-questions.md`
 - why it mattered:
   - DigiD’s wedge is communications trust under authority. If key revocation timing is ambiguous, receivers can’t safely answer “was this signer still authorized?” and products can accidentally enable repudiation-by-backdating or badge laundering.
-  - this stays public-safe by defining signed protocol semantics and reference verifier behavior without implementing issuer consoles, compromise workflows, or revocation distribution services.
+  - this stays within reference scope by defining signed protocol semantics and verifier behavior without expanding into issuer consoles, compromise workflows, or revocation distribution services.
 - next likely step at the time:
   - decide whether any DigiD profile should ever permit truly retroactive revocation for event-time evaluation (or always treat it as disputed), and choose a deterministic demo-only fixture key strategy before adding signed negative fixtures that exercise key revocation and backdating behavior.
 
@@ -67,9 +91,9 @@ Format notes:
   - `docs/review/open-questions.md`
 - why it mattered:
   - DigiD’s wedge is communications trust under owner-bound authority. A mathematically valid signature is not enough; verifiers and adapters must clearly surface whether the signing key is still usable for live trust decisions.
-  - this stays public-safe by focusing on protocol posture, reference verifier logic, and fixture-backed UX guardrails rather than any hosted key-management, revocation distribution, or issuer console infrastructure.
+  - this stays within reference scope by focusing on protocol posture, reference verifier logic, and fixture-backed UX guardrails rather than hosted key-management, revocation distribution, or issuer console infrastructure.
 - next likely step at the time:
-  - decide how DigiD represents key revocation timing precisely (signed `revoked_at` and/or a key event model) without turning the public repo into operational key-management tooling.
+  - decide how DigiD represents key revocation timing precisely (signed `revoked_at` and/or a key event model) without turning the reference repo into operational key-management tooling.
 
 ## Iteration 23 - Enforce cryptosuite disclosure + reject algorithm mismatch
 - date: 2026-04-19
@@ -95,7 +119,7 @@ Format notes:
   - `docs/review/open-questions.md`
 - why it mattered:
   - DigiD’s wedge is communications trust under owner-bound authority. Crypto agility without strict disclosure and mismatch rejection becomes an attack surface where “some signature math” can be used to overstate trust.
-  - this slice keeps the public repo honest by staying in protocol posture + transparent verifier enforcement, without drifting into issuer key-management platforms or hosted assurance services.
+  - this slice keeps the reference repo honest by staying in protocol posture + transparent verifier enforcement, without drifting into issuer key-management platforms or hosted assurance services.
 - next likely step at the time:
   - decide whether to publish a stricter canonicalization compliance profile before encouraging other language implementations, and whether any multi-suite roadmap belongs in public protocol docs or should wait for receiver-controlled policy profiles.
 
@@ -125,9 +149,9 @@ Format notes:
   - `CHANGELOG.md`
 - why it mattered:
   - DigiD is about communications trust under delegated authority, not just signature validity. If an agent acts outside the delegated purpose, the verifier needs to say that plainly instead of collapsing the failure into generic warning language.
-  - this closes an already-logged gap with audited signed fixtures and keeps the slice public-safe by stopping at transparent verifier logic and local demo coverage
+  - this closes an already-logged gap with audited signed fixtures and keeps the slice reference-scoped by stopping at transparent verifier logic and local demo coverage
 - next likely step at the time:
-  - decide whether the next public-safe scope slice is a channel-conflict or action-conflict variant, or whether richer delegation authoring and restriction management should move private before any further implementation
+  - decide whether the next scope slice is a channel-conflict or action-conflict variant, or whether richer delegation authoring and restriction management should wait for a later implementation phase
 
 ## Iteration 21 - Add verified organization trust state + pinned-org message fixture
 - date: 2026-04-18
@@ -156,7 +180,7 @@ Format notes:
   - DigiD should not collapse "organization identity" into "authenticated agent": receivers need a distinct trust state for org-signed communications, but that trust must still be explicitly anchored in receiver policy
   - this makes the trust model more honest: an organization can be a trust root (pinned) without pretending the protocol itself discovered or administered that trust
 - next likely step at the time:
-  - decide whether a public-safe "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration must move private before any richer org verification workflows are implemented
+  - decide whether a bounded "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration should be designed separately before any richer org verification workflows are implemented
 
 ## Iteration 20 - Add trusted issuer anchors and org-issued agent trust state
 - date: 2026-04-18
@@ -195,7 +219,7 @@ Format notes:
 - summary:
   - added a bounded local `dgd.adapter_evidence` contract so `platform-identity-mismatch` and `artifact-context-missing` no longer depend on manual demo flags
   - added fixture-backed voice presentation evidence plus `present-evidence` and `present-audit` CLI flows so adapter-facing honesty can be regression-tested locally
-  - kept the boundary explicit by treating adapter evidence as local presentation input over exported verifier contracts, not as a hosted adapter decision service, tenant-aware policy layer, or new signed protocol object
+  - kept the scope explicit by treating adapter evidence as local presentation input over exported verifier contracts, not as a hosted adapter decision service, tenant-aware policy layer, or new signed protocol object
 - changed files:
   - `packages/verifier/src/presentation.js`
   - `packages/verifier/src/contract.js`
@@ -214,9 +238,9 @@ Format notes:
   - `package.json`
   - `CHANGELOG.md`
 - why it mattered:
-  - this closes the next public-safe adapter gap by making presentation mismatch and context-loss reproducible from checked-in evidence files instead of ad hoc local inputs, while still avoiding any hosted adapter runtime or policy engine in the public repo
+  - this closes the next adapter gap by making presentation mismatch and context-loss reproducible from checked-in evidence files instead of ad hoc local inputs, while still avoiding hosted adapter runtime or policy-engine behavior in the reference repo
 - next likely step at the time:
-  - decide whether the next public-safe adapter slice is a second bounded evidence profile or whether stronger platform-binding assurance belongs in a future signed profile outside the current local contract
+  - decide whether the next adapter slice is a second bounded evidence profile or whether stronger platform-binding assurance belongs in a future signed profile outside the current local contract
 
 ## Iteration 18 - Make adapter-facing guardrails executable locally
 - date: 2026-04-17
@@ -225,7 +249,7 @@ Format notes:
 - summary:
   - added a local presentation guardrail evaluator over exported verifier contracts so DigiD can execute `platform-identity-mismatch` and `artifact-context-missing` without polluting core signature verification with unsigned adapter context
   - exposed the slice through a narrow demo CLI `present` mode that simulates platform mismatch and copied-artifact context loss for the happy-path verifier output
-  - kept the boundary explicit: local contract exports and local guardrail evaluation stay public-safe, while hosted adapter decision services, tenant-aware presentation logic, registry operations, billing, and enterprise workflows remain private-boundary candidates
+  - kept the scope explicit: local contract exports and local guardrail evaluation stay reference-scoped, while hosted adapter decision services, tenant-aware presentation logic, registry operations, billing, and enterprise workflows remain out of scope here
 - changed files:
   - `packages/verifier/src/presentation.js`
   - `packages/verifier/src/contract.js`
@@ -241,7 +265,7 @@ Format notes:
   - `docs/review/open-questions.md`
   - `CHANGELOG.md`
 - why it mattered:
-  - this closes the gap where DigiD documented adapter honesty guardrails but could not yet execute them in a local product loop, which is the last public-safe step before real adapter or platform work risks crossing into private commercial territory
+  - this closes the gap where DigiD documented adapter honesty guardrails but could not yet execute them in a local product loop, which is the last bounded reference step before real adapter or platform work needs separate design treatment
 - next likely step at the time:
   - define a narrow adapter evidence contract or a fixture-backed profile for mismatch/context inputs without building any hosted adapter runtime
 
@@ -252,8 +276,8 @@ Format notes:
 - summary:
   - removed the shortcut where fixture metadata supplied the verifier's compact banner, so runtime trust labels now come from actual warnings and trust state
   - added manifest expectation matching for compact labels, decisions, warning codes, error counts, and key verifier checks plus a local `audit` command that exercises the full manifest suite
-  - folded the existing owner-binding mismatch scenario into the audited suite so DigiD now continuously checks a public-safe adversarial delegated-agent path
-  - kept the slice public-safe by strengthening local verifier contracts, fixture manifests, and demo tooling only while still excluding hosted verifier services, tenant policy layers, registry operations, billing, and enterprise operations
+  - folded the existing owner-binding mismatch scenario into the audited suite so DigiD now continuously checks an adversarial delegated-agent path
+  - kept the slice reference-scoped by strengthening local verifier contracts, fixture manifests, and demo tooling only while still excluding hosted verifier services, tenant policy layers, registry operations, billing, and enterprise operations
 - changed files:
   - `packages/verifier/src/display.js`
   - `packages/verifier/src/expectations.js`
@@ -275,7 +299,7 @@ Format notes:
 - why it mattered:
   - this turns the public fixture set into an executable verifier regression contract and closes a subtle honesty gap where expected manifest labels could hide runtime rendering drift
 - next likely step at the time:
-  - add the next audited negative scenario, likely delegation-scope conflict, after choosing the safest public-safe strategy for authoring new signed demo variants
+  - add the next audited negative scenario, likely delegation-scope conflict, after choosing the safest strategy for authoring new signed demo variants
 
 ## Iteration 16 - Add a portable verifier result contract and isolated owner-binding mismatch fixture
 - date: 2026-04-17
@@ -283,10 +307,10 @@ Format notes:
 - commit: `uncommitted`
 - summary:
   - added a portable verifier result contract that preserves owner-binding, authority-scope, freshness, replay, and warning visibility requirements for future adapters
-  - exposed the contract through a local demo CLI `export` mode and a manifest audit mode so DigiD can support adapter experiments and verifier-drift checks without shipping a hosted verifier API in the public repo
+  - exposed the contract through a local demo CLI `export` mode and a manifest audit mode so DigiD can support adapter experiments and verifier-drift checks without shipping a hosted verifier API in the reference repo
   - added an isolated owner-binding mismatch fixture family proving that a valid agent signature plus in-scope delegation still degrades when the acting operator is not the agent's verified owner
   - tightened architecture and protocol docs so out-of-context rendering and platform-identity mismatch stay first-class warning paths instead of adapter-specific afterthoughts
-  - explicitly kept the slice on the public-safe side of the boundary by shipping local result contracts, reference verifier logic, and fixtures only, while keeping hosted verifier services, registry operations, and enterprise policy surfaces out of scope
+  - explicitly kept the slice reference-scoped by shipping local result contracts, reference verifier logic, and fixtures only, while keeping hosted verifier services, registry operations, and enterprise policy surfaces out of scope
 - changed files:
   - `packages/verifier/src/contract.js`
   - `packages/verifier/src/expectations.js`
@@ -313,9 +337,9 @@ Format notes:
   - `README.md`
   - `CHANGELOG.md`
 - why it mattered:
-  - this closes the next public-safe verifier gap by giving future adapters a strict, machine-readable trust contract before any hosted verifier surface or enterprise integration drifts into the public repo
+  - this closes the next verifier gap by giving future adapters a strict, machine-readable trust contract before any hosted verifier surface or enterprise integration drifts into the reference repo
 - next likely step at the time:
-  - decide whether the next public-safe slice is platform-mismatch fixture coverage or whether adapter-profile work should move to a private commercial repo first
+  - decide whether the next slice is platform-mismatch fixture coverage or whether adapter-profile work should wait for a later implementation phase
 
 ## Iteration 15 - Externalize verifier policy and enforce owner binding
 - date: 2026-04-17
@@ -325,7 +349,7 @@ Format notes:
   - added a dedicated verifier policy module so interaction class, replay posture, freshness defaults, owner-binding checks, and delegation-scope checks are no longer buried in one manifest verifier file
   - made delegated-agent trust require an explicit owner-binding chain in verifier output before the public demo will render high-trust agent posture
   - surfaced owner-binding and authority-scope diagnostics in the demo CLI so degraded trust is explained directly instead of implied by a generic warning badge
-  - kept the slice on the public-safe side of the boundary by strengthening reference verifier logic only, while leaving hosted verifier services and operational policy surfaces out of the repo
+  - kept the slice within reference scope by strengthening verifier logic only, while leaving hosted verifier services and operational policy surfaces out of the repo
 - changed files:
   - `packages/verifier/src/policy.js`
   - `packages/verifier/src/verify-manifest.js`
@@ -340,7 +364,7 @@ Format notes:
 - why it mattered:
   - this closes part of the gap between the v0.3 trust model and the runnable verifier by making owner-backed delegated-agent trust explicit instead of mostly documentary
 - next likely step at the time:
-  - decide the last public-safe verifier surface before any API or adapter work crosses into private hosted-service territory
+  - decide the last bounded verifier surface before any API or adapter work turns into hosted-service territory
 
 ## Iteration 13 - Ship the verifier-first MVP implementation
 - date: 2026-04-16
@@ -418,7 +442,7 @@ Format notes:
   - DigiD should not collapse "organization identity" into "authenticated agent": receivers need a distinct trust state for org-signed communications, but that trust must still be explicitly anchored in receiver policy
   - this makes the trust model more honest: an organization can be a trust root (pinned) without pretending the protocol itself discovered or administered that trust
 - next likely step at the time:
-  - decide whether a public-safe "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration must move private before any richer org verification workflows are implemented
+  - decide whether a bounded "pinned trust root" model is enough for verified organizations, or whether issuer discovery / trust-root administration should be designed separately before any richer org verification workflows are implemented
 ## Iteration 12 â€” Tighten signer resolution and ordered live-event rules
 - date: 2026-04-16
 - timestamp: 2026-04-16 18:00 America/Vancouver

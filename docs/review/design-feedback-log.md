@@ -37,7 +37,7 @@ Every meaningful critique should end up in one of these states:
 - summary: DigiD needs explicit, verifier-checkable algorithm disclosure and a strict stance on cryptographic agility. Without that, attackers can exploit algorithm ambiguity, mismatched key metadata, or UI confusion to overstate trust even when signatures are mathematically valid.
 - action taken: Tightened `verifyProof` to require key algorithm disclosure and reject any non-`Ed25519` signing keys in the v0.3 profile, exposed a stable cryptosuite identifier plus proof/digest details in verifier checks and portable result contracts, and updated protocol + UX docs to clarify where algorithms are disclosed and how products should treat crypto details in UI.
 - linked docs: `packages/protocol/src/signatures.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/contract.js`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/architecture/verifier-ux-guidance.md`
-- notes: This stays public-safe as protocol posture + transparent verifier enforcement. Issuer operational key management, trust registry operations, and enterprise policy/assurance tooling remain private-boundary candidates.
+- notes: This stays within reference scope as protocol posture + transparent verifier enforcement. Issuer operational key management, trust registry operations, and enterprise policy/assurance tooling remain outside the current implementation scope.
 
 ## DF-031 - Preserve scope-conflict specificity in delegated trust output
 - source: `2026-04-18 DigiD 3h loop`
@@ -49,7 +49,7 @@ Every meaningful critique should end up in one of these states:
 - summary: DigiD already detected delegation scope conflicts, but the public demo still collapsed purpose, channel, and action failures into one generic "authority out of scope" message and lacked a signed negative fixture proving the most product-relevant case.
 - action taken: Added verifier helpers that preserve the primary out-of-scope dimension in warning copy and compact banners, plus a signed `voice.delegation-purpose-conflict` fixture family that exercises a purpose-out-of-scope delegated voice call in the manifest-audited loop.
 - linked docs: `packages/verifier/src/policy.js`, `packages/verifier/src/display.js`, `packages/verifier/src/verify-manifest.js`, `fixtures/demo/manifests/voice.delegation-purpose-conflict.manifest.json`, `docs/architecture/verifier-ux-guidance.md`, `docs/protocol/message-formats.md`
-- notes: This remains public-safe because it is still transparent verifier logic, protocol wording, and local fixture coverage. Enterprise policy authoring, customer-specific restriction taxonomies, and delegated workflow administration remain private-boundary candidates.
+- notes: This remains reference-scoped because it is still transparent verifier logic, protocol wording, and local fixture coverage. Enterprise policy authoring, customer-specific restriction taxonomies, and delegated workflow administration remain outside the current implementation scope.
 
 ## DF-030 - Add verified organization trust state via pinned trust anchors
 - source: `2026-04-18 DigiD 3h loop`
@@ -61,7 +61,7 @@ Every meaningful critique should end up in one of these states:
 - summary: The repo claimed a `verified-organization` trust state, but the reference verifier could not render it and had no fixture coverage for org-signed communications. That risked collapsing org identity into generic "authenticated agent" thinking and leaving receiver-facing org trust ambiguous.
 - action taken: Added `verified-organization` resolution to the reference verifier, gated on receiver-side trust anchoring (pinned org id in `trusted_issuer_ids`). Added a manifest-audited async message fixture (`message.verified-organization`) so org-signed communications are exercised in the same regression loop as delegated voice cases.
 - linked docs: `packages/verifier/src/verify-manifest.js`, `fixtures/demo/manifests/message.verified-organization.manifest.json`, `docs/architecture/trust-states.md`, `docs/architecture/verifier-ux-guidance.md`
-- notes: This stays public-safe by treating trust roots as local verifier policy input only. Issuer discovery, trust-root administration workflows, and any hosted trust registry operations remain private-boundary candidates.
+- notes: This stays reference-scoped by treating trust roots as local verifier policy input only. Issuer discovery, trust-root administration workflows, and any hosted trust registry operations remain outside the current implementation scope.
 
 ## DF-029 - Require trusted issuer anchors for high-trust states
 - source: `2026-04-18 DigiD 3h loop`
@@ -73,7 +73,7 @@ Every meaningful critique should end up in one of these states:
 - summary: A self-consistent signature chain can still be a fake authenticated ecosystem unless verifiers have an explicit notion of which issuers they trust. The public demo needed a minimal, fixture-safe way to model issuer trust without building a trust registry.
 - action taken: Added `verification_defaults.trusted_issuer_ids` to the fixture manifest profile and enforced it in the reference verifier. Introduced the `issuer-untrusted` warning and a new `voice.issuer-untrusted` fixture manifest to keep this failure mode regression-tested. Also split the product-facing trust chip into an explicit `org-issued-agent` state instead of collapsing it into generic “verified agent”.
 - linked docs: `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/display.js`, `fixtures/demo/manifests/voice.issuer-untrusted.manifest.json`, `docs/protocol/fixture-manifest-profile.md`, `docs/protocol/normative-protocol-draft.md`, `docs/architecture/trust-states.md`
-- notes: This stays public-safe because it is a local policy input and fixture harness contract, not a hosted trust registry, tenant policy console, or enterprise integration layer.
+- notes: This stays reference-scoped because it is a local policy input and fixture harness contract, not a hosted trust registry, tenant policy console, or enterprise integration layer.
 
 ## DF-028 - Standardize a local adapter evidence contract before any channel profile grows
 - source: `2026-04-18 DigiD 3h loop`
@@ -85,7 +85,7 @@ Every meaningful critique should end up in one of these states:
 - summary: DigiD could already synthesize `platform-identity-mismatch` and `artifact-context-missing`, but the trigger path still depended on manual CLI flags instead of a bounded fixture-backed adapter evidence shape.
 - action taken: Added a local `dgd.adapter_evidence` contract, fixture-backed presentation evidence files, a `present-evidence` flow, a `present-audit` regression pass, and architecture updates that keep adapter evidence explicitly local-only and separate from signed protocol objects.
 - linked docs: `packages/verifier/src/presentation.js`, `packages/verifier/src/contract.js`, `apps/demo-cli/src/index.js`, `fixtures/demo/presentation/*.json`, `docs/architecture/adapter-evidence-contract.md`, `docs/architecture/verifier-result-contract.md`, `README.md`
-- notes: This remains public-safe because the contract is still transparent local evidence over exported verifier output, not a hosted adapter decision service, tenant policy engine, or new production trust object.
+- notes: This remains reference-scoped because the contract is still transparent local evidence over exported verifier output, not a hosted adapter decision service, tenant policy engine, or new production trust object.
 
 ## DF-027 - Make adapter-facing mismatch and context-loss guardrails executable locally before any public adapter code appears
 - source: `2026-04-17 DigiD 3h loop`
@@ -94,10 +94,10 @@ Every meaningful critique should end up in one of these states:
 - area: architecture
 - severity: high
 - status: applied
-- summary: DigiD already documented `platform-identity-mismatch` and `artifact-context-missing`, but they were still advisory prose in the portable contract instead of an executable public-safe demo surface.
+- summary: DigiD already documented `platform-identity-mismatch` and `artifact-context-missing`, but they were still advisory prose in the portable contract instead of an executable reference demo surface.
 - action taken: Added a local presentation guardrail evaluator over exported verifier contracts, exposed it through a narrow demo CLI `present` mode, and tightened docs so mismatch/context-loss simulation stays local-first rather than drifting into a hosted adapter decision API.
 - linked docs: `packages/verifier/src/presentation.js`, `packages/verifier/src/contract.js`, `packages/verifier/src/index.js`, `apps/demo-cli/src/index.js`, `docs/architecture/verifier-result-contract.md`, `docs/architecture/verifier-ux-guidance.md`, `README.md`
-- notes: This remains public-safe because it is transparent library and CLI logic over already-exported verifier contracts. Hosted adapter runtimes, tenant policy controls, registry operations, and enterprise workflow layers still belong on the private side of the boundary.
+- notes: This remains reference-scoped because it is transparent library and CLI logic over already-exported verifier contracts. Hosted adapter runtimes, tenant policy controls, registry operations, and enterprise workflow layers still belong outside the current reference scope.
 
 ## DF-026 - Make fixture manifests assert runtime verifier behavior instead of loosely describing it
 - source: `2026-04-17 DigiD 3h loop`
@@ -106,10 +106,10 @@ Every meaningful critique should end up in one of these states:
 - area: architecture
 - severity: high
 - status: applied
-- summary: The public verifier still let fixture metadata stand in for part of its own displayed answer, and the existing owner-binding mismatch scenario was not yet enforced as part of an audited runtime contract.
+- summary: The verifier still let fixture metadata stand in for part of its own displayed answer, and the existing owner-binding mismatch scenario was not yet enforced as part of an audited runtime contract.
 - action taken: Derived compact banners from runtime state, added manifest expectation matching, added a local manifest audit command, expanded manifests with warning and check assertions, and pulled the owner-binding mismatch fixture into the audited suite.
 - linked docs: `packages/verifier/src/display.js`, `packages/verifier/src/expectations.js`, `packages/verifier/src/verify-manifest.js`, `apps/demo-cli/src/index.js`, `fixtures/demo/manifests/*.json`, `fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json`
-- notes: This stays public-safe because it is still reference-verifier and local demo tooling only. Hosted verification APIs, tenant policy management, trust-registry operations, and regression orchestration services remain private-boundary candidates.
+- notes: This stays reference-scoped because it is still verifier and local demo tooling only. Hosted verification APIs, tenant policy management, trust-registry operations, and regression orchestration services remain outside the current implementation scope.
 
 ## DF-025 - Add a portable verifier result contract before any adapter or API surface grows
 - source: `2026-04-17 DigiD 3h loop`
@@ -118,10 +118,10 @@ Every meaningful critique should end up in one of these states:
 - area: architecture
 - severity: high
 - status: applied
-- summary: DigiD needed one public-safe, machine-readable verifier result contract so future adapters preserve warning visibility, owner binding, scope diagnostics, and context-binding rules without the public repo drifting into a hosted verifier product.
-- action taken: Added a local-first verifier result contract export, preserved owner-binding and authority-scope reason fields in verifier output, added an isolated owner-binding mismatch fixture family, and documented result-contract guardrails plus the public/private boundary around hosted verifier and policy surfaces.
+- summary: DigiD needed one bounded, machine-readable verifier result contract so future adapters preserve warning visibility, owner binding, scope diagnostics, and context-binding rules without the reference repo drifting into a hosted verifier product.
+- action taken: Added a local-first verifier result contract export, preserved owner-binding and authority-scope reason fields in verifier output, added an isolated owner-binding mismatch fixture family, and documented result-contract guardrails plus current reference-scope limits around hosted verifier and policy surfaces.
 - linked docs: `packages/verifier/src/contract.js`, `packages/verifier/src/verify-manifest.js`, `apps/demo-cli/src/index.js`, `docs/architecture/verifier-result-contract.md`, `fixtures/demo/manifests/voice.owner-binding-mismatch.manifest.json`
-- notes: This remains public-safe because the repo still ships transparent reference-verifier logic and local exports only. Hosted verifier services, registry operations, tenant-aware policy control, and enterprise workflow layers remain private-boundary candidates.
+- notes: This remains reference-scoped because the repo still ships transparent verifier logic and local exports only. Hosted verifier services, registry operations, tenant-aware policy control, and enterprise workflow layers remain outside the current implementation scope.
 
 ## DF-024 - Externalize verifier policy and make delegated owner binding executable
 - source: `2026-04-17 DigiD 3h loop`
@@ -133,7 +133,7 @@ Every meaningful critique should end up in one of these states:
 - summary: The runnable verifier still carried too much policy inline, and delegated-agent trust was not yet explicitly gated on a full owner-binding chain in executable logic.
 - action taken: Added a dedicated verifier policy module, made owner-binding and delegation-scope checks first-class result diagnostics, and updated the CLI to surface those states directly.
 - linked docs: `packages/verifier/src/policy.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/display.js`, `apps/demo-cli/src/index.js`
-- notes: This remains public-safe reference verifier work. Hosted verifier APIs, trust-registry operations, enterprise policy surfaces, and similar operational layers should stay private-boundary candidates.
+- notes: This remains reference verifier work. Hosted verifier APIs, trust-registry operations, enterprise policy surfaces, and similar operational layers should stay outside the current implementation scope.
 
 ## DF-001 — Add normative protocol draft and object resolution order
 - source: `review/first-critique.md`
@@ -421,4 +421,16 @@ Every meaningful critique should end up in one of these states:
 - summary: DigiD needed a verifier-grade way to represent key revocation timing without implying that `keys[].status: revoked` is historical proof or drifting into private key-management tooling.
 - action taken: Required `created_at` on `dgd.revocation`, clarified key revocation targeting (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`), and adopted a v0.3 reference verifier posture that treats effective revocation time as `max(revoked_at, created_at)` with an explicit `revocation-backdated` warning when a revocation claims an earlier effective time.
 - linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/review/open-questions.md`
-- notes: This stays public-safe by focusing on signed protocol semantics and reference verifier behavior, not issuer consoles, compromise workflows, or revocation distribution services.
+- notes: This stays within reference scope by focusing on signed protocol semantics and verifier behavior, not issuer consoles, compromise workflows, or revocation distribution services.
+
+## DF-025 - Normalize public docs to reference-scope language
+- source: `2026-04-20 manual repo cleanup`
+- date: 2026-04-20
+- timestamp: 2026-04-20 10:20 America/Vancouver
+- area: architecture
+- severity: medium
+- status: applied
+- summary: Public-facing docs and review logs had accumulated explicit repo-boundary and monetization-adjacent phrasing that distracted from DigiD's actual protocol/framework content.
+- action taken: Reworded architecture docs, changelog entries, open questions, and review logs to use neutral reference-scope language rather than open/closed or repo-separation strategy framing.
+- linked docs: `CHANGELOG.md`, `docs/architecture/*`, `docs/review/open-questions.md`, `docs/review/design-feedback-log.md`, `docs/review/critique-log.md`, `docs/review/red-team-log.md`
+- notes: Boundary handling remains part of the operating workflow, not the public repo narrative.

@@ -66,7 +66,7 @@ It turns protocol theory into a testable product experience.
 ## Likely first implementation shape
 
 A local CLI or library export that accepts a fixture manifest plus JSON objects and returns a verification result plus a portable result contract is enough for the first technical proof of concept.
-Hosted verifier services should stay outside this public repo's implementation scope.
+Hosted verifier services stay outside the current reference implementation scope.
 
 ## Reference verifier modes
 

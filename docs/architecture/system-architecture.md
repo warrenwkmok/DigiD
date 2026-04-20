@@ -43,12 +43,12 @@ Displays trust state in a form normal people can interpret quickly and safely.
 
 The first implementation does not need decentralized purity.
 A practical v0 can use:
-- local fixture and object resolution for the public reference verifier
+- local fixture and object resolution for the reference verifier
 - a local verifier CLI or library export that returns `dgd.verification_result` plus a portable result contract
 - thin demo adapters that emit signed events and messages without hosted control planes
 - a simple UI surface or CLI that renders trust state
 
-Hosted verifier services, registry operations, tenant-aware policy control, and other operational platform layers should remain private-boundary candidates rather than public-repo implementation targets.
+Hosted verifier services, registry operations, tenant-aware policy control, and other operational platform layers should remain outside the current reference implementation scope.
 
 ## Minimum reference-verifier responsibilities
 
