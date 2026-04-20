@@ -49,6 +49,7 @@ DigiD v0.3 intentionally supports **one** cryptographic suite so verifiers canno
 
 ### Required suite for v0.3
 - signature algorithm: `Ed25519`
+- cryptosuite identifier: `proof.cryptosuite = "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3"`
 - proof suite identifier: `proof.type = "ed25519-2020"`
 - canonicalization identifier: `proof.canonicalization = "JCS"`
 - detached digest prefix: `sha256:<hex>`
@@ -56,7 +57,7 @@ DigiD v0.3 intentionally supports **one** cryptographic suite so verifiers canno
 ### Algorithm disclosure rules
 - signature algorithm MUST be disclosed by the signer identity key record (`keys[].algorithm`) and verifiers MUST reject proofs whose `proof.type` is incompatible with the resolved key algorithm.
 - digest algorithm MUST be disclosed in signed digest fields via the digest prefix (example: `payload_digest = "sha256:..."`).
-- `proof.type` and `proof.canonicalization` are required verification parameters; verifiers MUST treat them as untrusted inputs and enforce them strictly (an attacker can tamper with proof metadata, but they cannot make verification pass unless the verifier accepts the claimed suite).
+- `proof.cryptosuite`, `proof.type`, and `proof.canonicalization` are required verification parameters; verifiers MUST treat them as untrusted inputs and enforce them strictly (an attacker can tamper with proof metadata, but they cannot make verification pass unless the verifier accepts the claimed suite).
 
 ### Public key encoding disclosure
 

@@ -25,10 +25,11 @@
   },
   "created_at": "2026-04-15T00:01:05.000Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:01:05.000Z",
     "canonicalization": "JCS",
-    "signature": "j1L7dSHfLDDNwdVm4eunyH4WJu7LrYopue8TuirYInyghJqvqKP5pnTm5i71w/mUK3Ab//z1quJd2nLzzM2oDg=="
+    "signature": "ZkaF6RMRmEvvDZR6LrLZYZco3XEDlJOPI/vcJ4KWWZKxyxjiXLMEhweIyj3gWdOBlpbu1UtFJAs2wN37Lz/pBg=="
   }
 }

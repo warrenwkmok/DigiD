@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-034 - Require proof cryptosuite disclosure + deterministic demo fixture keys
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 11:35 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: DigiD v0.3 locked the cryptosuite, but proofs did not carry a strict cryptosuite allowlist identifier and fixture regeneration rotated key material each run. That combination makes algorithm-policy enforcement harder to standardize across implementations and makes it awkward to author small signed negative fixtures without unintentionally rewriting the whole fixture corpus.
+- action taken: Required `proof.cryptosuite` and enforced a strict v0.3 cryptosuite allowlist in signature verification, surfaced the claimed cryptosuite in verifier crypto diagnostics and portable result contracts, introduced deterministic demo-only Ed25519 fixture keys so fixture regeneration stays stable, and added an audited negative manifest (`voice.cryptosuite-unsupported`) that proves cryptosuite mismatch rejection.
+- linked docs: `packages/protocol/src/cryptosuite.js`, `packages/protocol/src/signatures.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/contract.js`, `packages/verifier/src/display.js`, `scripts/demo-fixture-keys.mjs`, `scripts/generate-demo-fixtures.mjs`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/object-schemas.md`, `docs/protocol/normative-protocol-draft.md`, `docs/review/open-questions.md`
+- notes: The demo-only fixture keys are intentionally scoped to local reference fixtures and are not a production key-management pattern.
+
 ## DF-033 - Require key encoding disclosure + digest allowlist enforcement
 - source: `2026-04-20 DigiD 3h loop`
 - date: 2026-04-20

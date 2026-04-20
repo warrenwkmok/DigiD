@@ -32,10 +32,11 @@
   },
   "created_at": "2026-04-15T00:20:03.000Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_northwind:key-2026-01",
     "created_at": "2026-04-15T00:20:03.000Z",
     "canonicalization": "JCS",
-    "signature": "zKAoGF9MAVwnBLBy9P39+LgCAYpqlzue6k3ZHdxipx9/7jItRCrerx+G7aY5go6BNMP9ohvNu/58DJarqR17Aw=="
+    "signature": "tlCoS3tsUDnSAQTqpfoUny2/u2WeTrkPSKWa2XFbYort82mt7GM8/0WgtUN2KV4ILtLhAJpcXF7sfaJBDNMAAA=="
   }
 }

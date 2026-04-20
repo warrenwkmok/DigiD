@@ -88,6 +88,7 @@ export function derivePortableResultContract(result) {
       event_time_valid: result.checks.event_time_valid,
       current_time_valid: result.checks.current_time_valid,
       crypto_suite: result.checks.crypto_suite,
+      signature_cryptosuite: result.checks.signature_cryptosuite,
       signature_proof_type: result.checks.signature_proof_type,
       canonicalization: result.checks.canonicalization,
       signing_key_kid: result.checks.signing_key_kid,

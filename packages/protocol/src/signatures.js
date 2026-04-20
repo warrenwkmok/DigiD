@@ -3,6 +3,7 @@ import { canonicalizeForProof, stripProof } from "./canonicalize.js";
 
 import {
   DIGID_V03_CANONICALIZATION,
+  DIGID_V03_CRYPTOSUITE_ID,
   DIGID_V03_KEY_ALGORITHM,
   DIGID_V03_PROOF_TYPE,
   DIGID_V03_PUBLIC_KEY_ENCODING
@@ -23,6 +24,14 @@ function resolvePublicKey(publicKeyDerBase64) {
 export function verifyProof(document, signerIdentity) {
   if (!document.proof) {
     throw new Error("Missing proof");
+  }
+
+  if (!document.proof.cryptosuite) {
+    throw new Error("Missing proof cryptosuite disclosure");
+  }
+
+  if (document.proof.cryptosuite !== DIGID_V03_CRYPTOSUITE_ID) {
+    throw new Error(`Unsupported proof cryptosuite: ${document.proof.cryptosuite}`);
   }
 
   if (document.proof.type !== DIGID_V03_PROOF_TYPE) {

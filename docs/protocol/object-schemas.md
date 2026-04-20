@@ -150,6 +150,7 @@ The signer for each object family MUST be determinable from signed fields alone,
 
 ```json
 {
+  "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
   "type": "ed25519-2020",
   "kid": "dgd:key:agent_01:key-2026-04",
   "created_at": "2026-04-15T00:00:00Z",
@@ -159,6 +160,7 @@ The signer for each object family MUST be determinable from signed fields alone,
 ```
 
 Notes:
+- `cryptosuite` is a strict allowlist identifier; verifiers MUST reject unsupported cryptosuites rather than attempting best-effort verification
 - `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
 - the signature is calculated over the object with `proof` removed
 - `proof.created_at` is metadata and is not itself signed; verifiers should rely on signed top-level timestamps like `created_at` on the object family being evaluated
@@ -282,6 +284,7 @@ Represents a signed statement by an issuer about a subject.
     "reference": "att-evidence-2026-04-15-001"
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01Z",
@@ -328,6 +331,7 @@ Defines authority for one subject to act on behalf of another.
     "status": "clear"
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01Z",
@@ -388,6 +392,7 @@ A normalized high-level communication object for completed or in-progress exchan
     "edited": false
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
@@ -458,6 +463,7 @@ Represents the ordered interaction scope for a live communication flow.
     "ended_at": null
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
@@ -509,6 +515,7 @@ Represents a detached recording, transcript, summary, or exported media artifact
   },
   "created_at": "2026-04-15T00:10:00Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:10:00Z",
@@ -590,6 +597,7 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
   "revoked_at": "2026-05-01T00:00:00Z",
   "created_at": "2026-05-01T00:00:01Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-05-01T00:00:01Z",

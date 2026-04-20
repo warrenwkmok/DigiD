@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-014 - Proof cryptosuite stripping and demo-key misuse attacks
+- date: 2026-04-20
+- timestamp: 2026-04-20 11:35 America/Vancouver
+- reviewed slice:
+  - strict `proof.cryptosuite` disclosure and cryptosuite allowlisting in the v0.3 verifier profile
+  - deterministic demo-only signing keys for fixture regeneration
+- attack scenarios:
+  - cryptosuite stripping: a sender omits `proof.cryptosuite` and hopes a verifier infers "close enough" from `proof.type` or key metadata, creating inconsistent behavior across SDKs and room for badge laundering
+  - cryptosuite mismatch confusion: a sender claims one `proof.cryptosuite` while manipulating other proof metadata fields, hoping a verifier checks a subset of parameters and accepts a proof under ambiguous policy
+  - demo-key copy/paste: developers accidentally reuse demo-only private keys outside fixtures (or in a prototype adapter), leading to predictable signatures and false expectations about key-management posture
+- recommended mitigations:
+  1. require `proof.cryptosuite` and reject missing/unsupported values (no inference, no "best effort")
+  2. surface the claimed cryptosuite in crypto-detail views and portable result exports so adapters can’t hide algorithm-policy failures
+  3. keep demo-only keys clearly confined to fixture tooling and never treat them as an issuer pattern or key-management strategy
+
 ## RT-013 - Key encoding confusion and digest-prefix downgrade attacks
 - date: 2026-04-20
 - timestamp: 2026-04-20 08:33 America/Vancouver

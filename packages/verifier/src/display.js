@@ -93,6 +93,7 @@ export function renderExpandedDetails(result) {
 
   if (showCryptoDetails) {
     rows.push(["Crypto suite", result.checks.crypto_suite ?? "unknown"]);
+    rows.push(["Proof cryptosuite", result.checks.signature_cryptosuite ?? "unknown"]);
     rows.push(["Proof type", result.checks.signature_proof_type ?? "unknown"]);
     rows.push(["Canonicalization", result.checks.canonicalization ?? "unknown"]);
     rows.push(["Signing key", result.checks.signing_key_kid ?? "unknown"]);

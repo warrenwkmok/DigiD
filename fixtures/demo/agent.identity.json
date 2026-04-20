@@ -10,7 +10,7 @@
     {
       "kid": "dgd:key:agent_01:key-2026-04",
       "algorithm": "Ed25519",
-      "public_key": "MCowBQYDK2VwAyEAiCscKLzZoyIhgFm8QGOQpc9AmUk/pXYH6/I76oDSw7M=",
+      "public_key": "MCowBQYDK2VwAyEAp5SUo75Jp7wU9DiHszBudGCwpz0JQnTDAMrmYCsQPSU=",
       "public_key_encoding": "spki-der-base64",
       "status": "active",
       "purposes": [
@@ -33,10 +33,11 @@
   },
   "created_at": "2026-04-15T00:00:00.000Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:00.000Z",
     "canonicalization": "JCS",
-    "signature": "jaJZ6fbCssOSG/ECgrjd629p51K0WB8n5NGcBjUJBTaSCLs43Q3AUe+hCglAN4m/k5kmbUGOQTxXGf2hT9dFAA=="
+    "signature": "H7ysffmHqLeIJQ5OafmKa0PL/bycnkSMMXyiT3pFdNKuASn/lSXx7lssldc360iYSTU81pGAbPxF8oSsXKkyCA=="
   }
 }

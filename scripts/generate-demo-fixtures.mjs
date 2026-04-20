@@ -1,16 +1,18 @@
-import { generateKeyPairSync, sign, createHash } from "node:crypto";
+import { createHash, createPrivateKey, createPublicKey, sign } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   canonicalizeForProof,
   DIGID_V03_CANONICALIZATION,
+  DIGID_V03_CRYPTOSUITE_ID,
   DIGID_V03_KEY_ALGORITHM,
   DIGID_V03_PROOF_TYPE,
   DIGID_V03_PUBLIC_KEY_ENCODING,
   digestCanonicalPayload,
   stripProof
 } from "../packages/protocol/src/index.js";
+import { DEMO_FIXTURE_KEY_MATERIAL } from "./demo-fixture-keys.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -22,13 +24,28 @@ function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-function keyRecord(identityId, suffix, privateKey, publicKey) {
+function resolveKeyMaterial(pkcs8DerBase64) {
+  const privateKey = createPrivateKey({
+    key: Buffer.from(pkcs8DerBase64, "base64"),
+    format: "der",
+    type: "pkcs8"
+  });
+
+  const publicKey = createPublicKey(privateKey);
+
+  return {
+    private_key: pkcs8DerBase64,
+    public_key: publicKey.export({ format: "der", type: "spki" }).toString("base64")
+  };
+}
+
+function keyRecord(identityId, suffix, keyMaterial) {
   return {
     kid: `dgd:key:${identityId.split(":").pop()}:${suffix}`,
     algorithm: DIGID_V03_KEY_ALGORITHM,
     public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
-    public_key: publicKey.export({ format: "der", type: "spki" }).toString("base64"),
-    private_key: privateKey.export({ format: "der", type: "pkcs8" }).toString("base64")
+    public_key: keyMaterial.public_key,
+    private_key: keyMaterial.private_key
   };
 }
 
@@ -47,6 +64,7 @@ function signDocument(document, key) {
   return {
     ...proofless,
     proof: {
+      cryptosuite: DIGID_V03_CRYPTOSUITE_ID,
       type: DIGID_V03_PROOF_TYPE,
       kid: key.kid,
       created_at: proofless.created_at ?? proofless.timestamps?.created_at ?? iso("2026-04-15T00:00:00Z"),
@@ -57,20 +75,25 @@ function signDocument(document, key) {
 }
 
 function buildKeys() {
-  const org = generateKeyPairSync("ed25519");
-  const globex = generateKeyPairSync("ed25519");
-  const rogueOrg = generateKeyPairSync("ed25519");
-  const agent = generateKeyPairSync("ed25519");
-  const human = generateKeyPairSync("ed25519");
-  const unverified = generateKeyPairSync("ed25519");
-
   return {
-    org: keyRecord("dgd:identity:org_acme", "key-2026-01", org.privateKey, org.publicKey),
-    globex: keyRecord("dgd:identity:org_globex", "key-2026-01", globex.privateKey, globex.publicKey),
-    rogueOrg: keyRecord("dgd:identity:org_northwind", "key-2026-01", rogueOrg.privateKey, rogueOrg.publicKey),
-    agent: keyRecord("dgd:identity:agent_01", "key-2026-04", agent.privateKey, agent.publicKey),
-    human: keyRecord("dgd:identity:human_01", "key-2026-04", human.privateKey, human.publicKey),
-    unverified: keyRecord("dgd:identity:unverified_01", "key-2026-04", unverified.privateKey, unverified.publicKey)
+    org: keyRecord("dgd:identity:org_acme", "key-2026-01", resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.org_acme.pkcs8_der_base64)),
+    globex: keyRecord(
+      "dgd:identity:org_globex",
+      "key-2026-01",
+      resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.org_globex.pkcs8_der_base64)
+    ),
+    rogueOrg: keyRecord(
+      "dgd:identity:org_northwind",
+      "key-2026-01",
+      resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.org_northwind.pkcs8_der_base64)
+    ),
+    agent: keyRecord("dgd:identity:agent_01", "key-2026-04", resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.agent_01.pkcs8_der_base64)),
+    human: keyRecord("dgd:identity:human_01", "key-2026-04", resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.human_01.pkcs8_der_base64)),
+    unverified: keyRecord(
+      "dgd:identity:unverified_01",
+      "key-2026-04",
+      resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.unverified_01.pkcs8_der_base64)
+    )
   };
 }
 
@@ -343,6 +366,28 @@ function buildDelegatedVoiceFixtures(keys) {
     "fixtures/demo/events/voice.session.started.json": startedEvent,
     "fixtures/demo/messages/voice.session.announcement.json": announcementMessage,
     "fixtures/demo/revocations/delegation.revoked.json": revocation
+  };
+}
+
+function buildCryptosuiteUnsupportedFixtures(delegatedVoiceFixtures) {
+  const communication = delegatedVoiceFixtures["fixtures/demo/voice.communication.json"];
+
+  if (!communication) {
+    throw new Error("Delegated voice fixtures missing base communication object");
+  }
+
+  if (!communication.proof) {
+    throw new Error("Delegated voice communication missing proof");
+  }
+
+  return {
+    "fixtures/demo/voice.communication.unsupported-cryptosuite.json": {
+      ...communication,
+      proof: {
+        ...communication.proof,
+        cryptosuite: "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.2"
+      }
+    }
   };
 }
 
@@ -1188,6 +1233,17 @@ function buildManifests() {
     { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/scope-conflict/events/voice.session.started.json", required: true, stable_across_lineage: true },
     { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/scope-conflict/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
   ];
+  const cryptosuiteUnsupportedObjects = [
+    ...baseObjects.slice(0, 4),
+    {
+      role: "communication_anchor",
+      object_type: "dgd.communication",
+      path: "fixtures/demo/voice.communication.unsupported-cryptosuite.json",
+      required: true,
+      stable_across_lineage: true
+    },
+    ...baseObjects.slice(5)
+  ];
 
   return {
     "fixtures/demo/manifests/voice.happy-path.manifest.json": {
@@ -1216,6 +1272,27 @@ function buildManifests() {
           revocation_status: "clear",
           freshness_status: "fresh",
           replay_status: "clear"
+        }
+      }
+    },
+    "fixtures/demo/manifests/voice.cryptosuite-unsupported.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_cryptosuite_unsupported",
+      scenario_id: "voice-cryptosuite-unsupported",
+      scenario_class: "crypto-policy",
+      description: "Proof cryptosuite mismatch rejection (v0.3)",
+      lineage_group: "demo-voice-acme-01",
+      verification_time: iso("2026-04-15T00:05:00Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
+      objects: cryptosuiteUnsupportedObjects,
+      expected_outcome: {
+        compact_label: "Verification failed",
+        decision: "reject",
+        warning_codes: [],
+        error_count: 2,
+        checks: {
+          signature_valid: false
         }
       }
     },
@@ -1521,8 +1598,10 @@ function buildManifests() {
 async function main() {
   await ensureDirectories();
   const keys = buildKeys();
+  const delegatedVoiceFixtures = buildDelegatedVoiceFixtures(keys);
   const files = {
-    ...buildDelegatedVoiceFixtures(keys),
+    ...delegatedVoiceFixtures,
+    ...buildCryptosuiteUnsupportedFixtures(delegatedVoiceFixtures),
     ...buildScopeConflictFixtures(keys),
     ...buildDirectHumanFixtures(keys),
     ...buildUnverifiedFixtures(keys),

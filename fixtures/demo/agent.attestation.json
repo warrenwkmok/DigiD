@@ -17,10 +17,11 @@
   },
   "created_at": "2026-04-15T00:00:01.000Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01.000Z",
     "canonicalization": "JCS",
-    "signature": "tZehayuSvzDCRQTmiQjNPiXRZxRZzecZIBIcM+C4ko6lUsHVUg4QYebqeUwamw2SZEV/ddgL2Hgrfz07VLKcAA=="
+    "signature": "9tcitp9ZJqfeXV2uOY+lNGj3S/aI9r8Z9vpgCIoeGw2eDGqOLuKPotb3Wc/QWPR3/x59ynVRgQrEW5Sc7PcACw=="
   }
 }

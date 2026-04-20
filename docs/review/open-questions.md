@@ -96,8 +96,8 @@ Working resolution for now: the reference verifier should export guardrails for 
 Still open: which concrete evidence fields each adapter profile must supply to trigger those warnings deterministically without bloating the core public contract into service-side policy logic.
 
 ## OQ-026 - What is the safest strategy for authoring new signed negative fixtures?
-Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows in the reference repo so the verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure.
-Still open: whether DigiD should use fixed demo-only signing keys, deterministic seeded keys, or full-corpus regeneration as the intended path for adding new signed negative scenarios such as delegation-scope conflict. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
+Working resolution for now: keep audited manifests, checked-in demo fixtures, and local generation flows in the reference repo so the verifier can cover adversarial cases like owner-binding mismatch without introducing hosted fixture infrastructure. Use fixed demo-only signing keys (checked into the fixture generator) so fixture regeneration is deterministic and adding new signed negative scenarios does not rotate unrelated key material or signatures.
+Still open: whether DigiD should prefer deterministic seeded keys, fixed demo keys, or scenario-specific corpora for future fixture families. Any answer should remain explicitly demo-only and must not become a production key-management or hosted fixture platform.
 
 ## OQ-027 - What is the minimum evidence contract for adapter mismatch and context-loss inputs?
 Working resolution for now: the reference repo should use a local `dgd.adapter_evidence` contract with fixture-backed `presentation_context.verified_context_status` and `platform_identity.binding_status` fields so mismatch and context-loss warnings no longer depend on manual flags.

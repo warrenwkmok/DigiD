@@ -3,6 +3,24 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-014 - Proof cryptosuite disclosure + deterministic demo fixture keys critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 11:35 America/Vancouver
+- reviewed slice:
+  - requiring strict `proof.cryptosuite` disclosure and enforcing a v0.3 cryptosuite allowlist in signature verification
+  - introducing deterministic demo-only signing keys for fixture regeneration so negative fixtures can be authored without rotating unrelated signatures
+- strengths:
+  - makes algorithm policy unambiguous: `proof.cryptosuite` becomes a single, allowlist-friendly identifier that verifiers can reject without parsing a matrix of independent proof parameters
+  - improves verifier UX honesty: crypto metadata is still available for debugging, but compact trust labels remain about authority and identity rather than cryptography
+  - stabilizes the fixture authoring loop: deterministic demo keys reduce churn and make fixture diffs easier to review when iterating on delegation, owner binding, freshness, and revocation behaviors
+- concerns:
+  - demo-only fixed private keys are easy to misuse by copy/paste; they must remain clearly scoped to fixtures and never be treated as a pattern for issuer key management
+  - `proof.cryptosuite` is now a critical parameter; future suite evolution must remain receiver-controlled to avoid downgrade or "issuer picks weakest" outcomes
+- recommended changes:
+  1. keep one audited negative fixture that proves `proof.cryptosuite` mismatch rejection, and consider a second variant for missing `proof.cryptosuite` if/when it’s helpful
+  2. keep demo-only fixture keys explicitly confined to local fixture tooling and never emit private key material into signed objects
+  3. keep multi-suite evolution out of the current reference verifier until there is a disciplined receiver policy and migration story
+
 ## CL-013 - Key encoding disclosure + digest prefix allowlisting critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 08:33 America/Vancouver

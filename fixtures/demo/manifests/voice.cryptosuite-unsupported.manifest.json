@@ -1,0 +1,84 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:voice_cryptosuite_unsupported",
+  "scenario_id": "voice-cryptosuite-unsupported",
+  "scenario_class": "crypto-policy",
+  "description": "Proof cryptosuite mismatch rejection (v0.3)",
+  "lineage_group": "demo-voice-acme-01",
+  "verification_time": "2026-04-15T00:05:00.000Z",
+  "verification_defaults": {
+    "mode": "dual",
+    "revocation_max_age_seconds": 300,
+    "trusted_issuer_ids": [
+      "dgd:identity:org_acme"
+    ]
+  },
+  "objects": [
+    {
+      "role": "organization_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/org.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/agent.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_attestation",
+      "object_type": "dgd.attestation",
+      "path": "fixtures/demo/agent.attestation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_delegation",
+      "object_type": "dgd.delegation",
+      "path": "fixtures/demo/agent.delegation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/voice.communication.unsupported-cryptosuite.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/voice.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_started_event",
+      "object_type": "dgd.event",
+      "path": "fixtures/demo/events/voice.session.started.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_announcement_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/messages/voice.session.announcement.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Verification failed",
+    "decision": "reject",
+    "warning_codes": [],
+    "error_count": 2,
+    "checks": {
+      "signature_valid": false
+    }
+  }
+}

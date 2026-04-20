@@ -245,6 +245,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       const keyRecord = verifyProof(document, signerIdentity);
       graph.cryptoById.set(document.object_id ?? document.envelope_id, {
         proof_valid: true,
+        cryptosuite: document.proof.cryptosuite ?? null,
         proof_type: document.proof.type,
         canonicalization: document.proof.canonicalization,
         kid: document.proof.kid,
@@ -260,6 +261,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       errors.push(`${documentId}: ${error.message}`);
       graph.cryptoById.set(documentId, {
         proof_valid: false,
+        cryptosuite: document.proof?.cryptosuite ?? null,
         proof_type: document.proof?.type ?? null,
         canonicalization: document.proof?.canonicalization ?? null,
         kid: document.proof?.kid ?? null,
@@ -523,6 +525,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       event_time_valid: eventTimeValid,
       current_time_valid: currentTimeValid,
       crypto_suite: DIGID_V03_CRYPTOSUITE_ID,
+      signature_cryptosuite: communicationCrypto?.cryptosuite ?? null,
       signature_proof_type: communicationCrypto?.proof_type ?? null,
       canonicalization: communicationCrypto?.canonicalization ?? null,
       signing_key_kid: communicationCrypto?.kid ?? null,

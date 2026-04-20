@@ -139,6 +139,7 @@ Use this for signed payload-bearing communications across messaging, email, voic
     "encoding": "utf-8"
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
@@ -176,6 +177,7 @@ Use this for protocol lifecycle events and verification-audit events.
   },
   "payload_digest": "sha256:...",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
@@ -237,6 +239,7 @@ In the first delegated voice profile this message is intentionally not sequence-
     "purpose": "support-follow-up"
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
@@ -273,6 +276,7 @@ In the first delegated voice profile this message is intentionally not sequence-
     "duration_ms": 48321
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:10:00Z",
@@ -308,6 +312,7 @@ In the first delegated voice profile this message is intentionally not sequence-
     "encoding": "utf-8"
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
@@ -343,6 +348,7 @@ In the first delegated voice profile this message is intentionally not sequence-
     "subject_digest": "sha256:..."
   },
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
@@ -463,6 +469,7 @@ Created when a delegation is no longer valid.
   },
   "payload_digest": "sha256:...",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:verifier_service:key-2026-04",
     "created_at": "2026-04-15T00:05:00Z",

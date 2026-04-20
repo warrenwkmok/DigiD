@@ -20,10 +20,11 @@
   "payload_digest": "sha256:6686d954fa8b5e380ff03d7b91280a608032892a0d2f672b6e52dd708e2b4a2a",
   "sequence": 1,
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:01:10.000Z",
     "canonicalization": "JCS",
-    "signature": "KhOR62VkRPY24voruLpGmIWJlrwm1wmOCiLwlWHTEzzhy3IeOmmmXkC3C0QKGjgB+7sJXF52cPyu2gQuRQ4zAw=="
+    "signature": "PJr62UFuydndytv7I79Nb0ose9IkuYTZV/mmTS6OSTxxKL14QKdf2Fc7+VcmVePvbKaamkVumbLd86N/7EY/Cg=="
   }
 }

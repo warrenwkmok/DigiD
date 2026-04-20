@@ -56,6 +56,7 @@ Example:
 For v0.3 profile:
 - signing algorithm MUST be `Ed25519`
 - canonicalization MUST be `JCS`
+- `proof.cryptosuite` MUST be `urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3`
 - `proof.type` MUST be `ed25519-2020`
 - `proof.canonicalization` MUST be `JCS`
 - resolved signer key record `keys[].algorithm` MUST be `Ed25519`

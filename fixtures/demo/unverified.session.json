@@ -18,10 +18,11 @@
   },
   "created_at": "2026-04-15T00:02:05.000Z",
   "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:unverified_01:key-2026-04",
     "created_at": "2026-04-15T00:02:05.000Z",
     "canonicalization": "JCS",
-    "signature": "DBzESlTvAT+/RBuYu3PxkdL5YYw142PA7jlG4nBSbCUvcAYiwM45FY2Xd5LOFnEP80HTPc73u2HmgaFgr5toAg=="
+    "signature": "deUZFtaa8hYeX6WfweGH6dWmNWgMuMcrpKb3jHmJ0oCTmnYdKsCGJ824tlN87TCgnYqxJlvV4qEg9vrw9KDSBw=="
   }
 }

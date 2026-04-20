@@ -1,8 +1,17 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHash, generateKeyPairSync, sign } from "node:crypto";
-import { canonicalizeForProof, stripProof } from "../packages/protocol/src/index.js";
+import { createHash, createPrivateKey, createPublicKey, sign } from "node:crypto";
+import {
+  canonicalizeForProof,
+  DIGID_V03_CANONICALIZATION,
+  DIGID_V03_CRYPTOSUITE_ID,
+  DIGID_V03_KEY_ALGORITHM,
+  DIGID_V03_PROOF_TYPE,
+  DIGID_V03_PUBLIC_KEY_ENCODING,
+  stripProof
+} from "../packages/protocol/src/index.js";
+import { DEMO_FIXTURE_KEY_MATERIAL } from "./demo-fixture-keys.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -14,12 +23,28 @@ function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-function keyRecord(identityId, suffix, privateKey, publicKey) {
+function resolveKeyMaterial(pkcs8DerBase64) {
+  const privateKey = createPrivateKey({
+    key: Buffer.from(pkcs8DerBase64, "base64"),
+    format: "der",
+    type: "pkcs8"
+  });
+
+  const publicKey = createPublicKey(privateKey);
+
+  return {
+    private_key: pkcs8DerBase64,
+    public_key: publicKey.export({ format: "der", type: "spki" }).toString("base64")
+  };
+}
+
+function keyRecord(identityId, suffix, keyMaterial) {
   return {
     kid: `dgd:key:${identityId.split(":").pop()}:${suffix}`,
-    algorithm: "Ed25519",
-    public_key: publicKey.export({ format: "der", type: "spki" }).toString("base64"),
-    private_key: privateKey.export({ format: "der", type: "pkcs8" }).toString("base64")
+    algorithm: DIGID_V03_KEY_ALGORITHM,
+    public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
+    public_key: keyMaterial.public_key,
+    private_key: keyMaterial.private_key
   };
 }
 
@@ -38,10 +63,11 @@ function signDocument(document, key) {
   return {
     ...proofless,
     proof: {
-      type: "ed25519-2020",
+      cryptosuite: DIGID_V03_CRYPTOSUITE_ID,
+      type: DIGID_V03_PROOF_TYPE,
       kid: key.kid,
       created_at: proofless.created_at ?? proofless.timestamps?.created_at ?? iso("2026-04-15T00:00:00Z"),
-      canonicalization: "JCS",
+      canonicalization: DIGID_V03_CANONICALIZATION,
       signature
     }
   };
@@ -55,8 +81,11 @@ async function writeJson(relativePath, value) {
 
 async function main() {
   const orgId = "dgd:identity:org_globex";
-  const orgKeyPair = generateKeyPairSync("ed25519");
-  const key = keyRecord(orgId, "key-2026-01", orgKeyPair.privateKey, orgKeyPair.publicKey);
+  const key = keyRecord(
+    orgId,
+    "key-2026-01",
+    resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.org_globex.pkcs8_der_base64)
+  );
 
   const orgIdentity = signDocument(
     {
@@ -70,8 +99,9 @@ async function main() {
       keys: [
         {
           kid: key.kid,
-          algorithm: "Ed25519",
+          algorithm: DIGID_V03_KEY_ALGORITHM,
           public_key: key.public_key,
+          public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
           status: "active",
           purposes: ["assertion"],
           created_at: iso("2026-04-15T00:30:00Z"),
@@ -252,4 +282,3 @@ main().catch((error) => {
   console.error(error.stack);
   process.exitCode = 1;
 });
-
