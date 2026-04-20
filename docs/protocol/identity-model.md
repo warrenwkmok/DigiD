@@ -37,7 +37,7 @@ A DigiD identity record should include:
   "public_keys": [
     {
       "kid": "key-2026-01",
-      "algorithm": "ed25519",
+      "algorithm": "Ed25519",
       "public_key": "...",
       "status": "active"
     }

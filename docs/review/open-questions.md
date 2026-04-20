@@ -118,3 +118,7 @@ Still open: whether real deployments should rely on third-party issuer attestati
 ## OQ-031 - How far should DigiD standardize delegation restriction semantics in the public repo?
 Working resolution for now: the public verifier may preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when it is cleanly derivable from signed inputs, while keeping one stable machine-readable warning code: `delegation-scope-conflict`.
 Still open: whether broader restriction families, customer-specific delegation templates, and richer policy-authoring workflows belong in public protocol docs at all, or should stay private with enterprise policy tooling before implementation.
+
+## OQ-032 - How should DigiD evolve cryptographic agility without downgrade or UX confusion?
+Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `JCS` + `sha256`) and require verifiers to reject algorithm mismatches instead of "best-effort" verification.
+Still open: how DigiD introduces additional suites without letting issuers choose weaker algorithms, how suite negotiation/policy should be receiver-controlled, and whether DigiD should publish a stricter canonicalization profile (full RFC 8785 JCS compliance constraints) before any multi-language verifier implementations appear.

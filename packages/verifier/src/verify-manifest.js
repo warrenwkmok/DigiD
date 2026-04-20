@@ -22,6 +22,8 @@ import {
 import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
 
+const DIGID_V03_CRYPTOSUITE = "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3";
+
 function resolveSignerId(document, graph) {
   if (document.envelope_type === "dgd.message") {
     return document.sender_id;
@@ -113,6 +115,19 @@ function buildWarning(code, message) {
   return { code, message };
 }
 
+function parseDigestAlgorithm(value) {
+  if (!value || typeof value !== "string") {
+    return null;
+  }
+
+  const index = value.indexOf(":");
+  if (index <= 0) {
+    return null;
+  }
+
+  return value.slice(0, index);
+}
+
 export async function verifyFixtureManifest(manifestPath, options = {}) {
   const { manifest, repoRoot } = await loadFixtureManifest(manifestPath);
   const verificationTime = asInstant(options.verificationTime ?? manifest.verification_time ?? "2026-04-15T00:05:00Z");
@@ -121,7 +136,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     byId: new Map(),
     objects: [],
     envelopes: [],
-    roles: new Map()
+    roles: new Map(),
+    cryptoById: new Map()
   };
   const errors = [];
   const warnings = [];
@@ -167,7 +183,13 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
         throw new Error(`Signer identity ${signerId} not found`);
       }
 
-      verifyProof(document, signerIdentity);
+      const keyRecord = verifyProof(document, signerIdentity);
+      graph.cryptoById.set(document.object_id ?? document.envelope_id, {
+        proof_type: document.proof.type,
+        canonicalization: document.proof.canonicalization,
+        kid: document.proof.kid,
+        key_algorithm: keyRecord.algorithm ?? null
+      });
     } catch (error) {
       errors.push(`${document.object_id ?? document.envelope_id}: ${error.message}`);
     }
@@ -182,6 +204,16 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const replayStatus = checkReplay(graph.envelopes);
   if (replayStatus !== "clear") {
     errors.push("Replay-suspicious envelope sequence detected");
+  }
+
+  const digestAlgorithms = new Set();
+  for (const envelope of graph.envelopes) {
+    if (envelope.envelope_type === "dgd.event") {
+      const digestAlgorithm = parseDigestAlgorithm(envelope.payload_digest);
+      if (digestAlgorithm) {
+        digestAlgorithms.add(digestAlgorithm);
+      }
+    }
   }
 
   const signerIdentity = communication ? graph.byId.get(communication.sender.identity_id) : null;
@@ -228,6 +260,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const ownerBinding = evaluateOwnerBinding({ signerIdentity, operatorIdentity, attestation, delegation, communication });
   const authorityScope = evaluateDelegationScope({ communication, delegation, envelopes: graph.envelopes });
   const revocationStatus = revocation ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
+
+  const communicationCrypto = communication ? graph.cryptoById.get(communication.object_id) : null;
 
   if (attestation && !attestationIssuerTrusted) {
     warnings.push(
@@ -328,6 +362,12 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       signature_valid: signatureValid,
       event_time_valid: eventTimeValid,
       current_time_valid: currentTimeValid,
+      crypto_suite: DIGID_V03_CRYPTOSUITE,
+      signature_proof_type: communicationCrypto?.proof_type ?? null,
+      canonicalization: communicationCrypto?.canonicalization ?? null,
+      signing_key_kid: communicationCrypto?.kid ?? null,
+      signing_key_algorithm: communicationCrypto?.key_algorithm ?? null,
+      digest_algorithms: [...digestAlgorithms].sort(),
       owner_binding_status: ownerBinding.status,
       owner_binding_reasons: ownerBinding.reasons,
       authority_scope_status: authorityScope.status,

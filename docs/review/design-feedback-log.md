@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-032 - Enforce cryptosuite disclosure and algorithm mismatch rejection
+- source: `2026-04-19 DigiD 3h loop`
+- date: 2026-04-19
+- timestamp: 2026-04-19 23:28 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: DigiD needs explicit, verifier-checkable algorithm disclosure and a strict stance on cryptographic agility. Without that, attackers can exploit algorithm ambiguity, mismatched key metadata, or UI confusion to overstate trust even when signatures are mathematically valid.
+- action taken: Tightened `verifyProof` to require key algorithm disclosure and reject any non-`Ed25519` signing keys in the v0.3 profile, exposed a stable cryptosuite identifier plus proof/digest details in verifier checks and portable result contracts, and updated protocol + UX docs to clarify where algorithms are disclosed and how products should treat crypto details in UI.
+- linked docs: `packages/protocol/src/signatures.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/contract.js`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/architecture/verifier-ux-guidance.md`
+- notes: This stays public-safe as protocol posture + transparent verifier enforcement. Issuer operational key management, trust registry operations, and enterprise policy/assurance tooling remain private-boundary candidates.
+
 ## DF-031 - Preserve scope-conflict specificity in delegated trust output
 - source: `2026-04-18 DigiD 3h loop`
 - date: 2026-04-18

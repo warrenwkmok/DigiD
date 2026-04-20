@@ -3,6 +3,25 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-010 - Cryptosuite disclosure and verifier enforcement critique
+- date: 2026-04-19
+- timestamp: 2026-04-19 23:28 America/Vancouver
+- reviewed slice:
+  - v0.3 cryptographic suite disclosure policy across protocol docs
+  - reference verifier enforcement of key algorithm disclosure and mismatch rejection
+  - verifier UX guidance for keeping cryptographic details out of compact trust labels
+- strengths:
+  - reduces algorithm-confusion risk by making the reference verifier reject mismatched or undisclosed key algorithms instead of silently "trying" to verify
+  - clarifies where algorithm disclosure lives (signed key records + signed digest prefixes + enforced proof fields) so verifiers do not need to guess
+  - keeps UX honest by explicitly separating trust-state rendering from cryptographic implementation details
+- concerns:
+  - the repo still uses a simplified canonicalization implementation; protocol wording should stay honest about the exact v0.3 canonicalization profile before multi-language implementations diverge
+  - future crypto agility work can quickly become standards and compatibility churn; it should stay receiver-controlled and policy-driven
+- recommended changes:
+  1. decide whether to publish a stricter JCS compliance profile (or restricted JSON constraints) before encouraging other language implementations
+  2. keep multi-suite support out of v0.3 until downgrade resistance and suite policy UX are explicit
+  3. continue treating hosted key management, issuer consoles, and assurance tooling as private-boundary work before implementation
+
 ## CL-009 - Delegation purpose-conflict critique
 - date: 2026-04-18
 - timestamp: 2026-04-18 14:20 America/Vancouver

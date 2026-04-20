@@ -3,6 +3,25 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-010 - Cryptosuite downgrade and algorithm-confusion red-team pass
+- date: 2026-04-19
+- timestamp: 2026-04-19 23:28 America/Vancouver
+- reviewed slice:
+  - v0.3 cryptosuite disclosure and strict enforcement in the reference verifier
+  - verifier outputs carrying an explicit cryptosuite identifier and proof/digest algorithm diagnostics
+  - UX guidance for keeping cryptographic details out of compact labels
+- attack scenarios:
+  - algorithm confusion: a sender provides identity/key metadata that claims one algorithm while the proof metadata implies another, hoping a verifier "tries both" or a UI upgrades trust based on the wrong field
+  - downgrade pressure: issuers introduce new suites and rely on verifiers treating "unknown but verified" as acceptable, leading to silent acceptance of weaker or non-audited suites
+  - UI misdirection: a product exposes cryptographic details in primary trust badges, training users to trust the presence of crypto jargon rather than the authority and policy checks DigiD actually performs
+- integration risks:
+  - multi-suite support is a policy surface: without receiver-controlled suite allowlists and explicit downgrade behavior, "crypto agility" becomes an exploit path
+  - any hosted key assurance scoring, issuer key lifecycle dashboards, or enterprise crypto policy engines are private-boundary candidates and should not be implemented in this public repo
+- recommended mitigations:
+  1. keep v0.3 locked to one suite and reject mismatches or missing key algorithm disclosure
+  2. if/when multiple suites exist, make acceptance receiver-controlled (explicit allowlist) and keep UX stable (suite id in debug, not marketing badges)
+  3. treat unsupported suites as explicit verification failures rather than degraded-but-green trust states
+
 ## RT-009 - Delegation purpose-conflict red-team pass
 - date: 2026-04-18
 - timestamp: 2026-04-18 14:20 America/Vancouver

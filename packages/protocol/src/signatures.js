@@ -1,12 +1,20 @@
 import { createPublicKey, verify } from "node:crypto";
 import { canonicalizeForProof, stripProof } from "./canonicalize.js";
 
+const SUPPORTED_PROOF_TYPE = "ed25519-2020";
+const SUPPORTED_CANONICALIZATION = "JCS";
+const SUPPORTED_KEY_ALGORITHM = "Ed25519";
+
 function resolvePublicKey(publicKeyDerBase64) {
-  return createPublicKey({
-    key: Buffer.from(publicKeyDerBase64, "base64"),
-    format: "der",
-    type: "spki"
-  });
+  try {
+    return createPublicKey({
+      key: Buffer.from(publicKeyDerBase64, "base64"),
+      format: "der",
+      type: "spki"
+    });
+  } catch (error) {
+    throw new Error(`Invalid public_key encoding: ${error.message}`);
+  }
 }
 
 export function verifyProof(document, signerIdentity) {
@@ -14,11 +22,11 @@ export function verifyProof(document, signerIdentity) {
     throw new Error("Missing proof");
   }
 
-  if (document.proof.type !== "ed25519-2020") {
+  if (document.proof.type !== SUPPORTED_PROOF_TYPE) {
     throw new Error(`Unsupported proof type: ${document.proof.type}`);
   }
 
-  if (document.proof.canonicalization !== "JCS") {
+  if (document.proof.canonicalization !== SUPPORTED_CANONICALIZATION) {
     throw new Error(`Unsupported canonicalization: ${document.proof.canonicalization}`);
   }
 
@@ -26,6 +34,18 @@ export function verifyProof(document, signerIdentity) {
 
   if (!keyRecord) {
     throw new Error(`Signer key ${document.proof.kid} not found on ${signerIdentity.object_id}`);
+  }
+
+  if (!keyRecord.algorithm) {
+    throw new Error(`Signer key ${keyRecord.kid} is missing algorithm disclosure`);
+  }
+
+  if (keyRecord.algorithm !== SUPPORTED_KEY_ALGORITHM) {
+    throw new Error(`Unsupported key algorithm for ${keyRecord.kid}: ${keyRecord.algorithm}`);
+  }
+
+  if (!keyRecord.public_key || typeof keyRecord.public_key !== "string") {
+    throw new Error(`Signer key ${keyRecord.kid} is missing public_key`);
   }
 
   const verified = verify(

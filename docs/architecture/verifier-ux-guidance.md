@@ -75,6 +75,7 @@ Expanded views may include:
 - freshness posture
 - warning list
 - verifier mode
+- cryptography details only in advanced/debug views (for example a single "crypto suite" line), or when explaining an explicit rejection such as an unsupported algorithm
 
 Expanded views should distinguish clearly between:
 - signed facts

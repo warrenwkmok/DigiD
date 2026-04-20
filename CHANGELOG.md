@@ -10,10 +10,38 @@ Format notes:
 
 ---
 
+## Iteration 23 - Enforce cryptosuite disclosure + reject algorithm mismatch
+- date: 2026-04-19
+- timestamp: 2026-04-19 23:28 America/Vancouver
+- commit: `751b023`
+- summary:
+  - locked DigiD v0.3 to one explicit cryptosuite (Ed25519 + JCS + sha256) and clarified where algorithms are disclosed in protocol objects vs proof metadata
+  - tightened the reference verifier to require key algorithm disclosure and reject non-Ed25519 signing keys for the v0.3 profile (no algorithm ambiguity)
+  - exposed an explicit cryptosuite identifier plus proof/digest diagnostics in verifier checks and portable result contracts, while keeping crypto details out of compact UX by default
+- changed files:
+  - `packages/protocol/src/signatures.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/identity-model.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - DigiD’s wedge is communications trust under owner-bound authority. Crypto agility without strict disclosure and mismatch rejection becomes an attack surface where “some signature math” can be used to overstate trust.
+  - this slice keeps the public repo honest by staying in protocol posture + transparent verifier enforcement, without drifting into issuer key-management platforms or hosted assurance services.
+- next likely step at the time:
+  - decide whether to publish a stricter canonicalization compliance profile before encouraging other language implementations, and whether any multi-suite roadmap belongs in public protocol docs or should wait for receiver-controlled policy profiles.
+
 ## Iteration 22 - Add audited delegation purpose-conflict trust slice
 - date: 2026-04-18
 - timestamp: 2026-04-18 14:20 America/Vancouver
-- commit: `uncommitted`
+- commit: `fdc1279`
 - summary:
   - added a signed `voice.delegation-purpose-conflict` fixture family so DigiD now regression-tests the case where a delegated agent signs a real communication outside the delegated purpose
   - upgraded verifier warning copy and compact banner derivation so single-dimension scope failures preserve the actual reason, starting with `Signature valid, purpose not delegated`
@@ -43,7 +71,7 @@ Format notes:
 ## Iteration 21 - Add verified organization trust state + pinned-org message fixture
 - date: 2026-04-18
 - timestamp: 2026-04-18 12:54 America/Vancouver
-- commit: `uncommitted`
+- commit: `f6ec327`
 - summary:
   - added a first-class `verified-organization` trust state to the reference verifier, gated on an explicit receiver-side trust anchor (pinned organization id in `trusted_issuer_ids`) so self-asserted identity fields cannot upgrade trust
   - introduced an async-message fixture family (`message.verified-organization`) that exercises organization-signed communications in the same manifest-audited loop as the live voice cases

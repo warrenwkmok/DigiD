@@ -162,8 +162,9 @@ Notes:
 - `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
 - the signature is calculated over the object with `proof` removed
 - verifiers should reject unknown critical proof parameters
-- the first implementation profile should only accept `Ed25519`
+- the first implementation profile should only accept the `Ed25519` signing algorithm and MUST reject any mismatch between `proof.type` and the resolved signer key record `keys[].algorithm`
 - `proof.kid` must resolve unambiguously to the signing identity during verification
+- `keys[].public_key` is base64-encoded DER `spki` (`SubjectPublicKeyInfo`) for the referenced key in the v0.3 reference profile
 - signer resolution for the first profile is family-specific and MUST follow this matrix:
 
 | Object family | Expected signer identity |

@@ -56,8 +56,13 @@ Example:
 For v0.3 profile:
 - signing algorithm MUST be `Ed25519`
 - canonicalization MUST be `JCS`
+- `proof.type` MUST be `ed25519-2020`
+- `proof.canonicalization` MUST be `JCS`
+- resolved signer key record `keys[].algorithm` MUST be `Ed25519`
+- verifiers MUST reject proofs whose `proof.type` is incompatible with the resolved key algorithm (no algorithm downgrades or ambiguity)
 - the signature input MUST be the full JSON object with `proof` removed
 - detached binary payloads MUST be referenced by digest, not embedded in the signing rule itself
+  - digest algorithm MUST be disclosed by the digest prefix (example: `sha256:<hex>`)
 
 A verifier MUST reject:
 - unsupported signature algorithms

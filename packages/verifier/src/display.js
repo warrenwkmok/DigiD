@@ -52,8 +52,9 @@ export function deriveCompactBanner(result) {
 export function renderExpandedDetails(result) {
   const ownerBindingReasons = result.checks.owner_binding_reasons?.join(", ") || "none";
   const authorityScopeReasons = result.checks.authority_scope_reasons?.join(", ") || "none";
+  const showCryptoDetails = process.env.DIGID_SHOW_CRYPTO_DETAILS === "1";
 
-  return [
+  const rows = [
     ["Verified at", result.verified_at],
     ["Decision", result.decision],
     ["Trust state", result.resolved_trust_state],
@@ -76,4 +77,15 @@ export function renderExpandedDetails(result) {
     ["Freshness", result.checks.freshness_status],
     ["Replay status", result.checks.replay_status]
   ];
+
+  if (showCryptoDetails) {
+    rows.push(["Crypto suite", result.checks.crypto_suite ?? "unknown"]);
+    rows.push(["Proof type", result.checks.signature_proof_type ?? "unknown"]);
+    rows.push(["Canonicalization", result.checks.canonicalization ?? "unknown"]);
+    rows.push(["Signing key", result.checks.signing_key_kid ?? "unknown"]);
+    rows.push(["Key algorithm", result.checks.signing_key_algorithm ?? "unknown"]);
+    rows.push(["Digest algorithms", (result.checks.digest_algorithms ?? []).join(", ") || "none"]);
+  }
+
+  return rows;
 }
