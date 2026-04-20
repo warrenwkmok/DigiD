@@ -13,7 +13,7 @@ Format notes:
 ## Iteration 23 - Enforce cryptosuite disclosure + reject algorithm mismatch
 - date: 2026-04-19
 - timestamp: 2026-04-19 23:28 America/Vancouver
-- commit: `751b023`
+- commit: `ef5bbf3`
 - summary:
   - locked DigiD v0.3 to one explicit cryptosuite (Ed25519 + JCS + sha256) and clarified where algorithms are disclosed in protocol objects vs proof metadata
   - tightened the reference verifier to require key algorithm disclosure and reject non-Ed25519 signing keys for the v0.3 profile (no algorithm ambiguity)
