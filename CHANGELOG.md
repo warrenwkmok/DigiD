@@ -10,6 +10,35 @@ Format notes:
 
 ---
 
+## Iteration 25 - Add signed revocation timing posture + signing-key revocation diagnostics
+- date: 2026-04-20
+- timestamp: 2026-04-20 05:33 America/Vancouver
+- commit: `b6fcd30`
+- summary:
+  - required `created_at` on `dgd.revocation` and clarified revocation timing posture so verifiers can distinguish issuance time from claimed effective time without silently rewriting event-time history
+  - added first-class signing-key revocation diagnostics to verifier outputs and portable result contracts, keeping key revocation visible to adapters instead of collapsing into generic key status strings
+  - documented key revocation targeting (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`) and introduced explicit warning vocabulary for backdated revocation claims (`revocation-backdated`)
+- changed files:
+  - `packages/protocol/src/validate-shape.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/protocol/message-formats.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/architecture/verifier-ux-guidance.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - DigiD’s wedge is communications trust under authority. If key revocation timing is ambiguous, receivers can’t safely answer “was this signer still authorized?” and products can accidentally enable repudiation-by-backdating or badge laundering.
+  - this stays public-safe by defining signed protocol semantics and reference verifier behavior without implementing issuer consoles, compromise workflows, or revocation distribution services.
+- next likely step at the time:
+  - decide whether any DigiD profile should ever permit truly retroactive revocation for event-time evaluation (or always treat it as disputed), and choose a deterministic demo-only fixture key strategy before adding signed negative fixtures that exercise key revocation and backdating behavior.
+
 ## Iteration 24 - Enforce signing-key lifecycle posture in verifier outputs
 - date: 2026-04-20
 - timestamp: 2026-04-20 02:36 America/Vancouver
