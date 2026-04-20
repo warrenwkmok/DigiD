@@ -13,7 +13,7 @@ Format notes:
 ## Iteration 27 - Require key encoding disclosure + digest allowlisting
 - date: 2026-04-20
 - timestamp: 2026-04-20 08:33 America/Vancouver
-- commit: `uncommitted`
+- commit: `fe37cd7`
 - summary:
   - centralized the v0.3 cryptosuite constants in `packages/protocol` so verifier and fixture tooling share one canonical suite definition
   - required explicit key parsing disclosure via `keys[].public_key_encoding = "spki-der-base64"` and enforced it in signature verification
