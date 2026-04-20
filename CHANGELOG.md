@@ -10,6 +10,38 @@ Format notes:
 
 ---
 
+## Iteration 28 - Proof cryptosuite disclosure + deterministic demo fixtures
+- date: 2026-04-20
+- timestamp: 2026-04-20 11:35 America/Vancouver
+- commit: `d4858d9`
+- summary:
+  - required strict `proof.cryptosuite` disclosure and enforced a v0.3 cryptosuite allowlist during signature verification
+  - exposed the claimed proof cryptosuite in the reference verifier’s crypto-detail diagnostics and portable result contract
+  - made demo fixture regeneration deterministic by switching fixture signing to fixed demo-only Ed25519 keys
+  - added an audited negative manifest (`voice.cryptosuite-unsupported`) proving cryptosuite mismatch rejection without regenerating unrelated fixture families
+- changed files:
+  - `packages/protocol/src/signatures.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `scripts/demo-fixture-keys.mjs`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/manifests/voice.cryptosuite-unsupported.manifest.json`
+  - `fixtures/demo/voice.communication.unsupported-cryptosuite.json`
+  - `fixtures/demo/*` (regenerated proofs + stable key material)
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/message-formats.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - DigiD’s verifier posture depends on strict cryptographic parameter enforcement and consistent cross-implementation behavior. `proof.cryptosuite` turns algorithm policy into a single allowlistable identifier, while deterministic demo fixtures keep the signing and negative-fixture loop reviewable without signature churn.
+- next likely step at the time:
+  - decide how verifier outputs should treat trust-state resolution when signatures fail (e.g., whether `resolved_trust_state` should collapse to `unverified` on hard crypto errors) without weakening the “do not collapse high-trust states into authenticated agent” UX posture
+
 ## Iteration 27 - Require key encoding disclosure + digest allowlisting
 - date: 2026-04-20
 - timestamp: 2026-04-20 08:33 America/Vancouver
