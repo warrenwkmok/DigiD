@@ -263,6 +263,10 @@ Represents a signed statement by an issuer about a subject.
   "object_id": "dgd:attestation:01JXYZ...",
   "issuer_id": "dgd:identity:org_acme",
   "subject_id": "dgd:identity:agent_01JABC...",
+  "subject_key": {
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "public_key_digest": "sha256:..."
+  },
   "attestation_type": "organization-issued-agent",
   "verification_state": "verified-agent",
   "status": "active",
@@ -301,6 +305,8 @@ Represents a signed statement by an issuer about a subject.
 - verifier should treat missing or stale `revocation_check` posture as degraded trust, not silent success
 - `verification_state` and `attestation_type` MUST agree, for example `organization-issued-agent` cannot resolve to `verified-human`
 - `claims.authorized_channels` SHOULD be treated as issuer intent, not direct delegation authority
+- verifier profiles MAY require `subject_key` so high-trust delegated communication cannot be bound to a different subject signing key than the issuer attested
+- if `subject_key` is present, `subject_key.kid` MUST resolve to a key on the subject identity and `subject_key.public_key_digest` MUST be a digest string with an algorithm prefix (example: `sha256:<hex>`)
 - if `valid_until` is absent, verifier policy SHOULD treat the attestation as long-lived but still revocation-sensitive
 
 ## 3. Delegation object
@@ -314,6 +320,10 @@ Defines authority for one subject to act on behalf of another.
   "object_id": "dgd:delegation:01JKLM...",
   "issuer_id": "dgd:identity:org_acme",
   "delegate_id": "dgd:identity:agent_01JABC...",
+  "delegate_key": {
+    "kid": "dgd:key:agent_01:key-2026-04",
+    "public_key_digest": "sha256:..."
+  },
   "delegate_class": "agent",
   "status": "active",
   "authority": {
@@ -347,6 +357,8 @@ Defines authority for one subject to act on behalf of another.
 - expired delegation cannot be revived without a new object
 - delegations used for live high-trust communication should require fresher revocation data than static attestations
 - `authority.channels` and `authority.actions` MUST be non-empty arrays
+- verifier profiles MAY require `delegate_key` so high-trust delegated communication cannot be bound to a different signing key than the issuer delegated
+- if `delegate_key` is present, `delegate_key.kid` MUST resolve to a key on the delegate identity and `delegate_key.public_key_digest` MUST be a digest string with an algorithm prefix (example: `sha256:<hex>`)
 - if `purpose_bindings` are present, the communication or event using the delegation MUST declare one matching purpose
 - the first live-communication profile SHOULD require `valid_until` so delegated authority cannot drift into effectively permanent access
 - if `authority.restrictions` are present, verifier output SHOULD surface them when rendering expanded trust details

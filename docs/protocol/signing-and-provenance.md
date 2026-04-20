@@ -108,6 +108,18 @@ For the first delegated-agent profile, the verifier should require all of these:
 - the controlling human or organization signs the delegation that authorizes the agent for the claimed channel, action, and purpose
 - `proof.kid` on delegated agent artifacts resolves to a key published on that same agent identity
 
+### Key-binding objects (attestation + delegation)
+
+To prevent "valid signature, wrong key" ambiguity in delegated flows, issuer-signed artifacts SHOULD bind to the specific delegate signing key used for the communication.
+
+For v0.3, this is expressed as:
+- `dgd.attestation.subject_key = { kid, public_key_digest }`
+- `dgd.delegation.delegate_key = { kid, public_key_digest }`
+
+Digest disclosure rules apply:
+- `public_key_digest` MUST use an algorithm prefix (example: `sha256:<hex>`) so verifiers do not guess digest semantics.
+- verifier profiles MAY require both bindings for high-trust delegated communication; a mismatch SHOULD downgrade the result to degraded trust even if the signature math verifies.
+
 That means a valid delegated-agent trust path is not just:
 - agent key signs message
 

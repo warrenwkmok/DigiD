@@ -102,6 +102,7 @@ async function ensureDirectories() {
     "fixtures/demo/manifests",
     "fixtures/demo/events",
     "fixtures/demo/messages",
+    "fixtures/demo/key-binding-mismatch",
     "fixtures/demo/owner-binding",
     "fixtures/demo/owner-binding/events",
     "fixtures/demo/owner-binding/messages",
@@ -196,6 +197,10 @@ function buildDelegatedVoiceFixtures(keys) {
     object_id: "dgd:attestation:agent_01",
     issuer_id: "dgd:identity:org_acme",
     subject_id: "dgd:identity:agent_01",
+    subject_key: {
+      kid: keys.agent.kid,
+      public_key_digest: sha256(Buffer.from(keys.agent.public_key, "base64"))
+    },
     attestation_type: "organization-issued-agent",
     verification_state: "verified-agent",
     status: "active",
@@ -216,6 +221,10 @@ function buildDelegatedVoiceFixtures(keys) {
     object_id: "dgd:delegation:agent_01_voice",
     issuer_id: "dgd:identity:org_acme",
     delegate_id: "dgd:identity:agent_01",
+    delegate_key: {
+      kid: keys.agent.kid,
+      public_key_digest: sha256(Buffer.from(keys.agent.public_key, "base64"))
+    },
     delegate_class: "agent",
     status: "active",
     authority: {
@@ -366,6 +375,36 @@ function buildDelegatedVoiceFixtures(keys) {
     "fixtures/demo/events/voice.session.started.json": startedEvent,
     "fixtures/demo/messages/voice.session.announcement.json": announcementMessage,
     "fixtures/demo/revocations/delegation.revoked.json": revocation
+  };
+}
+
+function buildKeyBindingMismatchFixtures(keys) {
+  const attestation = signDocument({
+    object_type: "dgd.attestation",
+    schema_version: "0.3",
+    object_id: "dgd:attestation:agent_01",
+    issuer_id: "dgd:identity:org_acme",
+    subject_id: "dgd:identity:agent_01",
+    subject_key: {
+      kid: "dgd:key:agent_01:key-2099-01",
+      public_key_digest: sha256(Buffer.from(keys.agent.public_key, "base64"))
+    },
+    attestation_type: "organization-issued-agent",
+    verification_state: "verified-agent",
+    status: "active",
+    valid_from: iso("2026-04-15T00:00:00Z"),
+    valid_until: iso("2026-10-15T00:00:00Z"),
+    revocation_check: {
+      mode: "online-or-cached",
+      max_age_seconds: 3600,
+      status: "clear",
+      checked_at: iso("2026-04-15T00:04:00Z")
+    },
+    created_at: iso("2026-04-15T00:00:01Z")
+  }, keys.org);
+
+  return {
+    "fixtures/demo/key-binding-mismatch/agent.attestation.json": attestation
   };
 }
 
@@ -924,6 +963,10 @@ function buildOwnerBindingMismatchFixtures(keys) {
     object_id: "dgd:attestation:agent_owner_binding_01",
     issuer_id: "dgd:identity:org_acme_owner_binding",
     subject_id: "dgd:identity:agent_owner_binding_01",
+    subject_key: {
+      kid: "dgd:key:agent_owner_binding_01:key-2026-04",
+      public_key_digest: sha256(Buffer.from(keys.agent.public_key, "base64"))
+    },
     attestation_type: "organization-issued-agent",
     verification_state: "verified-agent",
     status: "active",
@@ -947,6 +990,10 @@ function buildOwnerBindingMismatchFixtures(keys) {
     object_id: "dgd:delegation:agent_owner_binding_01_voice",
     issuer_id: "dgd:identity:org_northwind",
     delegate_id: "dgd:identity:agent_owner_binding_01",
+    delegate_key: {
+      kid: "dgd:key:agent_owner_binding_01:key-2026-04",
+      public_key_digest: sha256(Buffer.from(keys.agent.public_key, "base64"))
+    },
     delegate_class: "agent",
     status: "active",
     authority: {
@@ -1226,6 +1273,12 @@ function buildManifests() {
     { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/events/voice.session.started.json", required: true, stable_across_lineage: true },
     { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
   ];
+  const keyBindingMismatchObjects = [
+    baseObjects[0],
+    baseObjects[1],
+    { ...baseObjects[2], path: "fixtures/demo/key-binding-mismatch/agent.attestation.json" },
+    ...baseObjects.slice(3)
+  ];
   const scopeConflictObjects = [
     ...baseObjects.slice(0, 4),
     { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/scope-conflict/voice.communication.json", required: true, stable_across_lineage: true },
@@ -1293,6 +1346,36 @@ function buildManifests() {
         error_count: 2,
         checks: {
           signature_valid: false
+        }
+      }
+    },
+    "fixtures/demo/manifests/voice.key-binding-mismatch.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_key_binding_mismatch",
+      scenario_id: "voice-key-binding-mismatch",
+      scenario_class: "delegated-agent-voice",
+      description: "Delegated agent voice call where the attestation binds the wrong signing key",
+      lineage_group: "demo-voice-acme-01",
+      verification_time: iso("2026-04-15T00:05:00Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
+      objects: keyBindingMismatchObjects,
+      expected_outcome: {
+        compact_label: "Delegated signing key not bound by issuer",
+        decision: "degraded-trust",
+        resolved_trust_state: "verified-agent",
+        warning_codes: ["key-binding-mismatch"],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: false,
+          current_time_valid: false,
+          owner_binding_status: "bound",
+          key_binding_status: "missing",
+          authority_scope_status: "in-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
         }
       }
     },
@@ -1601,6 +1684,7 @@ async function main() {
   const delegatedVoiceFixtures = buildDelegatedVoiceFixtures(keys);
   const files = {
     ...delegatedVoiceFixtures,
+    ...buildKeyBindingMismatchFixtures(keys),
     ...buildCryptosuiteUnsupportedFixtures(delegatedVoiceFixtures),
     ...buildScopeConflictFixtures(keys),
     ...buildDirectHumanFixtures(keys),

@@ -17,6 +17,7 @@ import {
   asInstant,
   evaluateDelegationScope,
   evaluateFreshness,
+  evaluateKeyBinding,
   evaluateOwnerBinding,
   resolveVerifierPolicy,
   summarizeAuthorityScopeConflict
@@ -375,6 +376,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
 
   const communicationCrypto = communication ? graph.cryptoById.get(communication.object_id) : null;
   const signingKeyKid = communicationCrypto?.kid ?? null;
+  const keyBinding = evaluateKeyBinding({ signerIdentity, attestation, delegation, communication, signingKeyKid });
   const signingKeyRevocation = signingKeyKid
     ? graph.objects.find(
         (candidate) =>
@@ -446,6 +448,10 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     warnings.push(buildWarning("owner-binding-missing", "Agent signature not bound to verified owner"));
   }
 
+  if (keyBinding.status === "missing") {
+    warnings.push(buildWarning(keyBinding.warning_code ?? "key-binding-missing", keyBinding.warning_message ?? "Delegated signing key binding missing"));
+  }
+
   if (authorityScope.status === "out-of-scope") {
     warnings.push(
       buildWarning(
@@ -460,6 +466,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   }
 
   const ownerBindingValid = ownerBinding.status !== "missing";
+  const keyBindingValid = keyBinding.status !== "missing";
   const authorityScopeValid = !delegationRequired || authorityScope.status === "in-scope";
   const eventTimeValid = Boolean(
     signatureValid &&
@@ -468,6 +475,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       delegationActiveAtEventTime &&
       identityTrustedAtEventTime &&
       ownerBindingValid &&
+      keyBindingValid &&
       authorityScopeValid
   );
   const currentTimeValid = Boolean(
@@ -477,6 +485,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       delegationActiveNow &&
       identityTrustedNow &&
       ownerBindingValid &&
+      keyBindingValid &&
       authorityScopeValid &&
       freshnessStatus !== "unknown"
   );
@@ -492,6 +501,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     delegationRequired &&
     delegationActiveAtEventTime &&
     ownerBindingValid &&
+    keyBindingValid &&
     authorityScopeValid
   ) {
     resolvedTrustState = operatorIdentity?.identity_class === "organization" ? "org-issued-agent" : "delegated-agent";
@@ -543,6 +553,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       digest_algorithms: [...digestAlgorithms].sort(),
       owner_binding_status: ownerBinding.status,
       owner_binding_reasons: ownerBinding.reasons,
+      key_binding_status: keyBinding.status,
+      key_binding_reasons: keyBinding.reasons,
       authority_scope_status: authorityScope.status,
       authority_scope_reasons: authorityScope.reasons,
       revocation_status: revocationStatus,

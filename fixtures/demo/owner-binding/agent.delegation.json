@@ -4,6 +4,10 @@
   "object_id": "dgd:delegation:agent_owner_binding_01_voice",
   "issuer_id": "dgd:identity:org_northwind",
   "delegate_id": "dgd:identity:agent_owner_binding_01",
+  "delegate_key": {
+    "kid": "dgd:key:agent_owner_binding_01:key-2026-04",
+    "public_key_digest": "sha256:90e444d342e9a8afc62c9b03a219673d52ef216eb2907b3603dec7b746854fe2"
+  },
   "delegate_class": "agent",
   "status": "active",
   "authority": {
@@ -37,6 +41,6 @@
     "kid": "dgd:key:org_northwind:key-2026-01",
     "created_at": "2026-04-15T00:20:03.000Z",
     "canonicalization": "JCS",
-    "signature": "tlCoS3tsUDnSAQTqpfoUny2/u2WeTrkPSKWa2XFbYort82mt7GM8/0WgtUN2KV4ILtLhAJpcXF7sfaJBDNMAAA=="
+    "signature": "BJDrZgTRVNyFAqqp+0p45ixq2hV1TswRXesD5JfYBn4xLLrmwjqV2zNwlF6wqriaTZNxH8TuatBmU1pKNGpSAw=="
   }
 }

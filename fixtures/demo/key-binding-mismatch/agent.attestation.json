@@ -5,7 +5,7 @@
   "issuer_id": "dgd:identity:org_acme",
   "subject_id": "dgd:identity:agent_01",
   "subject_key": {
-    "kid": "dgd:key:agent_01:key-2026-04",
+    "kid": "dgd:key:agent_01:key-2099-01",
     "public_key_digest": "sha256:90e444d342e9a8afc62c9b03a219673d52ef216eb2907b3603dec7b746854fe2"
   },
   "attestation_type": "organization-issued-agent",
@@ -26,6 +26,6 @@
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01.000Z",
     "canonicalization": "JCS",
-    "signature": "FvL7HuhbP5ykSypvOl5jIeL0zxhbXAVgJQP9ibhp/WJPTRsFK52m76+hYK6TYWvIPmVHV0hPvLQ36q3ZrIBzAQ=="
+    "signature": "CxSzMjzDD8z1DCrMUOeG12rAkSiTAG0jGwoF84yUHZWm5CJ95SmTiF+FERtz3YAK7NCF36lPzxlY642KtVW8Aw=="
   }
 }

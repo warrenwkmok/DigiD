@@ -27,6 +27,14 @@ export function deriveCompactBanner(result) {
     return "Agent signature not bound to verified owner";
   }
 
+  if (warningCodes.has("key-binding-mismatch")) {
+    return "Delegated signing key not bound by issuer";
+  }
+
+  if (warningCodes.has("key-binding-missing")) {
+    return "Delegated signing key binding missing";
+  }
+
   if (warningCodes.has("delegation-scope-conflict")) {
     return summarizeAuthorityScopeConflict(result.checks.authority_scope_reasons, { compact: true });
   }
@@ -59,6 +67,7 @@ export function deriveCompactBanner(result) {
 
 export function renderExpandedDetails(result) {
   const ownerBindingReasons = result.checks.owner_binding_reasons?.join(", ") || "none";
+  const keyBindingReasons = result.checks.key_binding_reasons?.join(", ") || "none";
   const authorityScopeReasons = result.checks.authority_scope_reasons?.join(", ") || "none";
   const showCryptoDetails = process.env.DIGID_SHOW_CRYPTO_DETAILS === "1";
 
@@ -84,6 +93,8 @@ export function renderExpandedDetails(result) {
     ["Current-time valid", String(result.checks.current_time_valid)],
     ["Owner binding", result.checks.owner_binding_status],
     ["Owner binding reasons", ownerBindingReasons],
+    ["Key binding", result.checks.key_binding_status ?? "unknown"],
+    ["Key binding reasons", keyBindingReasons],
     ["Authority scope", result.checks.authority_scope_status],
     ["Authority scope reasons", authorityScopeReasons],
     ["Revocation status", result.checks.revocation_status],

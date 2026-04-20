@@ -3,6 +3,25 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-015 - Bind delegated signing key in attestation + delegation critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 14:34 America/Vancouver
+- reviewed slice:
+  - adding issuer-signed key-binding blocks (`subject_key`, `delegate_key`) to prevent delegated authority from silently drifting across signing keys
+  - enforcing key-binding checks in the reference verifier and adding a signed negative fixture (`voice.key-binding-mismatch`)
+- strengths:
+  - makes delegated authority precise: the issuer is now explicitly binding to a delegate signing key instead of relying on implicit "whatever key the identity currently has"
+  - improves receiver honesty: degraded trust is now driven by a concrete, signed mismatch rather than UI heuristics
+  - fits the algorithm disclosure posture: key digests use explicit `sha256:<hex>` prefixes and can be allowlisted under the v0.3 cryptosuite policy
+- concerns:
+  - rotation pressure: if key bindings are treated as mandatory everywhere, issuers may need to reissue attestations/delegations more often than desired; this should be profile-driven, not accidental
+  - redundancy: org-issued identities are already controller-signed; for those profiles, key binding may be more about UX clarity and future-proofing than strictly necessary for cryptographic security
+  - future multi-key semantics: once delegates legitimately have multiple active keys, the schema will need either an allowlist binding set or a separate key-authorization object rather than a single key binding
+- recommended changes:
+  1. keep key binding enforcement profile-scoped (required for high-trust delegated live surfaces, optional elsewhere)
+  2. decide how key rotation should be represented without silently widening delegated authority (explicit binding sets or a later key-authorization object)
+  3. keep digest algorithms pinned by cryptosuite policy and reject unsupported digests rather than treating them as "informational"
+
 ## CL-014 - Proof cryptosuite disclosure + deterministic demo fixture keys critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 11:35 America/Vancouver

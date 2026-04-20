@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-035 - Bind delegated signing key in attestation + delegation
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 14:34 America/Vancouver
+- area: security
+- severity: high
+- status: applied
+- summary: Delegated communication needs a receiver-checkable, issuer-signed statement of which delegate signing key the attestation and delegation apply to. Without that, "valid signature" can be misinterpreted as sufficient authority even when the issuer intended a different key or when key rotation makes the authority path ambiguous.
+- action taken: Added `dgd.attestation.subject_key` and `dgd.delegation.delegate_key` bindings (kid + public-key digest) to the protocol schema docs and demo fixtures, enforced them in the reference verifier for delegated agent flows, exposed `key_binding_status` + `key_binding_reasons` in verifier outputs and portable result contracts, and added an audited negative manifest (`voice.key-binding-mismatch`) proving the downgrade path.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/signing-and-provenance.md`, `packages/verifier/src/policy.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/contract.js`, `packages/verifier/src/display.js`, `scripts/generate-demo-fixtures.mjs`, `fixtures/demo/manifests/voice.key-binding-mismatch.manifest.json`, `docs/review/open-questions.md`
+- notes: This stays in reference scope (protocol semantics + verifier enforcement + fixtures). Issuer key-management workflows, hosted trust services, and enterprise policy engines remain a later implementation phase.
+
 ## DF-034 - Require proof cryptosuite disclosure + deterministic demo fixture keys
 - source: `2026-04-20 DigiD 3h loop`
 - date: 2026-04-20

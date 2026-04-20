@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { DIGID_V03_DIGEST_ALGORITHM } from "../../protocol/src/index.js";
+
 const liveInteractionClasses = new Map([
   ["voice", "live_voice"],
   ["video", "live_video"],
@@ -90,6 +93,123 @@ export function evaluateOwnerBinding({ signerIdentity, operatorIdentity, attesta
   return {
     status: reasons.length === 0 ? "bound" : "missing",
     reasons
+  };
+}
+
+function parseDigest(value) {
+  if (!value || typeof value !== "string") {
+    return null;
+  }
+
+  const index = value.indexOf(":");
+  if (index <= 0) {
+    return null;
+  }
+
+  return {
+    algorithm: value.slice(0, index),
+    digest: value.slice(index + 1)
+  };
+}
+
+function digestSpkiDerBase64(spkiDerBase64) {
+  if (!spkiDerBase64 || typeof spkiDerBase64 !== "string") {
+    return null;
+  }
+
+  try {
+    const bytes = Buffer.from(spkiDerBase64, "base64");
+    const digest = createHash("sha256").update(bytes).digest("hex");
+    return `${DIGID_V03_DIGEST_ALGORITHM}:${digest}`;
+  } catch {
+    return null;
+  }
+}
+
+function evaluateBindingAgainstSigningKey(binding, label, signerIdentity, signingKeyKid, reasons) {
+  if (!binding || typeof binding !== "object") {
+    reasons.push(`${label}-missing`);
+    return;
+  }
+
+  const boundKid = typeof binding.kid === "string" ? binding.kid : null;
+  const boundDigest = typeof binding.public_key_digest === "string" ? binding.public_key_digest : null;
+
+  if (!boundKid) {
+    reasons.push(`${label}-kid-missing`);
+    return;
+  }
+
+  if (!boundDigest) {
+    reasons.push(`${label}-public-key-digest-missing`);
+    return;
+  }
+
+  if (!signingKeyKid) {
+    reasons.push("signing-key-kid-missing");
+    return;
+  }
+
+  if (boundKid !== signingKeyKid) {
+    reasons.push(`${label}-kid-mismatch`);
+  }
+
+  const resolvedKey = signerIdentity?.keys?.find((candidate) => candidate?.kid === boundKid) ?? null;
+  if (!resolvedKey) {
+    reasons.push(`${label}-kid-not-on-identity`);
+    return;
+  }
+
+  const parsedDigest = parseDigest(boundDigest);
+  if (!parsedDigest || parsedDigest.algorithm !== DIGID_V03_DIGEST_ALGORITHM) {
+    reasons.push(`${label}-public-key-digest-unsupported`);
+    return;
+  }
+
+  const expectedDigest = digestSpkiDerBase64(resolvedKey.public_key);
+  if (!expectedDigest) {
+    reasons.push(`${label}-public-key-digest-unavailable`);
+    return;
+  }
+
+  if (expectedDigest !== boundDigest) {
+    reasons.push(`${label}-public-key-digest-mismatch`);
+  }
+}
+
+function hasMismatchReason(reasons) {
+  return reasons.some((reason) => reason.includes("mismatch") || reason.includes("unsupported") || reason.includes("unavailable"));
+}
+
+export function evaluateKeyBinding({ signerIdentity, attestation, delegation, communication, signingKeyKid }) {
+  if (signerIdentity?.identity_class !== "agent") {
+    return { status: "not-required", reasons: [], warning_code: null, warning_message: null };
+  }
+
+  const delegationRequired = Boolean(communication?.operator_id || communication?.delegation_id);
+  if (!delegationRequired) {
+    return { status: "not-required", reasons: [], warning_code: null, warning_message: null };
+  }
+
+  if (!attestation || !delegation) {
+    return { status: "not-required", reasons: [], warning_code: null, warning_message: null };
+  }
+
+  const reasons = [];
+
+  evaluateBindingAgainstSigningKey(attestation?.subject_key ?? null, "attestation-subject-key", signerIdentity, signingKeyKid, reasons);
+  evaluateBindingAgainstSigningKey(delegation?.delegate_key ?? null, "delegation-delegate-key", signerIdentity, signingKeyKid, reasons);
+
+  if (reasons.length === 0) {
+    return { status: "bound", reasons: [], warning_code: null, warning_message: null };
+  }
+
+  const mismatch = hasMismatchReason(reasons);
+  return {
+    status: "missing",
+    reasons,
+    warning_code: mismatch ? "key-binding-mismatch" : "key-binding-missing",
+    warning_message: mismatch ? "Delegated signing key not bound by issuer" : "Delegated signing key binding missing"
   };
 }
 

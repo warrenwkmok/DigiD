@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-015 - Delegated key substitution and authority drift attacks
+- date: 2026-04-20
+- timestamp: 2026-04-20 14:34 America/Vancouver
+- reviewed slice:
+  - issuer-signed key binding blocks on attestations and delegations (`subject_key`, `delegate_key`)
+  - reference verifier enforcement and a signed negative fixture proving downgrade (`voice.key-binding-mismatch`)
+- attack scenarios:
+  - delegated-key substitution: an issuer delegates to an agent identity but the agent later signs with a different key than the one the issuer intended (or the receiver assumes any current key is "good enough"), leading to silent authority drift
+  - key-rotation ambiguity: an issuer rotates an agent key and an attacker reuses old delegated objects to claim authority under a new key (or vice versa), betting that verifiers collapse "signature valid" into a high-trust agent badge
+  - kid-only confusion: a verifier matches only `kid` and fails to bind it to the subject identity key bytes, allowing digest/encoding drift or collision across implementations
+- recommended mitigations:
+  1. require explicit key bindings for high-trust delegated communication profiles, and downgrade when bindings are missing or mismatched
+  2. bind key identity with both `kid` and a digest of the `SubjectPublicKeyInfo` bytes (`sha256:<hex>`) so receivers can detect key substitution
+  3. keep key-rotation widening explicit: new keys should require updated bindings or a later key-authorization primitive rather than silent acceptance
+
 ## RT-014 - Proof cryptosuite stripping and demo-key misuse attacks
 - date: 2026-04-20
 - timestamp: 2026-04-20 11:35 America/Vancouver
