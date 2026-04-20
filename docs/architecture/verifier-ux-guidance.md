@@ -202,6 +202,7 @@ If a message, clip, screenshot, transcript, or media artifact has left its origi
 
 If a verifier exports machine-readable results for adapters, those exports SHOULD preserve:
 - warning codes
+- signing-key lifecycle diagnostics (purpose + current-time status)
 - owner-binding and authority-scope diagnostics
 - rendering guardrails saying whether warning visibility is mandatory
 - context-binding rules for live surfaces

@@ -135,7 +135,7 @@ Expanded state:
 - signature status: valid
 - verification mode: dual
 - trust note: verifies sender authenticity, not truth of message content
-- warning codes: stable machine-readable slugs such as `revocation-stale` or `delegation-expired-current-time` back any warning UI
+- warning codes: stable machine-readable slugs such as `revocation-stale`, `delegation-expired-current-time`, or `signing-key-inactive-current-time` back any warning UI
 
 ### 10. Optional post-call artifacts
 If the demo includes persistence, emit:

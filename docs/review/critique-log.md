@@ -3,6 +3,24 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-011 - Signing key lifecycle enforcement critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 02:36 America/Vancouver
+- reviewed slice:
+  - reference verifier enforcement of signing-key purpose and lifecycle posture
+  - portable verifier result contract updates for key lifecycle preservation
+- strengths:
+  - makes a common real-world failure mode explicit: a signature can verify while a key is no longer usable for live trust decisions
+  - reduces adapter badge-laundering risk by requiring key lifecycle fields to remain visible in exported results
+  - tightens semantics around `keys[].status` vs `not_before`/`expires_at` so event-time validity and current-time trust are not silently collapsed
+- concerns:
+  - without a signed `revoked_at` timestamp, `status: revoked` remains an operational signal rather than historical proof; the protocol should avoid implying otherwise until a key event model exists
+  - too many lifecycle sub-states could clutter UX; compact badges must keep lifecycle detail in warnings/debug views
+- recommended changes:
+  1. keep key lifecycle outputs stable and machine-readable (status + reasons) so adapters cannot "reinterpret" them
+  2. add a signed key revocation timing model (object or event) only when the public/private boundary is clear and fixture-driven validation exists
+  3. keep issuer consoles, key recovery workflows, and operational revocation distribution private-boundary candidates outside this repo
+
 ## CL-010 - Cryptosuite disclosure and verifier enforcement critique
 - date: 2026-04-19
 - timestamp: 2026-04-19 23:28 America/Vancouver

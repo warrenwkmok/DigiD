@@ -38,7 +38,7 @@ A portable verifier result contract SHOULD include:
 - `verification_mode`
 - `interaction_class`
 - `warning_codes`
-- preserved check fields for issuer trust, owner binding, authority scope, revocation, freshness, and replay posture
+- preserved check fields for issuer trust, signing-key lifecycle, owner binding, authority scope, revocation, freshness, and replay posture
 - rendering guardrails that tell adapters what must remain visible
 
 The local public demo may also pair that result with a separate local adapter evidence document:
@@ -56,6 +56,7 @@ It is a bounded local adapter-profile input so mismatch and context-loss states 
 Adapters or local demos consuming this contract SHOULD preserve:
 - machine-readable warning codes
 - issuer-trust status
+- signing-key purpose + lifecycle status (at least current-time status)
 - owner-binding status and reasons
 - authority-scope status and reasons
 - revocation, freshness, and replay status

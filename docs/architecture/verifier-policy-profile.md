@@ -74,6 +74,8 @@ Use `reject` when any of these are true:
 - signature verification fails
 - signer identity cannot be resolved
 - proof key is revoked, expired, or not authorized for assertion at required verification time
+- signing key is not authorized for assertion
+- signing key is not valid at event time (not-yet-valid or expired)
 - required delegated authority is missing for a live delegated flow
 - event ordering indicates likely replay or stream tampering under the active replay policy
 - a critical extension is unsupported
@@ -88,6 +90,7 @@ Use `degraded-trust` when:
 ### Allow with warning
 Use `allow-with-warning` when:
 - signature and authority are valid, but revocation freshness is stale
+- signature and event-time authority are valid, but the signing key is no longer operationally active at verification time
 - event-time validity is true and current-time validity is uncertain
 - duplicate presentation is observed but the verifier can safely identify it as a repeat rather than conflicting replay
 - a lower-risk async or stored-artifact profile allows partial freshness degradation

@@ -76,9 +76,18 @@ For the first implementation, keys should support:
 - purpose list such as `assertion`, `authentication`
 - creation time and optional expiry time
 
+### Key status vs key window semantics (v0.3 posture)
+
+For v0.3, treat key lifecycle as two different questions:
+- **event-time validity**: was the key within its declared `not_before`/`expires_at` window when the artifact was signed?
+- **current-time operational status**: is the key currently usable for making a live trust claim (`status: active` and within the window at verification time)?
+
+Because v0.3 key records do not yet carry a signed `revoked_at` timestamp, verifiers SHOULD NOT treat a present-tense `status: revoked` as cryptographic proof that the key was revoked at some specific past time.
+It is an operational posture signal that affects current-time trust.
+
 Recommended verifier posture:
-- reject signatures from revoked keys
-- downgrade trust on expired keys even if the math verifies
+- reject current-time trust when the resolved signing key is `status: revoked` or `status: suspended`
+- downgrade or reject current-time trust when the key is outside its declared validity window, even if the signature math verifies
 - require proof `kid` to resolve to the signer identity unless the protocol explicitly allows delegated custodianship
 - distinguish event-time validity from current-time operational validity
 

@@ -6,6 +6,7 @@ The first implementation may be easiest to prove through a reference verifier ra
 
 The verifier's job is to take DigiD objects and answer:
 - is the signature valid?
+- is the signing key usable (purpose + lifecycle window + operational status)?
 - what kind of identity is this?
 - who, if anyone, stands behind it?
 - is delegation active?

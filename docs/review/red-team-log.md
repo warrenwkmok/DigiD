@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-011 - Signing key lifecycle and "still valid" badge abuse
+- date: 2026-04-20
+- timestamp: 2026-04-20 02:36 America/Vancouver
+- reviewed slice:
+  - signing-key lifecycle enforcement in the reference verifier (purpose + window + current-time operational status)
+  - portable result contract updates requiring key lifecycle fields to remain visible to adapters
+- attack scenarios:
+  - badge laundering: a signed artifact remains mathematically valid, but the signing key is no longer operationally active; an adapter suppresses that fact while keeping a high-trust compact label
+  - key-purpose confusion: a verifier accepts signatures from keys not authorized for `assertion`, letting authentication-only keys be misused to mint trust-bearing communication artifacts
+  - status overreach: a product treats `status: revoked` as proof of a past revocation moment and makes incorrect historical claims, or conversely ignores `status` and overstates current-time trust
+- recommended mitigations:
+  1. enforce key purpose and lifecycle posture in the verifier and expose it in stable machine-readable checks
+  2. require adapters to preserve signing-key lifecycle fields and to surface warnings when current-time key status blocks a live trust claim
+  3. keep key compromise workflows, key-management operations, and revocation distribution infrastructure private-boundary candidates outside this public repo
+
 ## RT-010 - Cryptosuite downgrade and algorithm-confusion red-team pass
 - date: 2026-04-19
 - timestamp: 2026-04-19 23:28 America/Vancouver

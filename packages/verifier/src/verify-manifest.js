@@ -19,6 +19,7 @@ import {
   resolveVerifierPolicy,
   summarizeAuthorityScopeConflict
 } from "./policy.js";
+import { evaluateSigningKeyLifecycle } from "./key-lifecycle.js";
 import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
 
@@ -185,13 +186,33 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
 
       const keyRecord = verifyProof(document, signerIdentity);
       graph.cryptoById.set(document.object_id ?? document.envelope_id, {
+        proof_valid: true,
         proof_type: document.proof.type,
         canonicalization: document.proof.canonicalization,
         kid: document.proof.kid,
-        key_algorithm: keyRecord.algorithm ?? null
+        key_algorithm: keyRecord.algorithm ?? null,
+        key_status: keyRecord.status ?? null,
+        key_purposes: Array.isArray(keyRecord.purposes) ? [...keyRecord.purposes] : null,
+        key_created_at: keyRecord.created_at ?? null,
+        key_not_before: keyRecord.not_before ?? null,
+        key_expires_at: keyRecord.expires_at ?? null
       });
     } catch (error) {
-      errors.push(`${document.object_id ?? document.envelope_id}: ${error.message}`);
+      const documentId = document.object_id ?? document.envelope_id;
+      errors.push(`${documentId}: ${error.message}`);
+      graph.cryptoById.set(documentId, {
+        proof_valid: false,
+        proof_type: document.proof?.type ?? null,
+        canonicalization: document.proof?.canonicalization ?? null,
+        kid: document.proof?.kid ?? null,
+        key_algorithm: null,
+        key_status: null,
+        key_purposes: null,
+        key_created_at: null,
+        key_not_before: null,
+        key_expires_at: null,
+        error: error.message
+      });
     }
   }
 
@@ -238,7 +259,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
         : []
   );
 
-  const signatureValid = errors.filter((entry) => entry.includes("Signature verification failed")).length === 0;
+  const signatureValid = [...graph.cryptoById.values()].every((entry) => entry.proof_valid);
   const signerActiveAtEventTime = signerIdentity ? isActiveInWindow(signerIdentity, eventTime) : false;
   const signerActiveNow = signerIdentity ? isActiveInWindow(signerIdentity, verificationTime) : false;
   const attestationActiveAtEventTime = attestation ? isActiveInWindow(attestation, eventTime) : false;
@@ -262,6 +283,31 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const revocationStatus = revocation ? "revoked" : freshnessStatus === "unknown" ? "unknown" : freshnessStatus === "stale" ? "stale" : "clear";
 
   const communicationCrypto = communication ? graph.cryptoById.get(communication.object_id) : null;
+  const signingKeyLifecycle = evaluateSigningKeyLifecycle(
+    communicationCrypto
+      ? {
+          status: communicationCrypto.key_status,
+          purposes: communicationCrypto.key_purposes,
+          created_at: communicationCrypto.key_created_at,
+          not_before: communicationCrypto.key_not_before,
+          expires_at: communicationCrypto.key_expires_at
+        }
+      : null,
+    { eventTime, verificationTime, requiredPurpose: "assertion" }
+  );
+  const signingKeyPurposeValid = signingKeyLifecycle.purpose_status === "authorized";
+  const signingKeyValidAtEventTime = signingKeyPurposeValid && signingKeyLifecycle.event_time_status === "valid";
+  const signingKeyActiveNow = signingKeyPurposeValid && signingKeyLifecycle.current_time_status === "active";
+
+  if (communication && !signingKeyPurposeValid) {
+    errors.push(`${communication.object_id}: Signing key is not authorized for assertion`);
+  } else if (communication && signingKeyLifecycle.event_time_status !== "valid") {
+    errors.push(`${communication.object_id}: Signing key was not valid at event time`);
+  }
+
+  if (communication && signingKeyValidAtEventTime && !signingKeyActiveNow) {
+    warnings.push(buildWarning("signing-key-inactive-current-time", "Signing key no longer active"));
+  }
 
   if (attestation && !attestationIssuerTrusted) {
     warnings.push(
@@ -304,6 +350,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const eventTimeValid = Boolean(
     signatureValid &&
       signerActiveAtEventTime &&
+      signingKeyValidAtEventTime &&
       delegationActiveAtEventTime &&
       identityTrustedAtEventTime &&
       ownerBindingValid &&
@@ -312,6 +359,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const currentTimeValid = Boolean(
     signatureValid &&
       signerActiveNow &&
+      signingKeyActiveNow &&
       delegationActiveNow &&
       identityTrustedNow &&
       ownerBindingValid &&
@@ -367,6 +415,13 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       canonicalization: communicationCrypto?.canonicalization ?? null,
       signing_key_kid: communicationCrypto?.kid ?? null,
       signing_key_algorithm: communicationCrypto?.key_algorithm ?? null,
+      signing_key_status: communicationCrypto?.key_status ?? null,
+      signing_key_purpose_status: signingKeyLifecycle.purpose_status,
+      signing_key_purpose_reasons: signingKeyLifecycle.purpose_reasons,
+      signing_key_event_time_status: signingKeyLifecycle.event_time_status,
+      signing_key_event_time_reasons: signingKeyLifecycle.event_time_reasons,
+      signing_key_current_time_status: signingKeyLifecycle.current_time_status,
+      signing_key_current_time_reasons: signingKeyLifecycle.current_time_reasons,
       digest_algorithms: [...digestAlgorithms].sort(),
       owner_binding_status: ownerBinding.status,
       owner_binding_reasons: ownerBinding.reasons,

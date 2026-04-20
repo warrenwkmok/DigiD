@@ -122,3 +122,7 @@ Still open: whether broader restriction families, customer-specific delegation t
 ## OQ-032 - How should DigiD evolve cryptographic agility without downgrade or UX confusion?
 Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `JCS` + `sha256`) and require verifiers to reject algorithm mismatches instead of "best-effort" verification.
 Still open: how DigiD introduces additional suites without letting issuers choose weaker algorithms, how suite negotiation/policy should be receiver-controlled, and whether DigiD should publish a stricter canonicalization profile (full RFC 8785 JCS compliance constraints) before any multi-language verifier implementations appear.
+
+## OQ-033 - How should DigiD represent key revocation time precisely?
+Working resolution for v0.3: treat `keys[].status` as an operational current-time posture signal and `not_before`/`expires_at` as the explicit signed window for event-time validity; verifiers must not infer a precise historical revocation moment from `status: revoked` alone.
+Still open: whether to add a signed `revoked_at` (or equivalent) either as a first-class key lifecycle object (ex: `dgd.key_revocation`) or as a signed append-only key event model, and where the public/private boundary should sit for key compromise workflows and operational key-management tooling.

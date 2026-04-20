@@ -165,6 +165,7 @@ Notes:
 - the first implementation profile should only accept the `Ed25519` signing algorithm and MUST reject any mismatch between `proof.type` and the resolved signer key record `keys[].algorithm`
 - `proof.kid` must resolve unambiguously to the signing identity during verification
 - `keys[].public_key` is base64-encoded DER `spki` (`SubjectPublicKeyInfo`) for the referenced key in the v0.3 reference profile
+- verifiers SHOULD enforce key purpose and lifecycle posture in addition to signature math: `keys[].purposes` must authorize `assertion`, the key must be within its declared `not_before`/`expires_at` window at sign time, and current-time trust should only render when the key is operationally `status: active` at verification time
 - signer resolution for the first profile is family-specific and MUST follow this matrix:
 
 | Object family | Expected signer identity |
@@ -235,6 +236,8 @@ Represents a persistent subject capable of holding keys and appearing in trust d
 - `verification_state` is user-facing interpretation, not raw evidence
 - `controller.relationship` should be one of `self-controlled`, `organization-issued`, `delegated-service`, `custodial`
 - key records should include `not_before` and may include `expires_at`
+- key records MUST include `purposes` and the v0.3 reference verifier MUST treat `assertion` as required for signing DigiD protocol objects
+- `keys[].status` is an operational posture signal for current-time trust; without a signed `revoked_at` timestamp, a verifier MUST NOT infer a precise historical revocation time solely from `status: revoked`
 - if all keys are stale, expired, suspended, or revoked, the identity must not be treated as active for signing
 - `display_name` is required for end-user rendered identities unless the identity class is intentionally pseudonymous
 - `keys[].kid` values MUST be unique within the identity object

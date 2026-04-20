@@ -155,7 +155,7 @@ Every meaningful critique should end up in one of these states:
 - severity: high
 - status: applied
 - summary: Key compromise, rotation, and revocation freshness are underdefined.
-- action taken: Added explicit key lifecycle posture, freshness states, revocation-check metadata, and verifier guidance distinguishing event-time validity from current-time trust.
+- action taken: Added explicit key lifecycle posture, freshness states, revocation-check metadata, and verifier guidance distinguishing event-time validity from current-time trust. Followed up by enforcing signing-key purpose and lifecycle posture in the reference verifier and portable verifier result contract.
 - linked docs: `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `docs/protocol/signing-and-provenance.md`, `docs/architecture/reference-verifier.md`
 - notes: Threat-model follow-through is still worth doing, but the protocol layer is now concrete enough to build fixtures against.
 

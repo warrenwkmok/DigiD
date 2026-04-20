@@ -68,7 +68,9 @@ A verifier MUST reject:
 - unsupported signature algorithms
 - unsupported canonicalization methods
 - signatures whose `kid` cannot be resolved
-- signatures from revoked keys
+- signatures whose resolved signing key is not authorized for `assertion`
+- signatures whose resolved signing key is outside its declared `not_before`/`expires_at` window at sign time
+- current-time trust claims when the resolved signing key is not operationally `status: active` at verification time
 
 ## Resolution order
 
