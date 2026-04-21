@@ -10,6 +10,41 @@ Format notes:
 
 ---
 
+## Iteration 30 - Key authorization for delegated key rotation overlap
+- date: 2026-04-20
+- timestamp: 2026-04-20 17:36 America/Vancouver
+- commit: `b81bfb1`
+- summary:
+  - added optional issuer-signed `dgd.key_authorization` so an issuer can authorize a rotated delegate signing key for an existing delegation without reissuing every base object
+  - updated the reference verifier to treat `dgd.key_authorization` as an alternative delegated key-binding method (strict issuer + delegation + key-digest match), surfacing `key_binding_method` and `key_authorization_*` diagnostics in outputs and the portable result contract
+  - added an audited fixture manifest (`voice.key-authorization-rotation`) proving org-issued delegated trust survives key rotation when the issuer explicitly authorizes the new key
+- changed files:
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `packages/protocol/src/validate-shape.js`
+  - `packages/verifier/src/policy.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `scripts/demo-fixture-keys.mjs`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/key-authorization/agent.identity.json`
+  - `fixtures/demo/key-authorization/key.authorization.json`
+  - `fixtures/demo/key-authorization/voice.communication.json`
+  - `fixtures/demo/key-authorization/voice.session.json`
+  - `fixtures/demo/key-authorization/events/voice.session.started.json`
+  - `fixtures/demo/key-authorization/messages/voice.session.announcement.json`
+  - `fixtures/demo/manifests/voice.key-authorization-rotation.manifest.json`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/review/open-questions.md`
+- why it mattered:
+  - delegated key binding prevents authority drift, but routine key rotation would otherwise force immediate issuer reissuance across multiple artifacts. A narrowly-scoped key-authorization bridge keeps issuer intent signed and explicit while preserving high-trust “org-issued agent” semantics when the authority is still valid.
+- next likely step at the time:
+  - add a signed negative fixture where a key authorization exists but fails issuer/delegation/digest matching, and decide whether any verifier profiles should hard-reject long-lived key authorizations vs treat them as rotation-only bridges
+
 ## Iteration 29 - Bind delegated signing keys in issuer artifacts
 - date: 2026-04-20
 - timestamp: 2026-04-20 14:34 America/Vancouver
