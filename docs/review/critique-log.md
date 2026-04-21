@@ -3,6 +3,26 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-018 - Trust distribution profile and public verifier-legibility critique
+- date: 2026-04-21
+- timestamp: 2026-04-21 01:50 America/Vancouver
+- reviewed slice:
+  - defining receiver-side trust distribution classes (`local`, `partner`, `public`) instead of leaving issuer trust as an abstract policy input
+  - clarifying governance expectations for public trust bundles without introducing a hosted registry design
+  - mapping fixture `trusted_issuer_ids` to the smallest local trust-bundle equivalent so the reference verifier posture matches the public docs more honestly
+- strengths:
+  - closes a major legibility gap: outside readers can now tell how DigiD expects trust to move from one receiver to many receivers without assuming a mandatory global registry
+  - preserves trust semantics by separating local receiver anchoring, scoped partner trust, and broader public issuer bundles instead of collapsing them into one vague "trusted issuer" idea
+  - keeps the framework-first boundary intact because the slice adds governance posture and clearer protocol language, not hosted infrastructure or commercial policy tooling
+- concerns:
+  - the trust distribution story is still descriptive rather than executable; the repo does not yet ship a machine-readable trust-bundle contract or portable verifier field preserving trust-input class
+  - public bundle governance is clearer, but still not concrete enough for independent operators to implement identically without another artifact or conformance profile
+  - canonicalization and cross-language conformance remain separate release blockers even if the trust story is now more coherent
+- recommended changes:
+  1. define a minimal machine-readable trust-bundle contract or verifier-side config example so implementers can test the `local` / `partner` / `public` distinction instead of only reading prose
+  2. preserve trust-input class in the portable verifier result contract before adapters flatten receiver-local and public trust into the same badge
+  3. keep public release judgment at "not yet" until trust-input execution semantics and cross-language conformance both become more concrete
+
 ## CL-017 - Canonicalization profile honesty and executable guardrails critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 22:49 America/Vancouver

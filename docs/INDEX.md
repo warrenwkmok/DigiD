@@ -15,6 +15,7 @@
 ## Architecture
 - `architecture/system-architecture.md`
 - `architecture/trust-states.md`
+- `architecture/trust-distribution-profile.md`
 - `architecture/reference-verifier.md`
 - `architecture/verifier-policy-profile.md`
 - `architecture/verifier-result-contract.md`

@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-038 - Define receiver-side trust distribution classes for public framework legibility
+- source: `2026-04-21 DigiD 3h loop`
+- date: 2026-04-21
+- timestamp: 2026-04-21 01:50 America/Vancouver
+- area: architecture
+- severity: critical
+- status: applied
+- summary: DigiD said issuer trust was receiver-side policy input, but the repo still did not explain how that trust should be packaged, scoped, or governed. That left a public-release blocker in place because outside readers could not tell whether DigiD expected local pinning only, a hidden registry, or some future issuer marketplace.
+- action taken: Added a trust distribution profile that distinguishes `local`, `partner`, and `public` trust inputs, defined minimum governance expectations for each class, mapped fixture `trusted_issuer_ids` to the smallest local-bundle equivalent, and threaded the new posture through system architecture, attestation semantics, the normative protocol draft, open questions, and public-facing repo docs.
+- linked docs: `docs/architecture/trust-distribution-profile.md`, `docs/architecture/system-architecture.md`, `docs/protocol/attestation-model.md`, `docs/protocol/normative-protocol-draft.md`, `docs/protocol/fixture-manifest-profile.md`, `docs/review/open-questions.md`, `README.md`, `docs/INDEX.md`
+- notes: This stays reference-scoped by defining trust-input classes and governance boundaries only. Hosted trust-bundle administration, registry operations, bundle fetch infrastructure, and commercial issuer workflows remain outside the current public repo.
+
 ## DF-037 - Replace JCS over-claim with DigiD canonicalization profile
 - source: `2026-04-20 DigiD 3h loop`
 - date: 2026-04-20

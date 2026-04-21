@@ -182,7 +182,7 @@ that the verifier treats as trusted issuers for the scenario.
 
 Notes:
 - If omitted, the public demo verifier currently falls back to treating the `organization_identity` role as the trusted issuer.
-- This is a fixture/demo affordance, not a production trust registry design.
+- This is a fixture/demo affordance that approximates the smallest possible `local` trust bundle input from `docs/architecture/trust-distribution-profile.md`, not a production trust registry design.
 
 ## Ordered dependency rules
 

@@ -13,10 +13,14 @@ Stores signed attestations and delegations that explain why a verifier should tr
 ### 3. Signing layer
 Creates signed DigiD objects, message envelopes, and event envelopes using canonicalized payloads.
 
-### 4. Verification layer
+### 4. Trust input layer
+Carries receiver-side trust inputs such as local pinned roots and receiver-adopted trust bundles.
+This layer determines which issuers are meaningful before the verifier turns valid signatures into higher-trust claims.
+
+### 5. Verification layer
 Resolves identity records, checks signatures, checks authority chains, resolves revocation state, and produces a final trust decision.
 
-### 5. Adapter layer
+### 6. Adapter layer
 Maps DigiD objects into real communication channels:
 - voice
 - video
@@ -25,15 +29,16 @@ Maps DigiD objects into real communication channels:
 - social
 - enterprise systems
 
-### 6. UX layer
+### 7. UX layer
 Displays trust state in a form normal people can interpret quickly and safely.
 
 ## Core architectural services
 
-- identity registry
+- identity and object resolution source
 - public key directory
 - attestation store
 - delegation store
+- receiver trust bundle source
 - revocation service
 - verification service
 - channel adapters
@@ -44,6 +49,7 @@ Displays trust state in a form normal people can interpret quickly and safely.
 The first implementation does not need decentralized purity.
 A practical v0 can use:
 - local fixture and object resolution for the reference verifier
+- local pinned trust inputs or checked-in trust-bundle equivalents for the reference verifier
 - a local verifier CLI or library export that returns `dgd.verification_result` plus a portable result contract
 - thin demo adapters that emit signed events and messages without hosted control planes
 - a simple UI surface or CLI that renders trust state

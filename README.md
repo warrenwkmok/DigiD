@@ -77,6 +77,7 @@ DigiD now includes a runnable verifier-first MVP slice:
 - audited negative fixtures for missing delegation, delegation purpose conflict, stale checks, revoked delegation, and owner-binding mismatch
 - a protocol package for canonicalization, shape validation, lineage checks, and signature verification
 - a verifier package that resolves event-time vs current-time trust outcomes
+- a framework-level trust distribution profile that distinguishes local receiver roots from partner and public trust bundles without turning the repo into a trust-registry product
 - a demo CLI that renders compact trust banners, expanded verification details, portable result contracts, manifest-audit output, and local presentation-guardrail simulations
 - a portable local verifier result contract plus a fixture-backed local adapter evidence contract so future adapter experiments can trigger mismatch/context-loss deterministically without shipping hosted adapter decision services
 

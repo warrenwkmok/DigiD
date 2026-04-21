@@ -4,8 +4,8 @@ This file holds questions that should not be silently resolved by drift.
 These are the design questions most likely to shape the protocol and product boundary.
 
 ## OQ-001 - Who can issue strong human attestations?
-Working resolution for v0.3: do not leave this fully abstract anymore. The framework should distinguish issuer classes (`self`, `owner`, `platform`, `independent-issuer`, `receiver-anchored`) and should treat strong `verified-human` claims as requiring an independent trusted issuer path or an explicitly equivalent receiver trust anchor.
-Still open: which concrete issuer-governance model DigiD eventually standardizes for public human verification, and whether any platform-issued human claims should qualify as strong verification outside platform-local trust scopes.
+Working resolution for v0.3: do not leave this fully abstract anymore. The framework should distinguish issuer classes (`self`, `owner`, `platform`, `independent-issuer`, `receiver-anchored`) and should treat strong `verified-human` claims as requiring an independent trusted issuer path listed in a receiver-adopted `public` trust bundle, or an explicitly equivalent receiver trust anchor.
+Still open: which concrete governance model DigiD eventually standardizes for any public human-verification bundle operator, and whether any platform-issued human claims should qualify as strong verification outside platform-local trust scopes.
 
 ## OQ-002 - What counts as enough proof for a verified human?
 Working resolution for now: the framework should stay stricter and narrower on `verified-human` than on owner-backed agent or receiver-anchored organization trust. The first public DigiD framework should not imply that strong general-purpose human verification is already solved by owner assertion alone.
@@ -111,12 +111,12 @@ Working resolution for now: keep adapter evidence local-only and explicitly outs
 Still open: whether commercial or standards-track profiles eventually need a signed or countersigned platform-binding primitive for higher-assurance adapter surfaces.
 
 ## OQ-029 - How should verifiers learn which issuers are trusted without a standardized trust registry?
-Working resolution for v0.3: issuer trust is receiver policy input. The reference verifier may use explicit `trusted_issuer_ids` or receiver-anchored roots, but the public framework should now say plainly that sender-provided trust roots are invalid for high-trust evaluation.
-Still open: what DigiD's long-term trust-root distribution model should be for public issuers, enterprise trust roots, and any future registry or federation design.
+Working resolution for v0.3: issuer trust is receiver policy input. The public framework should now model that input as one of three receiver-adopted trust-input classes: `local`, `partner`, or `public`. The reference verifier may keep using explicit `trusted_issuer_ids` as the smallest `local` equivalent, but sender-provided trust roots are invalid for high-trust evaluation.
+Still open: whether DigiD later standardizes a signed trust-bundle artifact, how any public bundle operator or federation is governed, and what update/removal semantics must be common across implementations.
 
 ## OQ-030 - What does `verified-organization` mean outside pinned trust roots?
-Working resolution for v0.3: `verified-organization` currently means either receiver-anchored organization trust or a future profile's acceptable trusted-issuer path. It does not mean that an organization can self-declare a universal verified state.
-Still open: whether DigiD should standardize independent issuer attestations for organizations in the next framework phase, and how that path should coexist with receiver-anchored enterprise trust.
+Working resolution for v0.3: `verified-organization` currently means either receiver-anchored organization trust or an acceptable issuer path carried by a receiver-adopted `partner` or `public` trust bundle. It does not mean that an organization can self-declare a universal verified state.
+Still open: whether DigiD should standardize independent issuer attestations for organizations in the next framework phase, how public bundle inclusion is governed, and how that path should coexist with receiver-anchored enterprise trust.
 
 ## OQ-031 - How far should DigiD standardize delegation restriction semantics in the reference repo?
 Working resolution for now: the verifier may preserve the primary failed scope dimension (`purpose`, `channel`, or required action) when it is cleanly derivable from signed inputs, while keeping one stable machine-readable warning code: `delegation-scope-conflict`.

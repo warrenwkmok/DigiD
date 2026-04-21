@@ -10,6 +10,37 @@ Format notes:
 
 ---
 
+## Iteration 33 - Define receiver-side trust distribution profile
+- date: 2026-04-21
+- timestamp: 2026-04-21 01:50 America/Vancouver
+- summary:
+  - added a public trust distribution profile that distinguishes `local`, `partner`, and `public` trust inputs so DigiD no longer leaves trust-root distribution as an abstract "receiver policy" placeholder
+  - threaded that posture through the architecture and protocol docs, clarifying how non-pinned organization trust and stronger human verification should relate to receiver-adopted trust bundles
+  - updated critique, red-team, design-feedback, open-question, and public repo docs so the release-readiness answer and current blockers are stated more concretely
+- changed files:
+  - `docs/architecture/trust-distribution-profile.md`
+  - `docs/architecture/system-architecture.md`
+  - `docs/protocol/attestation-model.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/protocol/fixture-manifest-profile.md`
+  - `docs/review/open-questions.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `docs/INDEX.md`
+  - `README.md`
+  - `CHANGELOG.md`
+- release-readiness judgment:
+  - no, DigiD is still not ready to be released publicly as a framework
+- blockers after this iteration:
+  - DigiD's trust distribution story is now more concrete, but it is still not executable enough for outside implementers: the repo lacks a machine-readable trust-bundle contract, a stable verifier result field preserving trust-input class, and a finalized governance model for any future public bundle operator or federation
+  - the canonicalization story is narrower and more honest, but it still lacks raw-wire duplicate-key rejection proof and multi-language conformance vectors
+  - the overall conformance and test surface is still too thin for independent implementers to judge DigiD as stable and likely to work across multiple implementations
+- why it mattered:
+  - this iteration turns a major release blocker from a hand-wave into a scoped framework profile. Outside readers can now see how DigiD expects local trust, shared partner trust, and broader public issuer trust to differ without assuming a hidden registry or a magical universal verifier network.
+- next likely step at the time:
+  - decide whether the next framework slice should make trust-input classes executable in verifier-side contracts and outputs, or whether canonicalization conformance vectors are now the higher-risk blocker to attack first
+
 ## Iteration 32 - Replace JCS over-claim with DigiD canonicalization profile
 - date: 2026-04-20
 - timestamp: 2026-04-20 22:49 America/Vancouver

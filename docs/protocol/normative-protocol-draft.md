@@ -170,19 +170,29 @@ The v0.3 reference posture recognizes these practical trust-input classes:
 - trusted owner issuers for owner-backed agent flows
 - trusted independent issuers for broader verification claims
 
+For the public framework posture, verifiers SHOULD source those issuer inputs from:
+- explicit local receiver policy, or
+- a receiver-adopted trust bundle with a declared class (`local`, `partner`, or `public`) and scope
+
+Sender-provided manifests, payload metadata, or protocol objects MUST NOT add or override trusted issuers for a high-trust DigiD evaluation.
+The v0.3 framework does not yet standardize a sender-visible `dgd.trust_bundle` object; trust bundles remain verifier-side policy artifacts.
+
 Self-consistent signatures and objects MUST NOT be treated as sufficient proof of trust by themselves.
 
 ### Issuer-class posture
 
 For the current framework draft:
 - owner-issued attestations are sufficient for owner-backed agent states such as `org-issued-agent` when the receiver trusts that owner path
-- `verified-organization` MAY be rendered when the organization itself is receiver-anchored or when a future profile provides an acceptable trusted issuer path
-- `verified-human` MUST NOT be rendered from owner-asserted or self-asserted records alone
+- `verified-organization` MAY be rendered when the organization itself is receiver-anchored or when a receiver-adopted `partner` or `public` trust bundle provides an acceptable issuer path
+- `verified-human` MUST NOT be rendered from owner-asserted or self-asserted records alone and SHOULD normally depend on an acceptable independent issuer listed in a receiver-adopted `public` trust bundle or an explicit equivalent local anchor
 
 Verifiers SHOULD preserve the distinction between:
 - owner-backed trust
 - receiver-anchored trust
 - independent-issuer trust
+- local trust inputs
+- partner trust bundles
+- public trust bundles
 
 Compact UI MAY simplify the wording, but the underlying verifier result MUST preserve enough machine-readable detail that those paths are not silently collapsed.
 

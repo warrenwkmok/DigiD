@@ -3,6 +3,22 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-018 - Trust-bundle injection and scope-laundering attacks
+- date: 2026-04-21
+- timestamp: 2026-04-21 01:50 America/Vancouver
+- reviewed slice:
+  - defining receiver-side `local`, `partner`, and `public` trust-input classes
+  - clarifying that trust bundles stay verifier-side and out of sender control
+  - mapping fixture `trusted_issuer_ids` to a minimal local trust-bundle equivalent
+- attack scenarios:
+  - sender-bundle injection: a sender embeds or references a convenient trust bundle and hopes a verifier treats it as authoritative, upgrading an otherwise local or unknown issuer into a high-trust path
+  - scope laundering: a product or screenshot hides whether trust came from a `local` root, a `partner` bundle, or a `public` bundle, making environment-local trust look universal
+  - stale-bundle replay: a verifier keeps using an old bundle snapshot after an issuer should have been removed or downgraded, letting compromised issuers continue to look trusted
+- recommended mitigations:
+  1. keep trust bundles receiver-adopted and out of sender control for every high-trust DigiD decision
+  2. preserve trust-input class in machine-readable verifier output and expanded UX so local, partner, and public trust cannot be silently collapsed
+  3. require versioning, expiry or freshness posture, and clear removal/update semantics before DigiD treats any public trust bundle as a meaningful public-verification path
+
 ## RT-017 - Canonicalization split-brain and parser-drift attacks
 - date: 2026-04-20
 - timestamp: 2026-04-20 22:49 America/Vancouver

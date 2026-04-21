@@ -112,6 +112,14 @@ For v0.3 reference posture:
 - receiver-pinned organization roots are allowed
 - sender-supplied trust roots must not be treated as authoritative
 
+For the broader public framework posture:
+- receiver trust inputs should be packaged as one of three classes: `local`, `partner`, or `public`
+- `local` trust inputs justify receiver-anchored trust only for that receiver's environment
+- `partner` trust bundles justify scope-limited shared trust for a named ecosystem, not universal public verification
+- `public` trust bundles are the intended path for broadly reusable independent-issuer trust without pretending DigiD already has one global registry
+
+The trust-input distribution profile lives in `docs/architecture/trust-distribution-profile.md`.
+
 Without a receiver trust input, a self-consistent fake ecosystem can still look cryptographically valid.
 
 ## Minimal attestation semantics
@@ -147,7 +155,7 @@ In the v0.3 schema, those semantics are primarily carried by:
 
 ### Independent issuer attests to a human
 - strongest path for `verified-human`
-- likely necessary before DigiD can claim public framework readiness for human verification
+- should normally be listed in a receiver-adopted public trust bundle before DigiD implies broad public verification
 
 ## UX posture
 
@@ -167,7 +175,8 @@ Bad examples:
 For the current DigiD reference framework:
 - owner-backed agent trust is in scope
 - receiver-anchored organization trust is in scope
-- strong general-purpose human verification is not fully resolved yet
+- trust distribution posture is now partially resolved through receiver-managed `local`, `partner`, and `public` bundle classes
+- strong general-purpose human verification is still not fully resolved end to end
 
 That means DigiD is strongest today when it says:
 - who signed
