@@ -3,6 +3,22 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-017 - Canonicalization split-brain and parser-drift attacks
+- date: 2026-04-20
+- timestamp: 2026-04-20 22:49 America/Vancouver
+- reviewed slice:
+  - replacing raw `JCS` claims with the explicit `DGD-C14N-0.3` reference profile
+  - executable canonicalization guardrails in the protocol package
+  - regenerated fixtures and verifier audit coverage under the new cryptosuite identifier
+- attack scenarios:
+  - canonicalization split-brain: two SDKs both claim "JCS" but serialize edge-case inputs differently, letting an attacker target whichever verifier accepts the sender's bytes
+  - silent-field erasure: a buggy issuer library includes `undefined`, sparse arrays, or non-plain objects and assumes the serialized result still means what the in-memory object meant
+  - parser drift: one implementation accepts duplicate member names or malformed Unicode that another rejects, creating badge laundering opportunities across products
+- recommended mitigations:
+  1. keep the public profile name explicit (`DGD-C14N-0.3`) so products cannot imply standards-level interoperability DigiD has not yet earned
+  2. reject ambiguous runtime inputs before signing or digesting, not after a verifier mismatch appears in the field
+  3. treat duplicate-key handling and cross-language conformance vectors as the next adversarial blocker before public framework release
+
 ## RT-016 - Fake trust-network and issuer-laundering attacks
 - date: 2026-04-20
 - timestamp: 2026-04-20 20:05 America/Vancouver

@@ -3,6 +3,26 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-017 - Canonicalization profile honesty and executable guardrails critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 22:49 America/Vancouver
+- reviewed slice:
+  - replacing the public `JCS` over-claim with an explicit DigiD v0.3 canonicalization profile (`DGD-C14N-0.3`)
+  - enforcing guardrails in the protocol package so unsupported runtime values fail explicitly instead of silently serializing differently across implementations
+  - regenerating signed fixtures so the checked-in corpus reflects the same cryptosuite and canonicalization story the docs now describe
+- strengths:
+  - closes a real public-framework honesty gap: outside readers no longer have to guess whether DigiD means full RFC 8785 JCS or only a simplified reference profile
+  - turns canonicalization from hand-wavy prose into executable reference behavior, including explicit rejection of unsafe integers, sparse arrays, unsupported runtime types, and lone-surrogate strings
+  - keeps the framework-first posture intact because the reference implementation is being used to validate a clearer protocol claim, not to invent new product surface
+- concerns:
+  - `DGD-C14N-0.3` is now honest, but it is DigiD-specific rather than standards-aligned; outside implementers still lack cross-language conformance vectors and raw-wire parser rules
+  - duplicate JSON member-name rejection is still not proven end-to-end in the reference code path, so parser divergence remains a public-release blocker
+  - the audited fixture suite verifies the local profile, but the broader conformance surface is still too thin for outside teams to treat the framework as stable
+- recommended changes:
+  1. publish a small conformance corpus for canonicalization edge cases so future non-JS implementations can prove they match `DGD-C14N-0.3`
+  2. decide whether the next public step is raw-wire duplicate-key rejection guidance or a move toward a stricter standards-aligned canonicalization layer
+  3. keep public release judgment at "not yet" until trust-root governance and multi-language conformance both become more concrete
+
 ## CL-016 - Issuer classes and trust-anchor posture critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 20:05 America/Vancouver

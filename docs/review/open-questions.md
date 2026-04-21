@@ -123,8 +123,8 @@ Working resolution for now: the verifier may preserve the primary failed scope d
 Still open: whether broader restriction families, customer-specific delegation templates, and richer policy-authoring workflows belong in protocol docs at all.
 
 ## OQ-032 - How should DigiD evolve cryptographic agility without downgrade or UX confusion?
-Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `JCS` + `sha256`) and require verifiers to reject algorithm mismatches instead of "best-effort" verification.
-Still open: how DigiD introduces additional suites without letting issuers choose weaker algorithms, how suite negotiation/policy should be receiver-controlled, and whether DigiD should publish a stricter canonicalization profile (full RFC 8785 JCS compliance constraints) before any multi-language verifier implementations appear.
+Working resolution for v0.3: ship exactly one cryptosuite (`Ed25519` + `DGD-C14N-0.3` + `sha256`) and require verifiers to reject algorithm mismatches instead of "best-effort" verification. The public framework should now describe canonicalization honestly as a DigiD-defined profile rather than claiming full RFC 8785 JCS interoperability.
+Still open: how DigiD introduces additional suites without letting issuers choose weaker algorithms, how suite negotiation/policy should be receiver-controlled, and when DigiD should publish raw-wire conformance vectors or a stricter standards-aligned canonicalization profile that closes duplicate-key and multi-language parser gaps.
 
 ## OQ-033 - How should DigiD represent key revocation time precisely?
 Working resolution for v0.3: keep `keys[].status` as an operational current-time posture signal, keep `not_before`/`expires_at` as the explicit signed window for event-time validity, and represent signed key revocation timing via `dgd.revocation` targeting the signing key (`target_object_type: dgd.signing_key`, `target_object_id: <kid>`).

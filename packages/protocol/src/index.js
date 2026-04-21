@@ -1,4 +1,4 @@
-export { canonicalizeForProof, digestCanonicalPayload, stripProof } from "./canonicalize.js";
+export { assertCanonicalizableForProof, canonicalizeForProof, digestCanonicalPayload, stripProof } from "./canonicalize.js";
 export {
   DIGID_V03_CANONICALIZATION,
   DIGID_V03_CRYPTOSUITE_ID,

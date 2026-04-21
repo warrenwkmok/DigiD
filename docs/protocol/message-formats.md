@@ -139,11 +139,11 @@ Use this for signed payload-bearing communications across messaging, email, voic
     "encoding": "utf-8"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -177,11 +177,11 @@ Use this for protocol lifecycle events and verification-audit events.
   },
   "payload_digest": "sha256:...",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -239,11 +239,11 @@ In the first delegated voice profile this message is intentionally not sequence-
     "purpose": "support-follow-up"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -276,11 +276,11 @@ In the first delegated voice profile this message is intentionally not sequence-
     "duration_ms": 48321
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:10:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -312,11 +312,11 @@ In the first delegated voice profile this message is intentionally not sequence-
     "encoding": "utf-8"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -348,11 +348,11 @@ In the first delegated voice profile this message is intentionally not sequence-
     "subject_digest": "sha256:..."
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -469,11 +469,11 @@ Created when a delegation is no longer valid.
   },
   "payload_digest": "sha256:...",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:verifier_service:key-2026-04",
     "created_at": "2026-04-15T00:05:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -544,7 +544,7 @@ The first signing library should expose two deterministic helpers:
 That keeps message verification and event verification reproducible with the same canonicalization rules.
 
 For the first implementation profile:
-- `payload_digest` for `dgd.event` MUST be computed over the JCS-canonicalized JSON bytes of the `payload` object only
+- `payload_digest` for `dgd.event` MUST be computed over the `DGD-C14N-0.3` canonicalized JSON bytes of the `payload` object only
 - `payload.content_digest` for detached message or artifact content MUST be computed over the raw detached content bytes, not over the enclosing envelope JSON
 - if a message includes user-visible fields such as `summary` or `purpose` that a verifier UI renders directly, those fields MUST live inside the signed `payload` object, not in unsigned side metadata
 - a verifier SHOULD treat any unsigned UI-facing detached metadata as advisory only, never trust-bearing
@@ -564,7 +564,7 @@ See `docs/protocol/fixture-manifest-profile.md` and `docs/architecture/verifier-
 
 For v0.3, keep transport simple:
 - primary wire format: JSON
-- canonical signing form: JCS
+- canonical signing form: `DGD-C14N-0.3`
 - binary payloads should be referenced by digest, not inlined
 - host platforms can carry the envelope as metadata, attachment, header, QR payload, or verifier URL param
 

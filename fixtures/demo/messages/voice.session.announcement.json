@@ -23,11 +23,11 @@
     "purpose": "support-follow-up"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:11.000Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "nJtGmo/0XdibeuGFnXDbxP225AEag3UeM+qfMi8mNJ30KAySTKwui5RdXOVYeKgimERnd6szEGqEbIzjM3gQCQ=="
   }
 }

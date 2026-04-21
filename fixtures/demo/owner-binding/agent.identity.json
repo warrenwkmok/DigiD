@@ -33,11 +33,11 @@
   },
   "created_at": "2026-04-15T00:20:01.000Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01:owner-binding",
     "created_at": "2026-04-15T00:20:01.000Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "FtaqOjhWObLOB2/no8FV5oH092kf3hcf+bHeRQLA0BF3XEqlU1RRAMsyRldI+U6gRjjjxrdcXtvMUnLdIhGjDQ=="
   }
 }

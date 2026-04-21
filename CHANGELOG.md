@@ -10,6 +10,40 @@ Format notes:
 
 ---
 
+## Iteration 32 - Replace JCS over-claim with DigiD canonicalization profile
+- date: 2026-04-20
+- timestamp: 2026-04-20 22:49 America/Vancouver
+- summary:
+  - replaced the public `JCS` claim with an explicit DigiD v0.3 canonicalization profile (`DGD-C14N-0.3`) and a matching v0.3 cryptosuite identifier so the framework no longer implies RFC 8785 interoperability it has not yet proven
+  - added executable canonicalization guardrails in the protocol package, rejecting unsafe integers, sparse arrays, unsupported runtime values, and lone-surrogate strings before signing or digesting
+  - regenerated the signed fixture corpus, added protocol tests for the canonicalization profile, and updated critique/red-team/design-feedback/open-questions artifacts so the release-readiness answer reflects the narrower but more honest posture
+- changed files:
+  - `docs/protocol/signing-and-provenance.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/protocol/object-schemas.md`
+  - `docs/protocol/message-formats.md`
+  - `packages/protocol/src/canonicalize.js`
+  - `packages/protocol/src/cryptosuite.js`
+  - `packages/protocol/src/index.js`
+  - `packages/protocol/test/canonicalization.test.js`
+  - `scripts/generate-demo-fixtures.mjs`
+  - `fixtures/demo/**/*`
+  - `docs/review/open-questions.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `CHANGELOG.md`
+- release-readiness judgment:
+  - no, DigiD is still not ready to be released publicly as a framework
+- blockers after this iteration:
+  - DigiD still lacks a concrete public trust-root governance and issuer-distribution model for strong human verification and non-pinned organization trust
+  - the canonicalization story is now honest, but it is still a DigiD-specific profile without raw-wire duplicate-key enforcement proof or multi-language conformance vectors
+  - the conformance and test surface is still too thin for outside implementers to judge the framework as stable and likely to work across independent implementations
+- why it mattered:
+  - this iteration removes a major framework-legibility risk: outside readers no longer have to infer whether DigiD means full JCS or only a narrower deterministic reference profile. The repo now says what it actually enforces, which is a prerequisite for any credible public framework release later.
+- next likely step at the time:
+  - publish a small conformance corpus for `DGD-C14N-0.3` and decide whether the next framework slice should standardize raw-wire duplicate-key rejection or move toward a stricter standards-aligned canonicalization layer
+
 ## Iteration 31 - Formalize issuer classes and trust-anchor posture
 - date: 2026-04-20
 - timestamp: 2026-04-20 20:05 America/Vancouver

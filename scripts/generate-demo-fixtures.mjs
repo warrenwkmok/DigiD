@@ -432,7 +432,7 @@ function buildCryptosuiteUnsupportedFixtures(delegatedVoiceFixtures) {
       ...communication,
       proof: {
         ...communication.proof,
-        cryptosuite: "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.2"
+        cryptosuite: "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.2"
       }
     }
   };

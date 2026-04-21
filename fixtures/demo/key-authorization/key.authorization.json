@@ -14,11 +14,11 @@
   "valid_until": "2026-10-15T00:00:00.000Z",
   "created_at": "2026-04-15T00:05:31.000Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:05:31.000Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "3xuO3rn6ASTS+bDSS+7oaZooPp+5Z0gTdnOOt+bXRo4O3ZzHzshSCujqWJ6P42ngbD7fkpcXCRrKvPHpl1o6Ag=="
   }
 }

@@ -33,11 +33,11 @@
   },
   "created_at": "2026-04-15T00:00:00.000Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:human_01:key-2026-04",
     "created_at": "2026-04-15T00:00:00.000Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zdjKX/5svtdZpBs+ZG9xj8a7DOOostL6W8TC5MSIn09/Q3Zi6z8TdgB2JBDwx5y84cxYH9if6tVRS8p8q61TAQ=="
   }
 }

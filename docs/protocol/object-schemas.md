@@ -150,18 +150,18 @@ The signer for each object family MUST be determinable from signed fields alone,
 
 ```json
 {
-  "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+  "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
   "type": "ed25519-2020",
   "kid": "dgd:key:agent_01:key-2026-04",
   "created_at": "2026-04-15T00:00:00Z",
-  "canonicalization": "JCS",
+  "canonicalization": "DGD-C14N-0.3",
   "signature": "zBase64OrMultibaseSignature"
 }
 ```
 
 Notes:
 - `cryptosuite` is a strict allowlist identifier; verifiers MUST reject unsupported cryptosuites rather than attempting best-effort verification
-- `canonicalization` should default to JSON Canonicalization Scheme (`JCS`)
+- `canonicalization` should default to DigiD Canonical JSON v0.3 (`DGD-C14N-0.3`), not a blanket claim of full RFC 8785 JCS interoperability
 - the signature is calculated over the object with `proof` removed
 - `proof.created_at` is metadata and is not itself signed; verifiers should rely on signed top-level timestamps like `created_at` on the object family being evaluated
 - verifiers should reject unknown critical proof parameters
@@ -288,11 +288,11 @@ Represents a signed statement by an issuer about a subject.
     "reference": "att-evidence-2026-04-15-001"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -341,11 +341,11 @@ Defines authority for one subject to act on behalf of another.
     "status": "clear"
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:00:01Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -389,11 +389,11 @@ This is a v0.3 escape hatch for safe key rotation overlap without forcing the is
   "valid_until": "2026-10-15T00:00:00Z",
   "created_at": "2026-04-15T00:05:31Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-04-15T00:05:31Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -446,11 +446,11 @@ A normalized high-level communication object for completed or in-progress exchan
     "edited": false
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -517,11 +517,11 @@ Represents the ordered interaction scope for a live communication flow.
     "ended_at": null
   },
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:00:10Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -569,11 +569,11 @@ Represents a detached recording, transcript, summary, or exported media artifact
   },
   "created_at": "2026-04-15T00:10:00Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:agent_01:key-2026-04",
     "created_at": "2026-04-15T00:10:00Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }
@@ -651,11 +651,11 @@ Represents an explicit revocation for an identity, key, attestation, delegation,
   "revoked_at": "2026-05-01T00:00:00Z",
   "created_at": "2026-05-01T00:00:01Z",
   "proof": {
-    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3",
     "type": "ed25519-2020",
     "kid": "dgd:key:org_acme:key-2026-01",
     "created_at": "2026-05-01T00:00:01Z",
-    "canonicalization": "JCS",
+    "canonicalization": "DGD-C14N-0.3",
     "signature": "zSig..."
   }
 }

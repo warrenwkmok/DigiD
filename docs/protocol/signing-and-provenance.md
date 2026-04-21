@@ -34,8 +34,17 @@ Issuers should preserve historical key records so past events remain independent
 
 To keep cross-platform verification stable, DigiD v0.3 should assume:
 - JSON wire format
-- JSON Canonicalization Scheme (`JCS`) for signing input
+- DigiD Canonical JSON v0.3 (`DGD-C14N-0.3`) for signing input
 - detached payloads represented by digests when the payload is large or binary
+
+`DGD-C14N-0.3` is intentionally narrower and more honest than claiming full RFC 8785 JCS interoperability.
+For the reference v0.3 profile, it means:
+- recursively sort object member names lexicographically before serialization
+- serialize plain JSON values with standard JSON text rules
+- reject unsupported runtime inputs that silently drift across implementations, including `undefined`, `BigInt`, sparse arrays, non-plain objects, non-finite numbers, unsafe integers, and strings containing lone UTF-16 surrogates
+
+Current limitation:
+- the reference implementation still assumes inputs do not contain duplicate JSON member names on the wire; DigiD has not yet published a raw-parser conformance layer that proves duplicate-key rejection across languages
 
 Signing target:
 - remove the `proof` field from the object
@@ -49,9 +58,9 @@ DigiD v0.3 intentionally supports **one** cryptographic suite so verifiers canno
 
 ### Required suite for v0.3
 - signature algorithm: `Ed25519`
-- cryptosuite identifier: `proof.cryptosuite = "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3"`
+- cryptosuite identifier: `proof.cryptosuite = "urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3"`
 - proof suite identifier: `proof.type = "ed25519-2020"`
-- canonicalization identifier: `proof.canonicalization = "JCS"`
+- canonicalization identifier: `proof.canonicalization = "DGD-C14N-0.3"`
 - detached digest prefix: `sha256:<hex>`
 
 ### Algorithm disclosure rules

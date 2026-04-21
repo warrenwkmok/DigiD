@@ -56,20 +56,24 @@ Example:
 
 For v0.3 profile:
 - signing algorithm MUST be `Ed25519`
-- canonicalization MUST be `JCS`
-- `proof.cryptosuite` MUST be `urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3`
+- canonicalization MUST be `DGD-C14N-0.3`
+- `proof.cryptosuite` MUST be `urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3`
 - `proof.type` MUST be `ed25519-2020`
-- `proof.canonicalization` MUST be `JCS`
+- `proof.canonicalization` MUST be `DGD-C14N-0.3`
 - resolved signer key record `keys[].algorithm` MUST be `Ed25519`
 - resolved signer key record `keys[].public_key_encoding` MUST be `spki-der-base64`
 - verifiers MUST reject proofs whose `proof.type` is incompatible with the resolved key algorithm (no algorithm downgrades or ambiguity)
 - the signature input MUST be the full JSON object with `proof` removed
+- the canonicalization input MUST be limited to plain JSON values; implementations MUST reject unsupported runtime values that would serialize ambiguously or silently disappear
+- integral numbers MUST stay within the safe interoperable range of the profile
+- strings containing lone UTF-16 surrogates MUST be rejected
 - detached binary payloads MUST be referenced by digest, not embedded in the signing rule itself
   - digest algorithm MUST be disclosed by the digest prefix (example: `sha256:<hex>`)
 
 A verifier MUST reject:
 - unsupported signature algorithms
 - unsupported canonicalization methods
+- canonicalization inputs that violate the `DGD-C14N-0.3` profile
 - signatures whose `kid` cannot be resolved
 - signatures whose resolved signing key is not authorized for `assertion`
 - signatures whose resolved signing key has missing or unsupported `public_key_encoding`

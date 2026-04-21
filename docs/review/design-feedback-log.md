@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-037 - Replace JCS over-claim with DigiD canonicalization profile
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 22:49 America/Vancouver
+- area: protocol
+- severity: critical
+- status: applied
+- summary: DigiD was still claiming `JCS` in public docs and signed fixture metadata even though the reference implementation only guaranteed a narrower deterministic JSON profile. That mismatch was an interoperability and public-release blocker because outside readers could reasonably assume broader standards alignment than the repo actually proved.
+- action taken: Introduced the explicit v0.3 canonicalization identifier `DGD-C14N-0.3`, renamed the v0.3 cryptosuite to `urn:dgd:cryptosuite:ed25519-dgd-c14n-sha256:0.3`, documented the profile limits and allowed input class more honestly, added executable canonicalization guardrails plus protocol tests, regenerated the signed fixture corpus, and updated open questions around the remaining raw-wire and multi-language gaps.
+- linked docs: `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/protocol/object-schemas.md`, `docs/protocol/message-formats.md`, `packages/protocol/src/canonicalize.js`, `packages/protocol/src/cryptosuite.js`, `packages/protocol/test/canonicalization.test.js`, `docs/review/open-questions.md`
+- notes: This narrows the framework claim to what the reference repo can actually defend without introducing hosted crypto infrastructure, tenant-specific policy logic, or commercial key-management workflows.
+
 ## DF-036 - Formalize issuer classes and trust-anchor posture for public framework readiness
 - source: `2026-04-20 DigiD 3h loop`
 - date: 2026-04-20
