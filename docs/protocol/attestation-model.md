@@ -1,74 +1,177 @@
-# DigiD attestation model
+# DigiD attestation model v0.3
 
 ## Purpose
 
-An identity claim on its own is weak.
-Attestation is what gives the claim weight.
+An identity object plus a valid signature is not enough for high trust.
+Attestation is the signed statement that says why a receiver should treat that identity as meaningful.
 
-DigiD should support a layered attestation model so that trust is not all-or-nothing.
+For DigiD, the critical question is not just "was this signed?"
+It is:
+- who stands behind this identity
+- what class of issuer said that
+- whether the receiver trusts that issuer class for this use case
 
-## Types of attestation
+## Core rule
 
-Possible attestation categories include:
-- self-asserted
-- organization-issued
-- employer-issued
-- platform-issued
-- government-backed verification
-- KYC or financial verification
-- web-of-trust or delegated trust
-- device possession attestation
+Attestation strength is not self-declared by the sender.
 
-## Attestation fields
+A verifier should derive attestation strength from:
+- the attestation type
+- the issuer identity
+- the issuer's relationship to the subject
+- receiver trust-anchor policy
+- current validity and revocation posture
 
-A DigiD attestation should include:
-- attestation id
-- subject identity id
-- issuer identity id
-- attestation type
-- trust level
-- issue date
-- expiry date if any
-- revocation info
-- disclosure policy
-- signature of issuer
+That means DigiD should not treat a sender-provided field like `trust_level: high` as authoritative.
 
-## Example
+## Issuer classes
 
-```json
-{
-  "attestation_id": "att-123",
-  "subject": "dgd:agent:abc",
-  "issuer": "dgd:org:company-x",
-  "type": "organization-issued-agent",
-  "trust_level": "high",
-  "issued_at": "2026-04-15T00:00:00Z",
-  "expires_at": "2026-10-15T00:00:00Z",
-  "signature": "..."
-}
-```
+For the first public framework posture, DigiD should distinguish these issuer classes:
+- `self`
+- `owner`
+- `platform`
+- `independent-issuer`
+- `receiver-pinned-root`
 
-## Why attestation matters
+### `self`
+- the subject attests to itself
+- useful for continuity, not for strong verification
 
-Attestation lets the system distinguish between:
-- an unknown agent claiming to be legitimate
-- an agent that is explicitly authorized by a known company
-- a human identity verified by a trusted authority
+### `owner`
+- the controlling human or organization attests to its own agent or subordinate identity
+- strong for owner-backed agent identity and delegation
+- not equivalent to independent third-party proof of a human or organization
 
-## Policy stance
+### `platform`
+- the platform that hosts, mediates, or administers the account or runtime attests to the subject
+- can be meaningful, but trust depends on receiver policy and platform scope
 
-Different products and channels can choose different minimum trust requirements.
+### `independent-issuer`
+- a separate trusted party attests to the subject
+- this is the strongest path for durable `verified-human` and broader `verified-organization` claims
 
-Examples:
-- a business phone system may require organization-issued agent attestation
-- public social posting may allow pseudonymous self-attested identities
-- high-trust workflows may require stronger verification classes
+### `receiver-pinned-root`
+- the receiver treats a specific identity as an explicit trust root for its environment
+- this is the current v0.3 reference-verifier posture for fixture-driven organization trust
 
-## Receiver interpretation
+## Trust-tier posture
 
-The receiver should not have to inspect raw cryptography.
-The UX should summarize the meaning, for example:
-- verified by organization
-- self-asserted only
-- government-ID verified
-- revoked delegation
+The first DigiD framework should talk about trust as tiers, not a binary.
+
+Recommended interpretation tiers:
+- `self-asserted`
+- `owner-asserted`
+- `platform-verified`
+- `issuer-verified`
+- `receiver-anchored`
+
+These are interpretation tiers, not necessarily wire fields.
+They tell the verifier and UI how much confidence is being transferred.
+
+### `self-asserted`
+- subject controls the key and signs consistently
+- no meaningful external backing
+
+### `owner-asserted`
+- the controlling human or organization stands behind the subject
+- this is the key DigiD posture for org-issued and delegated agents
+
+### `platform-verified`
+- a platform says the subject is real or controlled within that platform
+- useful, but narrower than a general internet trust claim
+
+### `issuer-verified`
+- an independent trusted issuer attests to the subject
+- strongest general-purpose verification tier in the framework
+
+### `receiver-anchored`
+- the receiver explicitly trusts the root or issuer for its own environment
+- powerful and valid, but scope is local to that receiver policy
+
+## Subject classes and appropriate issuer expectations
+
+### Human
+- `verified-human` should normally require `independent-issuer` or an explicitly trusted equivalent
+- owner-asserted human claims are not enough for strong cross-context verification
+
+### Organization
+- `verified-organization` can be satisfied in v0.3 by receiver anchoring
+- broader future profiles may allow an independent issuer path for organizations
+
+### Agent
+- agents should usually rely on `owner` attestation plus active delegation
+- DigiD's core wedge is not "this agent exists"
+- it is "this agent is attributable to a real human or organization and is acting under current authority"
+
+## Receiver trust inputs
+
+The verifier must have a receiver-side trust input.
+
+For v0.3 reference posture:
+- trusted issuer ids are verifier policy input
+- receiver-pinned organization roots are allowed
+- sender-supplied trust roots must not be treated as authoritative
+
+Without a receiver trust input, a self-consistent fake ecosystem can still look cryptographically valid.
+
+## Minimal attestation semantics
+
+An attestation should answer:
+- who is the issuer
+- who is the subject
+- what is being asserted
+- how long that assertion is valid
+- what revocation posture applies
+- whether the receiver trusts the issuer class for this claim
+
+In the v0.3 schema, those semantics are primarily carried by:
+- `issuer_id`
+- `subject_id`
+- `attestation_type`
+- `verification_state`
+- `valid_from`
+- `valid_until`
+- `status`
+- `proof`
+
+## Example interpretations
+
+### Organization attests to its own agent
+- useful for `org-issued-agent`
+- not enough by itself for `verified-human`
+- should transfer owner accountability, not universal reputation
+
+### Receiver pins an organization root
+- sufficient in the v0.3 reference verifier to render `verified-organization`
+- should be described as receiver-anchored trust, not universal objective truth
+
+### Independent issuer attests to a human
+- strongest path for `verified-human`
+- likely necessary before DigiD can claim public framework readiness for human verification
+
+## UX posture
+
+Compact UI should not imply that all attestation paths are equivalent.
+
+Good examples:
+- `Org-issued agent for Acme`
+- `Receiver-verified organization`
+- `Signature valid, issuer not trusted`
+
+Bad examples:
+- `Verified` with no indication of who verified what
+- `Trusted agent` when only self-asserted continuity exists
+
+## v0.3 release posture
+
+For the current DigiD reference framework:
+- owner-backed agent trust is in scope
+- receiver-anchored organization trust is in scope
+- strong general-purpose human verification is not fully resolved yet
+
+That means DigiD is strongest today when it says:
+- who signed
+- under whose authority
+- with what current validity
+
+and weaker when it tries to claim universal human verification semantics.

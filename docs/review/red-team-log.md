@@ -3,6 +3,21 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-016 - Fake trust-network and issuer-laundering attacks
+- date: 2026-04-20
+- timestamp: 2026-04-20 20:05 America/Vancouver
+- reviewed slice:
+  - formalizing issuer classes and receiver-side trust-anchor posture
+  - clarifying `verified-human` versus owner-backed or receiver-anchored trust paths
+- attack scenarios:
+  - fake trust-network attack: an attacker creates a complete self-consistent graph of organization, agent, attestation, and delegation objects and relies on ambiguous documentation to make receivers think "valid signatures + nice docs" imply strong trust
+  - issuer laundering: a platform or owner-issued attestation is presented as if it were equivalent to an independent issuer verification, causing users to over-trust a weaker path
+  - receiver-anchor confusion: a product renders a receiver-pinned organization as universally verified, letting screenshots or copied artifacts imply broader trust than the receiver policy actually proved
+- recommended mitigations:
+  1. keep issuer trust explicitly receiver-side and never accept sender-provided trust roots for high-trust evaluation
+  2. preserve issuer-path distinctions in verifier outputs and UX so `owner-asserted`, `receiver-anchored`, and `issuer-verified` do not collapse into one generic "verified" claim
+  3. keep DigiD conservative on public `verified-human` claims until independent-issuer semantics and trust-root governance are defined more concretely
+
 ## RT-015 - Delegated key substitution and authority drift attacks
 - date: 2026-04-20
 - timestamp: 2026-04-20 14:34 America/Vancouver

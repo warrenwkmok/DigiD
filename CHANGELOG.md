@@ -10,6 +10,34 @@ Format notes:
 
 ---
 
+## Iteration 31 - Formalize issuer classes and trust-anchor posture
+- date: 2026-04-20
+- timestamp: 2026-04-20 20:05 America/Vancouver
+- summary:
+  - rewrote the public identity and attestation model docs around issuer classes, trust tiers, receiver-side trust anchors, and the different meanings of `verified-human`, `verified-organization`, and owner-backed agent trust
+  - tightened the normative protocol draft so issuer trust is explicitly receiver policy input and `verified-human` cannot be derived from self-asserted or owner-asserted records alone
+  - updated trust-state, critique, red-team, design-feedback, and open-questions docs so the repo now answers the public-release question more honestly and records the remaining blockers more clearly
+- changed files:
+  - `docs/protocol/identity-model.md`
+  - `docs/protocol/attestation-model.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/architecture/trust-states.md`
+  - `docs/review/open-questions.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `CHANGELOG.md`
+- release-readiness judgment:
+  - no, not yet ready to be released as a public framework
+- blockers after this iteration:
+  - DigiD now has a clearer issuer/trust-anchor posture, but it still lacks a finalized public trust-root governance model for strong human and broader organization verification
+  - the canonicalization story still over-claims `JCS` relative to the current simplified implementation, which remains an interoperability blocker
+  - the conformance and test surface is still too thin for outside implementers to trust as a stable framework
+- why it mattered:
+  - the biggest current framework risk was ambiguity around who is allowed to make a verification claim meaningful. Tightening issuer classes and trust-anchor posture makes the repo more legible to outside readers and reduces the chance that "verified" gets interpreted as one flat trust claim.
+- next likely step at the time:
+  - tighten the canonicalization profile so the public docs stop over-claiming JCS interoperability, then expand conformance coverage around signer resolution and trust-path outcomes
+
 ## Iteration 30 - Key authorization for delegated key rotation overlap
 - date: 2026-04-20
 - timestamp: 2026-04-20 17:36 America/Vancouver

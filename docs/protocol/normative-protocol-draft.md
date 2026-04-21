@@ -157,6 +157,31 @@ If signer identity resolution is ambiguous, verification MUST fail.
 
 ## Trust path requirements
 
+### Issuer trust inputs
+
+For high-trust DigiD states, a verifier MUST treat issuer trust as a receiver-side policy input, not as sender-provided truth.
+
+The v0.3 reference posture recognizes these practical trust-input classes:
+- receiver-anchored roots or issuer ids
+- trusted owner issuers for owner-backed agent flows
+- trusted independent issuers for broader verification claims
+
+Self-consistent signatures and objects MUST NOT be treated as sufficient proof of trust by themselves.
+
+### Issuer-class posture
+
+For the current framework draft:
+- owner-issued attestations are sufficient for owner-backed agent states such as `org-issued-agent` when the receiver trusts that owner path
+- `verified-organization` MAY be rendered when the organization itself is receiver-anchored or when a future profile provides an acceptable trusted issuer path
+- `verified-human` MUST NOT be rendered from owner-asserted or self-asserted records alone
+
+Verifiers SHOULD preserve the distinction between:
+- owner-backed trust
+- receiver-anchored trust
+- independent-issuer trust
+
+Compact UI MAY simplify the wording, but the underlying verifier result MUST preserve enough machine-readable detail that those paths are not silently collapsed.
+
 A verifier MUST NOT render `verified-agent`, `delegated-agent`, or `org-issued-agent` unless:
 - the signer identity is active
 - the signing key is active at evaluation time or valid at event time under accepted historical policy

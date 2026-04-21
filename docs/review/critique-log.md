@@ -3,6 +3,26 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-016 - Issuer classes and trust-anchor posture critique
+- date: 2026-04-20
+- timestamp: 2026-04-20 20:05 America/Vancouver
+- reviewed slice:
+  - formalizing issuer classes (`self`, `owner`, `platform`, `independent-issuer`, `receiver-anchored`)
+  - tightening public docs so issuer trust is explicitly receiver policy input rather than sender-declared truth
+  - clarifying that `verified-human` is stricter than owner-backed agent or receiver-anchored organization trust
+- strengths:
+  - directly addresses the biggest framework-release blocker: outside readers now get a clearer answer to what "verified" means and who is allowed to make it meaningful
+  - keeps DigiD's strongest wedge sharp by emphasizing attributable authority for agents rather than pretending universal human verification is already solved
+  - reduces verifier drift by separating owner-backed trust, receiver-anchored trust, and independent-issuer trust instead of collapsing them into one badge
+- concerns:
+  - the framework posture is clearer than before, but it is still not a full public trust-network model; issuer governance and trust-root distribution remain intentionally unresolved
+  - `platform-verified` remains semantically fuzzy across channels and could still be over-read by downstream adopters if not constrained by future profile docs
+  - the docs are now more coherent, but canonicalization and multi-language conformance are still separate release blockers
+- recommended changes:
+  1. keep `verified-human` conservative until DigiD publishes a concrete independent-issuer posture and minimum evidence model
+  2. make future verifier outputs preserve issuer-path detail so adapters cannot flatten receiver-anchored and issuer-verified trust into the same compact claim
+  3. treat JCS/canonicalization rigor as the next framework blocker once issuer semantics are no longer the dominant ambiguity
+
 ## CL-015 - Bind delegated signing key in attestation + delegation critique
 - date: 2026-04-20
 - timestamp: 2026-04-20 14:34 America/Vancouver

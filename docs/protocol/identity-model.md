@@ -1,120 +1,141 @@
-# DigiD identity model
+# DigiD identity model v0.3
+
+## Purpose
+
+DigiD identities exist so a verifier can answer:
+- who signed this
+- what kind of actor they are
+- who controls them
+- what trust path, if any, supports the claim
+
+Identity is therefore not just a profile record.
+It is the root of signer resolution, key resolution, owner binding, and trust-state interpretation.
 
 ## Identity classes
 
-DigiD should support multiple identity classes from the start:
-- human
-- agent
-- organization
-- pseudonymous identity
-- unverified identity
+The first DigiD framework recognizes these subject classes:
+- `human`
+- `agent`
+- `organization`
+- `service`
+- `pseudonymous`
+- `unverified`
 
-These are not just labels. They influence trust interpretation, display rules, and attestation requirements.
+These classes affect:
+- what attestations are meaningful
+- whether delegation is expected
+- what trust states a verifier may render
 
 ## Core identity record
 
-A DigiD identity record should include:
-- stable identity id
-- public keys
-- key history
-- identity class
-- display name
-- optional legal name or verified human name
-- verification status
-- attestations
-- delegation relationships
-- revocation status
-- metadata disclosure policy
+The normative v0.3 shape is defined in `docs/protocol/object-schemas.md`.
 
-## Example conceptual schema
+Conceptually, every DigiD identity should provide:
+- stable `object_id`
+- `identity_class`
+- visible `display_name` when disclosure policy allows it
+- one or more signing keys
+- lifecycle state
+- optional controller binding
+- optional disclosure policy
 
-```json
-{
-  "id": "dgd:human:7F3A...",
-  "class": "human",
-  "display_name": "Warren Mok",
-  "verification_state": "verified-human",
-  "public_keys": [
-    {
-      "kid": "key-2026-01",
-      "algorithm": "Ed25519",
-      "public_key": "...",
-      "status": "active"
-    }
-  ],
-  "attestations": [
-    {
-      "type": "government-id-verified",
-      "issuer": "trusted-verifier-x",
-      "issued_at": "2026-04-15T00:00:00Z"
-    }
-  ],
-  "delegations": [],
-  "revocation": null
-}
-```
+## Key posture
 
-## Human identity
+Identity keys are not just login material.
+They are the cryptographic roots used to sign DigiD objects and envelopes.
 
-A human identity represents a real individual.
-Possible verification methods later may include:
-- government ID verification
-- bank or KYC verification
-- employer verification
-- device-bound verification
-- web-of-trust or delegated attestation
+For v0.3, a useful identity record should support:
+- stable `kid`
+- disclosed `algorithm`
+- disclosed `public_key_encoding`
+- `status`
+- `purposes`
+- `not_before`
+- optional `expires_at`
 
-## Agent identity
+The first reference verifier assumes:
+- `Ed25519`
+- `spki-der-base64`
+- explicit `assertion` purpose for trust-bearing signatures
 
-An agent identity represents an autonomous or semi-autonomous software actor.
-An agent may be:
-- self-issued
-- user-issued
-- organization-issued
+## Controller model
 
-The system should preserve who stands behind the agent when applicable.
+The most important identity question for DigiD is often not the subject alone.
+It is control.
 
-Agent identities should be able to declare:
-- owning organization or operator
-- scope of authority
-- expiration
-- communication permissions
-- model/provider metadata if disclosure is desired
+`controller.controller_id` answers who stands behind the identity when it is not self-controlled.
 
-## Organization identity
+Typical controller relationships:
+- `self-controlled`
+- `organization-issued`
+- `delegated-service`
+- `custodial`
 
-An organization identity represents a company, institution, or collective entity that can:
-- sign communications directly
-- delegate authority to humans
-- delegate authority to agents
-- revoke credentials and agents
+## Identity classes by trust meaning
 
-## Pseudonymous identity
+### Human
+- represents a real individual
+- strong public `verified-human` semantics likely require an independent issuer path
 
-A pseudonymous identity is persistent but intentionally does not disclose a real-world name by default.
-This matters for privacy, speech, and safety.
+### Organization
+- represents a company or institution that can sign directly and delegate authority
+- v0.3 can treat organizations as trusted when the receiver explicitly anchors them
 
-Pseudonymous should not mean untrusted by default. It should mean:
-- stable identity
-- constrained disclosure
-- possibly lower or different attestation type
+### Agent
+- represents an autonomous or semi-autonomous software actor
+- agent trust should not float free from owner binding when high-trust claims are rendered
 
-## Unverified identity
+### Service
+- represents a system actor or workload identity
+- may be organization-backed without being person-like
 
-An unverified identity may still have a key and may still sign data, but the receiver should see clearly that:
-- no strong external attestation exists
-- trust should be interpreted cautiously
+### Pseudonymous
+- stable identity with intentionally constrained disclosure
+- should not be collapsed into "fake" or "unverified by default"
 
-## Delegation model
+### Unverified
+- continuity may exist, but strong trust transfer does not
 
-The identity model should support relationships like:
-- this agent is authorized by this human
-- this agent is authorized by this organization
-- this human is acting under this organization
+## Agent identity posture
 
-Delegation should carry:
-- issuer
-- scope
-- validity window
-- revocation status
-- optional policy conditions
+Agent identity is where DigiD is most differentiated.
+
+For high-trust agent states, an agent should usually be:
+- controller-bound to a human or organization
+- attested by an acceptable issuer class
+- covered by active delegation when acting for another party
+- signed with an authorized signing key
+
+That means a fake "authenticated agent" is not enough.
+A verifier should care whether the agent is attributable.
+
+## Delegation relationships
+
+The identity model must support questions like:
+- is this agent acting for this organization
+- is this human acting for this organization
+- is this service delegated for this session, channel, and purpose
+
+Delegation itself lives in `dgd.delegation`, but the identity model has to make those relationships resolvable.
+
+## Verification state posture
+
+`verification_state` on an identity is descriptive metadata, not self-proving truth.
+
+A verifier should derive high-trust labels from:
+- signed identity and key material
+- signed attestations
+- signed delegations
+- receiver trust-anchor policy
+
+not from a sender-declared string alone.
+
+## Receiver interpretation
+
+The receiver should be able to distinguish:
+- stable but self-asserted identity
+- owner-backed identity
+- receiver-anchored organization identity
+- independently issuer-verified identity
+
+If DigiD fails to preserve those differences, "verified" becomes too vague to trust.

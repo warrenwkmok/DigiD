@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-036 - Formalize issuer classes and trust-anchor posture for public framework readiness
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 20:05 America/Vancouver
+- area: protocol
+- severity: critical
+- status: applied
+- summary: The framework was still too ambiguous about who can issue meaningful attestations, what `verified-human` or `verified-organization` actually mean, and whether issuer trust comes from sender claims or receiver policy. That ambiguity was a direct public-release blocker even though the verifier demo already had a fixture-level trusted-issuer input.
+- action taken: Reworked the public identity and attestation model docs around issuer classes and trust tiers, clarified that issuer trust is a receiver-side policy input, tightened the normative draft so `verified-human` cannot be derived from self-asserted or owner-asserted records alone, and updated the trust-state and open-questions docs to give DigiD a clearer v0.3 trust-anchor posture.
+- linked docs: `docs/protocol/identity-model.md`, `docs/protocol/attestation-model.md`, `docs/protocol/normative-protocol-draft.md`, `docs/architecture/trust-states.md`, `docs/review/open-questions.md`
+- notes: This improves public-framework legibility without introducing a trust registry, issuer operations tooling, or any new hosted policy surface into the reference repo.
+
 ## DF-035 - Bind delegated signing key in attestation + delegation
 - source: `2026-04-20 DigiD 3h loop`
 - date: 2026-04-20

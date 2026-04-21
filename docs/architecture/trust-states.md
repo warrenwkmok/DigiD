@@ -9,9 +9,11 @@ They will rely on visible trust states.
 
 ### Verified human
 A real person with a strong attestation chain.
+In DigiD terms, this should normally mean an independent trusted issuer path, not just owner assertion.
 
 ### Verified agent
 A software agent with a valid identity and attestation chain, but not necessarily acting under a verified operator at the moment of communication.
+This should be treated carefully because a "verified agent" without active owner-backed authority is weaker than an org-issued or delegated agent.
 
 ### Verified organization
 A receiver-meaningful organization identity that is anchored in receiver policy (for example, pinned as a trusted issuer root, or proven via an attestation from a trusted issuer).
@@ -32,6 +34,41 @@ No meaningful trust attestation beyond self-assertion.
 
 ### Revoked or disputed
 Previously valid identity or delegation that should no longer be trusted.
+
+## Trust-tier interpretation
+
+These visible trust states should be interpreted through trust tiers, not as one flat green badge.
+
+Recommended tiers:
+- `self-asserted`
+- `owner-asserted`
+- `platform-verified`
+- `issuer-verified`
+- `receiver-anchored`
+
+Important examples:
+- `org-issued-agent` is usually `owner-asserted` plus active delegation and owner accountability
+- `verified-organization` in the current reference verifier is usually `receiver-anchored`
+- `verified-human` should aim toward `issuer-verified`
+
+## Why this matters
+
+If DigiD does not preserve the difference between these tiers, a fake but internally consistent ecosystem can look too similar to a truly trusted one.
+
+The verifier therefore should not collapse these questions:
+- did a key sign this
+- who controls that key
+- who attested the subject
+- why does the receiver trust that issuer
+
+## Release-readiness posture
+
+For the current public framework draft:
+- organization trust is clearest when receiver-anchored
+- agent trust is clearest when owner-bound and actively delegated
+- human trust is still the least settled category
+
+That means DigiD is currently strongest when it renders attributable authority, not when it implies a universal human-verification network already exists.
 
 ## UX examples
 
