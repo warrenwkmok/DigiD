@@ -1,0 +1,35 @@
+{
+  "bundle_type": "dgd.trust_bundle",
+  "schema_version": "0.1",
+  "bundle_id": "dgd:trust-bundle:acme-local-demo",
+  "bundle_class": "local",
+  "version": "2026-04-21.local.1",
+  "published_at": "2026-04-14T00:00:00.000Z",
+  "expires_at": "2026-10-21T00:00:00.000Z",
+  "status": "active",
+  "operator": {
+    "name": "Acme Support Receiver Demo"
+  },
+  "scope": {
+    "scope_id": "acme-support-voice-demo",
+    "scope_name": "Acme Support delegated voice demo",
+    "subject_classes": [
+      "organization",
+      "agent"
+    ]
+  },
+  "issuers": [
+    {
+      "issuer_id": "dgd:identity:org_acme",
+      "issuer_class": "owner",
+      "allowed_subject_classes": [
+        "organization",
+        "agent"
+      ],
+      "trust_ceiling": "org-issued-agent",
+      "status": "active",
+      "policy_reference": "Receiver-local anchor for Acme delegated support communications"
+    }
+  ],
+  "change_log": "Initial local trust bundle for the Acme delegated voice fixture family"
+}

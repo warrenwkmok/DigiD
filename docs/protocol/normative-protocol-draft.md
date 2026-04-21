@@ -195,6 +195,7 @@ Verifiers SHOULD preserve the distinction between:
 - public trust bundles
 
 Compact UI MAY simplify the wording, but the underlying verifier result MUST preserve enough machine-readable detail that those paths are not silently collapsed.
+At minimum, bundle-backed evaluations SHOULD preserve the trust-input class plus bundle id, version, status, and scope so local, partner, and public trust do not collapse into one opaque badge.
 
 A verifier MUST NOT render `verified-agent`, `delegated-agent`, or `org-issued-agent` unless:
 - the signer identity is active
@@ -259,6 +260,7 @@ A conforming verifier result MUST include:
 - `verification_mode` (`event_time`, `current_time`, or `dual`)
 - `checks.revocation_status`
 - `checks.freshness_status`
+- `checks.trust_input_class` when issuer trust contributes to the result
 - user-visible warnings when trust is degraded
 
 ## Minimum rejection cases

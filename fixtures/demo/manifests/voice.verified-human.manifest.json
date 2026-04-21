@@ -75,6 +75,8 @@
       "signature_valid": true,
       "event_time_valid": true,
       "current_time_valid": true,
+      "issuer_trust_source": "trusted-issuer-ids",
+      "trust_input_class": "local",
       "owner_binding_status": "not-required",
       "authority_scope_status": "not-required",
       "revocation_status": "clear",

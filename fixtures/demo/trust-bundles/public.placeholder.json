@@ -1,0 +1,35 @@
+{
+  "bundle_type": "dgd.trust_bundle",
+  "schema_version": "0.1",
+  "bundle_id": "dgd:trust-bundle:public-placeholder-demo",
+  "bundle_class": "public",
+  "version": "2026-04-21.public.1",
+  "published_at": "2026-04-14T00:00:00.000Z",
+  "expires_at": "2026-10-21T00:00:00.000Z",
+  "status": "active",
+  "operator": {
+    "name": "DigiD public placeholder bundle"
+  },
+  "scope": {
+    "scope_id": "placeholder-public-bundle",
+    "scope_name": "Public trust bundle placeholder for contract validation",
+    "subject_classes": [
+      "human",
+      "organization"
+    ]
+  },
+  "issuers": [
+    {
+      "issuer_id": "dgd:identity:issuer_placeholder",
+      "issuer_class": "independent-issuer",
+      "allowed_subject_classes": [
+        "human",
+        "organization"
+      ],
+      "trust_ceiling": "verified-human",
+      "status": "active",
+      "policy_reference": "Placeholder only; the public repo does not yet prove a governed public issuer path"
+    }
+  ],
+  "change_log": "Placeholder public bundle contract for schema validation and documentation examples"
+}

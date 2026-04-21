@@ -26,6 +26,7 @@ import {
 import { evaluateSigningKeyLifecycle } from "./key-lifecycle.js";
 import { derivePortableResultContract } from "./contract.js";
 import { evaluateFixtureExpectations } from "./expectations.js";
+import { resolveTrustInputs } from "./trust-bundles.js";
 
 const REVOCATION_BACKDATE_SKEW_SECONDS = 300;
 
@@ -413,17 +414,16 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const delegationRevocationEffectiveAt = delegationRevocation ? resolveEffectiveRevokedAt(delegationRevocation, warnings) : null;
   const eventEnvelope = graph.envelopes.find((candidate) => candidate.envelope_type === "dgd.event");
   const eventTime = asInstant(eventEnvelope?.created_at ?? communication?.timestamps?.session_started_at ?? communication?.created_at);
+  const defaultTrustedIssuer = graph.roles.get("organization_identity")?.object_id ?? null;
   const policy = resolveVerifierPolicy(manifest, communication);
   const maxAgeSeconds = policy.revocation_max_age_seconds;
-  const manifestTrustedIssuers = manifest?.verification_defaults?.trusted_issuer_ids;
-  const defaultTrustedIssuer = graph.roles.get("organization_identity")?.object_id ?? null;
-  const trustedIssuerIds = new Set(
-    Array.isArray(manifestTrustedIssuers)
-      ? manifestTrustedIssuers.filter((entry) => typeof entry === "string" && entry.length > 0)
-      : defaultTrustedIssuer
-        ? [defaultTrustedIssuer]
-        : []
-  );
+  const trustInputs = await resolveTrustInputs({
+    manifest,
+    repoRoot,
+    verificationTime,
+    defaultTrustedIssuerId: defaultTrustedIssuer
+  });
+  const trustedIssuerIds = trustInputs.trustedIssuerIds;
 
   const signatureValid = [...graph.cryptoById.values()].every((entry) => entry.proof_valid);
   const signerActiveAtEventTime = signerIdentity ? isActiveInWindow(signerIdentity, eventTime) : false;
@@ -708,9 +708,17 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
           : "untrusted"
         : signerIdentity?.identity_class === "organization"
           ? signerPinned
-            ? "pinned"
+            ? trustInputs.issuerTrustSource === "trust-bundle"
+              ? "trusted"
+              : "pinned"
             : "untrusted"
-          : "not-required"
+          : "not-required",
+      issuer_trust_source: trustInputs.issuerTrustSource,
+      trust_input_class: trustInputs.trustInputClass,
+      trust_bundle_id: trustInputs.trustBundleId,
+      trust_bundle_version: trustInputs.trustBundleVersion,
+      trust_bundle_status: trustInputs.trustBundleStatus,
+      trust_bundle_scope: trustInputs.trustBundleScope
     },
     warnings,
     errors,

@@ -52,7 +52,7 @@ A manifest should be a JSON document shaped like this:
   "verification_defaults": {
     "mode": "dual",
     "revocation_max_age_seconds": 300,
-    "trusted_issuer_ids": ["dgd:identity:org_acme"],
+    "trust_bundle_path": "fixtures/demo/trust-bundles/acme.local.json",
     "duplicate_envelope_policy": "warn",
     "replay_policy": "same-subject-sequence-conflict-reject"
   },
@@ -180,9 +180,14 @@ The fixture verifier is only meaningful if it can distinguish:
 To support this, manifests MAY include `verification_defaults.trusted_issuer_ids`, an explicit allowlist of identity ids
 that the verifier treats as trusted issuers for the scenario.
 
+Manifests MAY instead include `verification_defaults.trust_bundle_path`, a repo-relative path to a verifier-side trust-bundle policy file.
+The reference verifier treats that file as authoritative for issuer trust, trust-input class, and bundle provenance fields in exported results.
+
 Notes:
+- `trust_bundle_path` and `trusted_issuer_ids` should not be used together in one manifest.
 - If omitted, the public demo verifier currently falls back to treating the `organization_identity` role as the trusted issuer.
-- This is a fixture/demo affordance that approximates the smallest possible `local` trust bundle input from `docs/architecture/trust-distribution-profile.md`, not a production trust registry design.
+- `trusted_issuer_ids` remains a fixture/demo affordance that approximates the smallest possible inline `local` trust bundle input from `docs/architecture/trust-distribution-profile.md`, not a production trust registry design.
+- `trust_bundle_path` is still verifier-side policy input, not a DigiD sender object or a trust-registry protocol.
 
 ## Ordered dependency rules
 

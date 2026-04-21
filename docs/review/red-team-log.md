@@ -3,6 +3,22 @@
 This file records adversarial findings per meaningful DigiD iteration.
 It should stay tightly coupled to build slices so attack paths feed the next implementation loop quickly.
 
+## RT-019 - Executable trust-bundle contract red-team pass
+- date: 2026-04-21
+- timestamp: 2026-04-21 02:38 America/Vancouver
+- reviewed slice:
+  - local verifier-side `dgd.trust_bundle` policy files
+  - manifest `trust_bundle_path` support and representative `local` / `partner` bundle-backed fixtures
+  - portable verifier outputs preserving trust-input class and bundle provenance
+- attack scenarios:
+  - bundle-class laundering: an adapter receives a positive trust result and drops whether it came from a `local` or `partner` bundle, causing screenshots or copied artifacts to overstate how portable that trust really is
+  - stale bundle carry-forward: a verifier keeps using an expired or replaced bundle file and the UI still renders a strong trust state without exposing that the bundle itself is no longer current
+  - placeholder-public escalation: teams see a contract-valid `public` bundle example and assume DigiD has already solved public issuer governance or strong human-verification semantics when it has not
+- recommended mitigations:
+  1. require adapters to preserve trust-input class and bundle provenance whenever issuer trust contributes to the result
+  2. keep bundle freshness, expiry, and supersession visible in machine-readable verifier output before any public bundle story is treated as mature
+  3. keep public-bundle examples clearly separated from genuine independent-issuer fixture coverage until DigiD can model that trust path honestly
+
 ## RT-018 - Trust-bundle injection and scope-laundering attacks
 - date: 2026-04-21
 - timestamp: 2026-04-21 01:50 America/Vancouver

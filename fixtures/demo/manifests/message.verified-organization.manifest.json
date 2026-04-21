@@ -10,9 +10,7 @@
   "verification_defaults": {
     "mode": "current_time",
     "revocation_max_age_seconds": 3600,
-    "trusted_issuer_ids": [
-      "dgd:identity:org_globex"
-    ]
+    "trust_bundle_path": "fixtures/demo/trust-bundles/globex.partner.json"
   },
   "objects": [
     {
@@ -54,6 +52,10 @@
       "signature_valid": true,
       "event_time_valid": true,
       "current_time_valid": true,
+      "issuer_trust_source": "trust-bundle",
+      "trust_input_class": "partner",
+      "trust_bundle_id": "dgd:trust-bundle:globex-partner-demo",
+      "trust_bundle_status": "active",
       "owner_binding_status": "not-required",
       "authority_scope_status": "not-required",
       "revocation_status": "clear",

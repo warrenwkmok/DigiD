@@ -66,8 +66,10 @@ In v0.3, a trust bundle is a verifier-side policy artifact, not a DigiD sender o
 It may be stored as a local file, packaged config, pinned remote document, or another integrity-protected distribution format.
 
 At minimum, a reusable trust bundle should declare:
+- `bundle_type` (`dgd.trust_bundle` for the reference contract)
 - `bundle_id`
 - `bundle_class` (`local`, `partner`, or `public`)
+- `schema_version`
 - `version`
 - `published_at`
 - bundle operator identity or accountable maintainer
@@ -137,13 +139,14 @@ Practical consequences:
 The current reference verifier does not implement bundle fetch, refresh, governance workflows, or operator signatures.
 
 What it does implement:
-- local `trusted_issuer_ids` as verifier policy input
-- manifest-scoped examples of receiver anchoring for the fixture suite
+- a local `verification_defaults.trust_bundle_path` contract for verifier-side policy artifacts
+- portable verifier result fields preserving trust-input class plus bundle provenance
+- legacy `trusted_issuer_ids` as the smallest inline `local` equivalent for fixture compatibility
 
 How that maps to this profile:
-- fixture `trusted_issuer_ids` are the smallest possible `local` trust bundle equivalent
-- they validate the trust-shape concept without claiming public registry operations
-- they are intentionally insufficient as a public distribution design by themselves
+- checked-in bundle files now make `local` and `partner` trust-input classes executable in the reference verifier without adding registry operations
+- fixture `trusted_issuer_ids` remain the smallest possible inline `local` trust bundle equivalent for scenarios that have not moved to bundle files yet
+- both forms are intentionally insufficient as a public distribution design by themselves
 
 ## Non-goals for v0.3
 
@@ -167,6 +170,6 @@ That is enough to make the framework more coherent.
 It is not enough, by itself, to make DigiD publicly release-ready yet.
 
 The remaining public-release gaps are:
-- no executable trust-bundle contract in the reference implementation yet
-- no stable verifier result field that preserves trust-input class across adapters
+- the public trust-bundle class is now contract-valid, but the repo still does not prove a governed independent-issuer fixture path that outside implementers could treat as a real public `verified-human` posture
 - no finalized governance model for any future public bundle operator or federation
+- no common freshness/update semantics for public bundle distribution beyond the minimal local reference contract

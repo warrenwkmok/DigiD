@@ -10,9 +10,7 @@
   "verification_defaults": {
     "mode": "dual",
     "revocation_max_age_seconds": 300,
-    "trusted_issuer_ids": [
-      "dgd:identity:org_acme"
-    ]
+    "trust_bundle_path": "fixtures/demo/trust-bundles/acme.local.json"
   },
   "objects": [
     {
@@ -82,6 +80,10 @@
       "signature_valid": true,
       "event_time_valid": true,
       "current_time_valid": true,
+      "issuer_trust_source": "trust-bundle",
+      "trust_input_class": "local",
+      "trust_bundle_id": "dgd:trust-bundle:acme-local-demo",
+      "trust_bundle_status": "active",
       "owner_binding_status": "bound",
       "authority_scope_status": "in-scope",
       "revocation_status": "clear",

@@ -27,6 +27,18 @@ Every meaningful critique should end up in one of these states:
 
 ## Active entries
 
+## DF-039 - Make trust-input classes executable in verifier policy and exported results
+- source: `2026-04-21 DigiD 3h loop`
+- date: 2026-04-21
+- timestamp: 2026-04-21 02:38 America/Vancouver
+- area: architecture
+- severity: critical
+- status: applied
+- summary: DigiD's trust distribution profile had become more legible, but outside readers still could not see an executable trust-bundle contract or a portable verifier field preserving whether trust came from a local, partner, or public input. That meant adapters could still launder local and shared trust into the same opaque "trusted issuer" story.
+- action taken: Added a local verifier-side `dgd.trust_bundle` contract, taught fixture manifests to point at bundle files via `verification_defaults.trust_bundle_path`, updated representative fixtures to exercise `local` and `partner` bundle classes, and exported trust-input class plus bundle provenance through the verifier result contract and expanded diagnostics.
+- linked docs: `packages/verifier/src/trust-bundles.js`, `packages/verifier/src/verify-manifest.js`, `packages/verifier/src/contract.js`, `packages/verifier/src/display.js`, `fixtures/demo/trust-bundles/*.json`, `docs/architecture/trust-distribution-profile.md`, `docs/architecture/verifier-result-contract.md`, `docs/protocol/fixture-manifest-profile.md`, `docs/protocol/normative-protocol-draft.md`, `docs/review/open-questions.md`
+- notes: This stays reference-scoped because trust bundles are still local verifier policy artifacts. Registry operations, bundle distribution services, and public-bundle governance remain unresolved and outside the current public repo.
+
 ## DF-038 - Define receiver-side trust distribution classes for public framework legibility
 - source: `2026-04-21 DigiD 3h loop`
 - date: 2026-04-21

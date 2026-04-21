@@ -1,0 +1,33 @@
+{
+  "bundle_type": "dgd.trust_bundle",
+  "schema_version": "0.1",
+  "bundle_id": "dgd:trust-bundle:globex-partner-demo",
+  "bundle_class": "partner",
+  "version": "2026-04-21.partner.1",
+  "published_at": "2026-04-14T00:00:00.000Z",
+  "expires_at": "2026-10-21T00:00:00.000Z",
+  "status": "active",
+  "operator": {
+    "name": "Enterprise Messaging Federation Demo"
+  },
+  "scope": {
+    "scope_id": "enterprise-messaging-demo",
+    "scope_name": "Enterprise messaging partner bundle demo",
+    "subject_classes": [
+      "organization"
+    ]
+  },
+  "issuers": [
+    {
+      "issuer_id": "dgd:identity:org_globex",
+      "issuer_class": "owner",
+      "allowed_subject_classes": [
+        "organization"
+      ],
+      "trust_ceiling": "verified-organization",
+      "status": "active",
+      "policy_reference": "Partner-bundle trust for the Globex corporate message fixture"
+    }
+  ],
+  "change_log": "Initial partner trust bundle for the Globex verified-organization fixture"
+}

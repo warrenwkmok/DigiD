@@ -10,6 +10,44 @@ Format notes:
 
 ---
 
+## Iteration 34 - Execute trust bundles in verifier policy and exported results
+- date: 2026-04-21
+- timestamp: 2026-04-21 02:38 America/Vancouver
+- summary:
+  - added a verifier-side `dgd.trust_bundle` contract plus manifest `trust_bundle_path` support so DigiD's `local` / `partner` / `public` trust-input story is now at least partly executable instead of prose-only
+  - updated representative fixtures to exercise a local bundle for delegated Acme trust and a partner bundle for Globex verified-organization trust, while keeping legacy `trusted_issuer_ids` as the smallest inline local equivalent
+  - preserved trust-input class and trust-bundle provenance in verifier diagnostics and the portable result contract so adapters cannot silently flatten local and shared trust into the same opaque badge
+- changed files:
+  - `packages/verifier/src/trust-bundles.js`
+  - `packages/verifier/src/verify-manifest.js`
+  - `packages/verifier/src/contract.js`
+  - `packages/verifier/src/display.js`
+  - `fixtures/demo/manifests/voice.happy-path.manifest.json`
+  - `fixtures/demo/manifests/voice.verified-human.manifest.json`
+  - `fixtures/demo/manifests/message.verified-organization.manifest.json`
+  - `fixtures/demo/trust-bundles/acme.local.json`
+  - `fixtures/demo/trust-bundles/globex.partner.json`
+  - `fixtures/demo/trust-bundles/public.placeholder.json`
+  - `docs/architecture/trust-distribution-profile.md`
+  - `docs/architecture/verifier-result-contract.md`
+  - `docs/protocol/fixture-manifest-profile.md`
+  - `docs/protocol/normative-protocol-draft.md`
+  - `docs/review/open-questions.md`
+  - `docs/review/design-feedback-log.md`
+  - `docs/review/critique-log.md`
+  - `docs/review/red-team-log.md`
+  - `CHANGELOG.md`
+- release-readiness judgment:
+  - no, DigiD is still not ready to be released publicly as a framework
+- blockers after this iteration:
+  - DigiD now has executable local and partner trust-bundle examples, but it still does not prove a governed public independent-issuer path that outside implementers could treat as a real public `verified-human` posture
+  - bundle freshness, supersession, and governance semantics are still too thin for public trust-bundle interoperability beyond the local reference contract
+  - canonicalization duplicate-key handling and multi-language conformance are still under-specified for a credible public framework release
+- why it mattered:
+  - this iteration turns the trust-distribution story from a descriptive architecture doc into a verifier-visible contract. Outside readers can now see how trust-input class survives into actual outputs, which makes DigiD's trust-anchor posture more legible and harder for adapters to overstate.
+- next likely step at the time:
+  - decide whether the next framework slice should prove an honest public-bundle issuer path with an independent-issuer fixture family or attack the remaining canonicalization conformance blockers first
+
 ## Iteration 33 - Define receiver-side trust distribution profile
 - date: 2026-04-21
 - timestamp: 2026-04-21 01:50 America/Vancouver

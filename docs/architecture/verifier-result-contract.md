@@ -38,6 +38,9 @@ A portable verifier result contract SHOULD include:
 - `verification_mode`
 - `interaction_class`
 - `warning_codes`
+- `trust_input.class`
+- `trust_input.source`
+- trust-bundle provenance when bundle-backed trust is used (`trust_input.bundle_id`, `trust_input.bundle_version`, `trust_input.bundle_status`, `trust_input.bundle_scope`)
 - preserved check fields for issuer trust, signing-key lifecycle, owner binding, authority scope, revocation, freshness, and replay posture
 - rendering guardrails that tell adapters what must remain visible
 
@@ -56,6 +59,7 @@ It is a bounded local adapter-profile input so mismatch and context-loss states 
 Adapters or local demos consuming this contract SHOULD preserve:
 - machine-readable warning codes
 - issuer-trust status
+- trust-input class and trust-bundle provenance when present
 - signing-key purpose + lifecycle status (at least current-time status)
 - signing-key revocation diagnostics when present (event-time vs current-time)
 - owner-binding status and reasons

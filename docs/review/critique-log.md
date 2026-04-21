@@ -3,6 +3,26 @@
 This file records one critique pass per meaningful DigiD design or build iteration.
 It is the per-iteration critique ledger, separate from `design-feedback-log.md`, which tracks assimilated findings and their disposition.
 
+## CL-019 - Executable trust-bundle contract and trust-input provenance critique
+- date: 2026-04-21
+- timestamp: 2026-04-21 02:38 America/Vancouver
+- reviewed slice:
+  - adding a local verifier-side trust-bundle contract and manifest `trust_bundle_path` support
+  - preserving `local` / `partner` / `public` trust-input class plus bundle provenance in portable verifier outputs
+  - exercising representative `local` and `partner` trust bundles in the fixture suite without adding registry or hosted policy infrastructure
+- strengths:
+  - closes the biggest trust-distribution execution gap: outside readers can now see a concrete verifier-side bundle artifact instead of only prose about future trust packaging
+  - hardens adapter honesty by carrying trust-input class and bundle provenance into the exported verifier contract, reducing the risk that local and shared trust collapse into one vague badge
+  - stays framework-first because the slice validates trust semantics through local contracts and fixtures rather than drifting into bundle hosting, issuer onboarding, or registry operations
+- concerns:
+  - DigiD now has executable `local` and `partner` trust-bundle examples, but it still does not prove a governed public independent-issuer path that would justify strong public `verified-human` claims
+  - the trust-bundle contract is intentionally minimal and local; freshness/update semantics, operator signatures, and cross-implementation bundle interchange are still unresolved
+  - canonicalization duplicate-key handling and broader multi-language conformance remain independent public-release blockers even after this trust-input improvement
+- recommended changes:
+  1. add one fixture family that proves a genuine public-bundle-backed issuer path only when DigiD can model independent issuer semantics honestly
+  2. decide how much bundle freshness and supersession semantics belong in the public framework contract versus verifier-policy profiles
+  3. keep public release judgment at "not yet" until public bundle governance and cross-language conformance are both materially stronger
+
 ## CL-018 - Trust distribution profile and public verifier-legibility critique
 - date: 2026-04-21
 - timestamp: 2026-04-21 01:50 America/Vancouver
