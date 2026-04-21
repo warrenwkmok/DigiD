@@ -1,0 +1,57 @@
+{
+  "object_type": "dgd.identity",
+  "schema_version": "0.3",
+  "object_id": "dgd:identity:agent_01",
+  "identity_class": "agent",
+  "display_name": "Acme Support Agent 01",
+  "verification_state": "verified-agent",
+  "status": "active",
+  "keys": [
+    {
+      "kid": "dgd:key:agent_01:key-2026-04",
+      "algorithm": "Ed25519",
+      "public_key": "MCowBQYDK2VwAyEAp5SUo75Jp7wU9DiHszBudGCwpz0JQnTDAMrmYCsQPSU=",
+      "public_key_encoding": "spki-der-base64",
+      "status": "active",
+      "purposes": [
+        "assertion"
+      ],
+      "created_at": "2026-04-15T00:00:00.000Z",
+      "not_before": "2026-04-15T00:00:00.000Z",
+      "expires_at": null,
+      "revocation_checked_at": "2026-04-15T00:04:00.000Z"
+    },
+    {
+      "kid": "dgd:key:agent_01:key-2026-05",
+      "algorithm": "Ed25519",
+      "public_key": "MCowBQYDK2VwAyEAbliaBFQaup4rceOUN746khWlh8ENrFY5upIme7BssgA=",
+      "public_key_encoding": "spki-der-base64",
+      "status": "active",
+      "purposes": [
+        "assertion"
+      ],
+      "created_at": "2026-04-15T00:05:30.000Z",
+      "not_before": "2026-04-15T00:05:30.000Z",
+      "expires_at": null,
+      "revocation_checked_at": "2026-04-15T00:05:40.000Z"
+    }
+  ],
+  "controller": {
+    "controller_id": "dgd:identity:org_acme",
+    "relationship": "organization-issued"
+  },
+  "disclosure": {
+    "display_level": "standard",
+    "real_world_identity_disclosed": false,
+    "supports_selective_disclosure": false
+  },
+  "created_at": "2026-04-15T00:00:00.000Z",
+  "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-04-15T00:00:00.000Z",
+    "canonicalization": "JCS",
+    "signature": "CkSzq5dsFOldm5ixkeckNJaY/tRZ06D1Hw/TZf1E7bIo0YjU+H68GdF/uUhJ1kiN3KTTGgaJ9U2nvcMkXrEXBg=="
+  }
+}

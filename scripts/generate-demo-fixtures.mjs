@@ -88,6 +88,11 @@ function buildKeys() {
       resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.org_northwind.pkcs8_der_base64)
     ),
     agent: keyRecord("dgd:identity:agent_01", "key-2026-04", resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.agent_01.pkcs8_der_base64)),
+    agentRotated: keyRecord(
+      "dgd:identity:agent_01",
+      "key-2026-05",
+      resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.agent_01_rotated.pkcs8_der_base64)
+    ),
     human: keyRecord("dgd:identity:human_01", "key-2026-04", resolveKeyMaterial(DEMO_FIXTURE_KEY_MATERIAL.human_01.pkcs8_der_base64)),
     unverified: keyRecord(
       "dgd:identity:unverified_01",
@@ -103,6 +108,9 @@ async function ensureDirectories() {
     "fixtures/demo/events",
     "fixtures/demo/messages",
     "fixtures/demo/key-binding-mismatch",
+    "fixtures/demo/key-authorization",
+    "fixtures/demo/key-authorization/events",
+    "fixtures/demo/key-authorization/messages",
     "fixtures/demo/owner-binding",
     "fixtures/demo/owner-binding/events",
     "fixtures/demo/owner-binding/messages",
@@ -544,6 +552,188 @@ function buildScopeConflictFixtures(keys) {
     "fixtures/demo/scope-conflict/voice.session.json": session,
     "fixtures/demo/scope-conflict/events/voice.session.started.json": startedEvent,
     "fixtures/demo/scope-conflict/messages/voice.session.announcement.json": announcementMessage
+  };
+}
+
+function buildKeyAuthorizationRotationFixtures(keys) {
+  const agentIdentity = signDocument({
+    object_type: "dgd.identity",
+    schema_version: "0.3",
+    object_id: "dgd:identity:agent_01",
+    identity_class: "agent",
+    display_name: "Acme Support Agent 01",
+    verification_state: "verified-agent",
+    status: "active",
+    keys: [
+      {
+        kid: keys.agent.kid,
+        algorithm: DIGID_V03_KEY_ALGORITHM,
+        public_key: keys.agent.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:00:00Z"),
+        not_before: iso("2026-04-15T00:00:00Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:04:00Z")
+      },
+      {
+        kid: keys.agentRotated.kid,
+        algorithm: DIGID_V03_KEY_ALGORITHM,
+        public_key: keys.agentRotated.public_key,
+        public_key_encoding: DIGID_V03_PUBLIC_KEY_ENCODING,
+        status: "active",
+        purposes: ["assertion"],
+        created_at: iso("2026-04-15T00:05:30Z"),
+        not_before: iso("2026-04-15T00:05:30Z"),
+        expires_at: null,
+        revocation_checked_at: iso("2026-04-15T00:05:40Z")
+      }
+    ],
+    controller: {
+      controller_id: "dgd:identity:org_acme",
+      relationship: "organization-issued"
+    },
+    disclosure: {
+      display_level: "standard",
+      real_world_identity_disclosed: false,
+      supports_selective_disclosure: false
+    },
+    created_at: iso("2026-04-15T00:00:00Z")
+  }, keys.org);
+
+  const keyAuthorization = signDocument({
+    object_type: "dgd.key_authorization",
+    schema_version: "0.3",
+    object_id: "dgd:key_authorization:agent_01_voice_rotation_01",
+    issuer_id: "dgd:identity:org_acme",
+    subject_id: "dgd:identity:agent_01",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    authorized_key: {
+      kid: keys.agentRotated.kid,
+      public_key_digest: sha256(Buffer.from(keys.agentRotated.public_key, "base64"))
+    },
+    status: "active",
+    valid_from: iso("2026-04-15T00:05:30Z"),
+    valid_until: iso("2026-10-15T00:00:00Z"),
+    created_at: iso("2026-04-15T00:05:31Z")
+  }, keys.org);
+
+  const communication = signDocument({
+    object_type: "dgd.communication",
+    schema_version: "0.3",
+    object_id: "dgd:communication:voice_key_authorization_01",
+    status: "active",
+    channel: "voice",
+    channel_subtype: "outbound-call",
+    session_id: "dgd:session:voice_key_authorization_01",
+    sender: {
+      identity_id: "dgd:identity:agent_01",
+      identity_class: "agent",
+      verification_state: "delegated-agent"
+    },
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    purpose: "support-follow-up",
+    payload: {
+      content_type: "session-manifest",
+      content_digest: sha256("voice-key-authorization-session-manifest"),
+      content_length: 128,
+      media_mode: "real-time-voice"
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:08:05Z"),
+      session_started_at: iso("2026-04-15T00:08:10Z"),
+      session_ended_at: null
+    },
+    created_at: iso("2026-04-15T00:08:05Z")
+  }, keys.agentRotated);
+
+  const session = signDocument({
+    object_type: "dgd.session",
+    schema_version: "0.3",
+    object_id: "dgd:session:voice_key_authorization_01",
+    status: "active",
+    session_type: "voice.live",
+    communication_id: "dgd:communication:voice_key_authorization_01",
+    channel: "voice",
+    operator_id: "dgd:identity:org_acme",
+    sequence_scope: {
+      scope_type: "conversation",
+      scope_id: "dgd:session:voice_key_authorization_01",
+      next_expected_sequence: 2
+    },
+    timestamps: {
+      created_at: iso("2026-04-15T00:08:05Z"),
+      started_at: iso("2026-04-15T00:08:10Z"),
+      ended_at: null
+    },
+    created_at: iso("2026-04-15T00:08:05Z")
+  }, keys.agentRotated);
+
+  const startedPayload = {
+    direction: "outbound",
+    channel_subtype: "outbound-call",
+    session_started_at: iso("2026-04-15T00:08:10Z"),
+    announcement_expected: true
+  };
+
+  const startedEvent = signDocument({
+    envelope_type: "dgd.event",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:event_voice_key_authorization_started_01",
+    event_type: "voice.session.started",
+    subject_id: "dgd:communication:voice_key_authorization_01",
+    actor_id: "dgd:identity:agent_01",
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    conversation_id: "dgd:session:voice_key_authorization_01",
+    created_at: iso("2026-04-15T00:08:10Z"),
+    purpose: "support-follow-up",
+    sequence: 1,
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: startedPayload,
+    payload_digest: digestCanonicalPayload(startedPayload)
+  }, keys.agentRotated);
+
+  const announcementPayload = {
+    content_type: "application/dgd+json",
+    content_digest: sha256("voice-key-authorization-announcement"),
+    content_length: 64,
+    summary: "Verified org-issued agent (key rotation authorized)",
+    purpose: "support-follow-up"
+  };
+
+  const announcementMessage = signDocument({
+    envelope_type: "dgd.message",
+    schema_version: "0.3",
+    envelope_id: "dgd:envelope:msg_voice_key_authorization_announcement_01",
+    message_type: "voice.session.announcement",
+    subject_id: "dgd:communication:voice_key_authorization_01",
+    channel: "voice",
+    sender_id: "dgd:identity:agent_01",
+    operator_id: "dgd:identity:org_acme",
+    delegation_id: "dgd:delegation:agent_01_voice",
+    conversation_id: "dgd:session:voice_key_authorization_01",
+    created_at: iso("2026-04-15T00:08:11Z"),
+    purpose: "support-follow-up",
+    verification_context: {
+      verification_mode: "dual",
+      revocation_max_age_seconds: 300
+    },
+    payload: announcementPayload
+  }, keys.agentRotated);
+
+  return {
+    "fixtures/demo/key-authorization/agent.identity.json": agentIdentity,
+    "fixtures/demo/key-authorization/key.authorization.json": keyAuthorization,
+    "fixtures/demo/key-authorization/voice.communication.json": communication,
+    "fixtures/demo/key-authorization/voice.session.json": session,
+    "fixtures/demo/key-authorization/events/voice.session.started.json": startedEvent,
+    "fixtures/demo/key-authorization/messages/voice.session.announcement.json": announcementMessage
   };
 }
 
@@ -1279,6 +1469,17 @@ function buildManifests() {
     { ...baseObjects[2], path: "fixtures/demo/key-binding-mismatch/agent.attestation.json" },
     ...baseObjects.slice(3)
   ];
+  const keyAuthorizationObjects = [
+    baseObjects[0],
+    { ...baseObjects[1], path: "fixtures/demo/key-authorization/agent.identity.json" },
+    baseObjects[2],
+    baseObjects[3],
+    { role: "key_authorization", object_type: "dgd.key_authorization", path: "fixtures/demo/key-authorization/key.authorization.json", required: true, stable_across_lineage: true },
+    { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/key-authorization/voice.communication.json", required: true, stable_across_lineage: true },
+    { role: "session_object", object_type: "dgd.session", path: "fixtures/demo/key-authorization/voice.session.json", required: true, stable_across_lineage: true },
+    { role: "session_started_event", object_type: "dgd.event", path: "fixtures/demo/key-authorization/events/voice.session.started.json", required: true, stable_across_lineage: true },
+    { role: "session_announcement_message", object_type: "dgd.message", path: "fixtures/demo/key-authorization/messages/voice.session.announcement.json", required: true, stable_across_lineage: true }
+  ];
   const scopeConflictObjects = [
     ...baseObjects.slice(0, 4),
     { role: "communication_anchor", object_type: "dgd.communication", path: "fixtures/demo/scope-conflict/voice.communication.json", required: true, stable_across_lineage: true },
@@ -1299,6 +1500,36 @@ function buildManifests() {
   ];
 
   return {
+    "fixtures/demo/manifests/voice.key-authorization-rotation.manifest.json": {
+      manifest_type: "dgd.fixture_manifest",
+      schema_version: "0.3",
+      manifest_id: "dgd:manifest:voice_key_authorization_rotation",
+      scenario_id: "voice-key-authorization-rotation",
+      scenario_class: "delegated-agent-voice",
+      description: "Delegated agent rotated signing key, authorized by issuer without reissuing delegation",
+      lineage_group: "demo-voice-key-authorization-01",
+      verification_time: iso("2026-04-15T00:08:30Z"),
+      verification_defaults: { mode: "dual", revocation_max_age_seconds: 300, trusted_issuer_ids: ["dgd:identity:org_acme"] },
+      objects: keyAuthorizationObjects,
+      expected_outcome: {
+        compact_label: "Org-issued agent for Acme Support",
+        decision: "allow-with-trust-indicator",
+        resolved_trust_state: "org-issued-agent",
+        warning_codes: [],
+        error_count: 0,
+        checks: {
+          signature_valid: true,
+          event_time_valid: true,
+          current_time_valid: true,
+          owner_binding_status: "bound",
+          key_binding_status: "bound",
+          authority_scope_status: "in-scope",
+          revocation_status: "clear",
+          freshness_status: "fresh",
+          replay_status: "clear"
+        }
+      }
+    },
     "fixtures/demo/manifests/voice.happy-path.manifest.json": {
       manifest_type: "dgd.fixture_manifest",
       schema_version: "0.3",
@@ -1687,6 +1918,7 @@ async function main() {
     ...buildKeyBindingMismatchFixtures(keys),
     ...buildCryptosuiteUnsupportedFixtures(delegatedVoiceFixtures),
     ...buildScopeConflictFixtures(keys),
+    ...buildKeyAuthorizationRotationFixtures(keys),
     ...buildDirectHumanFixtures(keys),
     ...buildUnverifiedFixtures(keys),
     ...buildVerifiedOrganizationMessageFixtures(keys),

@@ -366,7 +366,49 @@ Defines authority for one subject to act on behalf of another.
 - the first live delegated profile MUST reject authority escalation when an envelope or communication claims an action not enumerated in the delegation, even if the channel is otherwise allowed
 - the first live delegated profile MUST also reject owner-binding gaps where the delegate signing key is present but the controlling human or organization cannot be resolved through the signed identity, attestation, and delegation chain
 
-## 4. Signed communication object
+## 4. Key authorization object (optional)
+
+An issuer-signed authorization to treat a specific delegate signing key as eligible to exercise an existing delegation.
+
+This is a v0.3 escape hatch for safe key rotation overlap without forcing the issuer to reissue every attestation/delegation immediately.
+
+```json
+{
+  "object_type": "dgd.key_authorization",
+  "schema_version": "0.3",
+  "object_id": "dgd:key_authorization:01JKEYAUTH...",
+  "issuer_id": "dgd:identity:org_acme",
+  "subject_id": "dgd:identity:agent_01JABC...",
+  "delegation_id": "dgd:delegation:01JKLM...",
+  "authorized_key": {
+    "kid": "dgd:key:agent_01:key-2026-05",
+    "public_key_digest": "sha256:..."
+  },
+  "status": "active",
+  "valid_from": "2026-04-15T00:05:30Z",
+  "valid_until": "2026-10-15T00:00:00Z",
+  "created_at": "2026-04-15T00:05:31Z",
+  "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "type": "ed25519-2020",
+    "kid": "dgd:key:org_acme:key-2026-01",
+    "created_at": "2026-04-15T00:05:31Z",
+    "canonicalization": "JCS",
+    "signature": "zSig..."
+  }
+}
+```
+
+### Key authorization constraints
+- `issuer_id` MUST match the delegating identity (`dgd.delegation.issuer_id`) for the referenced `delegation_id`
+- `subject_id` MUST match the delegate identity (`dgd.delegation.delegate_id`) for the referenced `delegation_id`
+- `authorized_key.kid` MUST resolve to a key on the `subject_id` identity object and `authorized_key.public_key_digest` MUST be a digest string with an algorithm prefix (example: `sha256:<hex>`)
+- a verifier MUST NOT treat a key authorization as expanding delegation scope; it only authorizes which delegate signing key is acceptable for that existing delegation
+- verifiers MAY accept a valid `dgd.key_authorization` as an alternative binding method when `subject_key`/`delegate_key` bindings are missing or mismatched due to rotation overlap
+- `dgd.key_authorization` SHOULD be short-lived for rotation overlap, not a permanent multi-key delegation mechanism
+- `dgd.key_authorization` MUST be revocable via `dgd.revocation` with `target_object_type: dgd.key_authorization` and `target_object_id: <object_id>`
+
+## 5. Signed communication object
 
 A normalized high-level communication object for completed or in-progress exchanges.
 
@@ -446,7 +488,7 @@ These fields MAY remain unsigned operational metadata in adapter-specific system
 - vendor-specific delivery metadata
 
 If an adapter renders any unsigned field as if DigiD verified it, the verifier UI SHOULD treat that presentation as out of profile.
-## 5. Session object
+## 6. Session object
 
 Represents the ordered interaction scope for a live communication flow.
 
@@ -496,7 +538,7 @@ Represents the ordered interaction scope for a live communication flow.
 - `sequence_scope.next_expected_sequence` MUST either be omitted from immutable fixtures or reflect the next sequence after the highest signed event already included in the fixture set
 - if `sequence_scope.next_expected_sequence` is present, verifiers MUST treat it as advisory replay metadata unless a future countersignature profile proves it was updated after the latest accepted event
 
-## 6. Artifact object
+## 7. Artifact object
 
 Represents a detached recording, transcript, summary, or exported media artifact that is trust-bound to a communication flow.
 
@@ -547,7 +589,7 @@ Represents a detached recording, transcript, summary, or exported media artifact
 - the first demo profile MAY keep artifacts optional, but any recording or transcript fixture SHOULD use `dgd.artifact` instead of leaving artifact identity implicit in message envelopes alone
 - the first implementation profile SHOULD require `derived_from` whenever the artifact is generated from a live session so post-call manifests cannot silently detach from the signed event stream
 
-## 7. Verification result object
+## 8. Verification result object
 
 Represents a portable verifier output that downstream UIs can render without repeating the full trust evaluation logic.
 
@@ -591,7 +633,7 @@ Represents a portable verifier output that downstream UIs can render without rep
 - `warnings` MUST explain every downgrade that still results in non-reject output
 - `display_summary` SHOULD be short enough to fit a compact trust banner without truncation
 
-## 8. Revocation object
+## 9. Revocation object
 
 Represents an explicit revocation for an identity, key, attestation, delegation, or communication object.
 
@@ -665,7 +707,8 @@ The first fixture-driven implementation should treat these objects as required f
 6. one signed `dgd.session` object aligned to the communication `session_id`
 7. one or more envelopes referencing the same communication, session, and delegation lineage
 8. zero or more `dgd.artifact` objects for recording or transcript comparisons
-9. zero or more `dgd.revocation` objects for degraded comparison cases
+9. zero or more `dgd.key_authorization` objects to support key rotation overlap without reissuing the base delegation
+10. zero or more `dgd.revocation` objects for degraded comparison cases
 
 This profile gives the verifier a stable graph instead of letting demo fixtures omit trust-bearing links opportunistically.
 

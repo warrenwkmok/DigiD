@@ -14,6 +14,7 @@ The first verifier profile supports these object families:
 - `dgd.identity`
 - `dgd.attestation`
 - `dgd.delegation`
+- `dgd.key_authorization`
 - `dgd.communication`
 - `dgd.session`
 - `dgd.artifact`
@@ -122,6 +123,13 @@ If signer identity resolution is ambiguous, verification MUST fail.
 - MUST include `valid_from`
 - SHOULD include `valid_until`
 
+### `dgd.key_authorization` (optional)
+- MUST reference authorizing issuer in `issuer_id`
+- MUST reference delegate identity in `subject_id`
+- MUST reference one delegation in `delegation_id`
+- MUST bind one key in `authorized_key` (`kid` + `public_key_digest`)
+- MUST NOT expand delegation scope; it only authorizes which delegate signing key is acceptable for that existing delegation
+
 ### `dgd.session`
 - MUST reference one `communication_id`
 - MUST define one ordered interaction scope
@@ -155,6 +163,9 @@ A verifier MUST NOT render `verified-agent`, `delegated-agent`, or `org-issued-a
 - a qualifying attestation path exists
 - the issuer(s) of that trust path are trusted under the verifier's policy inputs
 - any required delegation exists and is in scope
+- the delegated agent signing key is bound by issuer intent via either:
+  - `dgd.attestation.subject_key` + `dgd.delegation.delegate_key`, or
+  - an active issuer-signed `dgd.key_authorization` referencing the delegation and binding the signing key (`authorized_key`)
 - the signer identity's controlling human or organization is bound through a signed ownership chain when the agent is not self-controlled
 
 A verifier MUST NOT render `verified-human` unless a qualifying human-verification attestation path exists.
@@ -238,6 +249,7 @@ At minimum, the profile should support:
 - `revocation-stale`
 - `revocation-unknown`
 - `delegation-expired-current-time`
+- `key-authorization-expired-current-time`
 - `key-expired-current-time`
 - `signing-key-revoked-current-time`
 - `revocation-backdated`

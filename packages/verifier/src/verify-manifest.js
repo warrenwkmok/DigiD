@@ -15,6 +15,7 @@ import { deriveCompactBanner } from "./display.js";
 import { loadFixtureManifest } from "./manifest.js";
 import {
   asInstant,
+  digestSpkiDerBase64,
   evaluateDelegationScope,
   evaluateFreshness,
   evaluateKeyBinding,
@@ -42,6 +43,7 @@ function resolveSignerId(document, graph) {
       return document.controller?.controller_id ?? document.object_id;
     case "dgd.attestation":
     case "dgd.delegation":
+    case "dgd.key_authorization":
     case "dgd.revocation":
       return document.issuer_id;
     case "dgd.communication":
@@ -142,6 +144,87 @@ function resolveEffectiveRevokedAt(revocation, warnings) {
   }
 
   return revokedAt < createdAt ? createdAt : revokedAt;
+}
+
+function resolveKeyAuthorizationForSigningKey({
+  graph,
+  issuerId,
+  subjectId,
+  delegationId,
+  signingKeyKid,
+  signingKeyDigest,
+  eventTime,
+  verificationTime,
+  warnings
+}) {
+  if (!issuerId || !subjectId || !delegationId || !signingKeyKid || !signingKeyDigest) {
+    return {
+      authorization: null,
+      active_at_event_time: false,
+      active_now: false,
+      revocation_effective_at: null
+    };
+  }
+
+  const candidates = graph.objects.filter((candidate) => candidate.object_type === "dgd.key_authorization");
+  for (const candidate of candidates) {
+    if (candidate.issuer_id !== issuerId) {
+      continue;
+    }
+
+    if (candidate.subject_id !== subjectId) {
+      continue;
+    }
+
+    if (candidate.delegation_id !== delegationId) {
+      continue;
+    }
+
+    const binding = candidate.authorized_key ?? null;
+    const boundKid = typeof binding?.kid === "string" ? binding.kid : null;
+    const boundDigest = typeof binding?.public_key_digest === "string" ? binding.public_key_digest : null;
+
+    if (boundKid !== signingKeyKid) {
+      continue;
+    }
+
+    if (boundDigest !== signingKeyDigest) {
+      continue;
+    }
+
+    const crypto = graph.cryptoById.get(candidate.object_id);
+    if (!crypto?.proof_valid) {
+      continue;
+    }
+
+    const revocation = graph.objects.find(
+      (entry) =>
+        entry.object_type === "dgd.revocation" &&
+        entry.target_object_type === "dgd.key_authorization" &&
+        entry.target_object_id === candidate.object_id
+    );
+    const revocationEffectiveAt = revocation ? resolveEffectiveRevokedAt(revocation, warnings) : null;
+    const activeAtEventTime = Boolean(
+      isActiveInWindow(candidate, eventTime) && (!revocationEffectiveAt || eventTime < revocationEffectiveAt)
+    );
+    const activeNow = Boolean(
+      isActiveInWindow(candidate, verificationTime) && (!revocationEffectiveAt || verificationTime < revocationEffectiveAt)
+    );
+
+    return {
+      authorization: candidate,
+      active_at_event_time: activeAtEventTime,
+      active_now: activeNow,
+      revocation_effective_at: revocationEffectiveAt
+    };
+  }
+
+  return {
+    authorization: null,
+    active_at_event_time: false,
+    active_now: false,
+    revocation_effective_at: null
+  };
 }
 
 function parseDigestAlgorithm(value) {
@@ -377,6 +460,51 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   const communicationCrypto = communication ? graph.cryptoById.get(communication.object_id) : null;
   const signingKeyKid = communicationCrypto?.kid ?? null;
   const keyBinding = evaluateKeyBinding({ signerIdentity, attestation, delegation, communication, signingKeyKid });
+  const signingKeyRecord = signingKeyKid ? signerIdentity?.keys?.find((candidate) => candidate.kid === signingKeyKid) ?? null : null;
+  const signingKeyDigest = signingKeyRecord?.public_key ? digestSpkiDerBase64(signingKeyRecord.public_key) : null;
+  const keyAuthorizationEvaluation =
+    delegationRequired && delegation && keyBinding.status === "missing"
+      ? resolveKeyAuthorizationForSigningKey({
+          graph,
+          issuerId: delegation.issuer_id ?? null,
+          subjectId: signerIdentity?.object_id ?? null,
+          delegationId: delegation.object_id ?? null,
+          signingKeyKid,
+          signingKeyDigest,
+          eventTime,
+          verificationTime,
+          warnings
+        })
+      : { authorization: null, active_at_event_time: false, active_now: false, revocation_effective_at: null };
+  const keyAuthorization = keyAuthorizationEvaluation.authorization;
+  const keyAuthorizationActiveAtEventTime = keyAuthorizationEvaluation.active_at_event_time;
+  const keyAuthorizationActiveNow = keyAuthorizationEvaluation.active_now;
+  const keyAuthorizationRevocationEffectiveAt = keyAuthorizationEvaluation.revocation_effective_at;
+
+  let keyAuthorizationStatus = "not-required";
+  const keyAuthorizationReasons = [];
+  if (delegationRequired && delegation && keyBinding.status === "missing") {
+    if (!keyAuthorization) {
+      keyAuthorizationStatus = "missing";
+    } else if (!keyAuthorizationActiveAtEventTime) {
+      keyAuthorizationStatus = "inactive-at-event-time";
+      if (keyAuthorizationRevocationEffectiveAt && eventTime >= keyAuthorizationRevocationEffectiveAt) {
+        keyAuthorizationReasons.push("revoked-at-event-time");
+      } else {
+        keyAuthorizationReasons.push("inactive-at-event-time");
+      }
+    } else if (keyAuthorizationActiveAtEventTime && !keyAuthorizationActiveNow) {
+      keyAuthorizationStatus = "expired-current-time";
+      if (keyAuthorizationRevocationEffectiveAt && verificationTime >= keyAuthorizationRevocationEffectiveAt) {
+        keyAuthorizationReasons.push("revoked-current-time");
+      } else {
+        keyAuthorizationReasons.push("inactive-current-time");
+      }
+    } else {
+      keyAuthorizationStatus = "active";
+    }
+  }
+
   const signingKeyRevocation = signingKeyKid
     ? graph.objects.find(
         (candidate) =>
@@ -448,8 +576,12 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     warnings.push(buildWarning("owner-binding-missing", "Agent signature not bound to verified owner"));
   }
 
-  if (keyBinding.status === "missing") {
+  if (keyBinding.status === "missing" && !keyAuthorizationActiveAtEventTime) {
     warnings.push(buildWarning(keyBinding.warning_code ?? "key-binding-missing", keyBinding.warning_message ?? "Delegated signing key binding missing"));
+  }
+
+  if (keyAuthorization && keyAuthorizationActiveAtEventTime && !keyAuthorizationActiveNow) {
+    warnings.push(buildWarning("key-authorization-expired-current-time", "Authorized signing key no longer active"));
   }
 
   if (authorityScope.status === "out-of-scope") {
@@ -466,7 +598,8 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
   }
 
   const ownerBindingValid = ownerBinding.status !== "missing";
-  const keyBindingValid = keyBinding.status !== "missing";
+  const delegatedSigningKeyValidAtEventTime = keyBinding.status !== "missing" || keyAuthorizationActiveAtEventTime;
+  const delegatedSigningKeyValidNow = keyBinding.status !== "missing" || keyAuthorizationActiveNow;
   const authorityScopeValid = !delegationRequired || authorityScope.status === "in-scope";
   const eventTimeValid = Boolean(
     signatureValid &&
@@ -475,7 +608,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       delegationActiveAtEventTime &&
       identityTrustedAtEventTime &&
       ownerBindingValid &&
-      keyBindingValid &&
+      delegatedSigningKeyValidAtEventTime &&
       authorityScopeValid
   );
   const currentTimeValid = Boolean(
@@ -485,7 +618,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       delegationActiveNow &&
       identityTrustedNow &&
       ownerBindingValid &&
-      keyBindingValid &&
+      delegatedSigningKeyValidNow &&
       authorityScopeValid &&
       freshnessStatus !== "unknown"
   );
@@ -501,7 +634,7 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
     delegationRequired &&
     delegationActiveAtEventTime &&
     ownerBindingValid &&
-    keyBindingValid &&
+    delegatedSigningKeyValidAtEventTime &&
     authorityScopeValid
   ) {
     resolvedTrustState = operatorIdentity?.identity_class === "organization" ? "org-issued-agent" : "delegated-agent";
@@ -553,8 +686,17 @@ export async function verifyFixtureManifest(manifestPath, options = {}) {
       digest_algorithms: [...digestAlgorithms].sort(),
       owner_binding_status: ownerBinding.status,
       owner_binding_reasons: ownerBinding.reasons,
-      key_binding_status: keyBinding.status,
-      key_binding_reasons: keyBinding.reasons,
+      key_binding_status: keyBinding.status === "missing" && keyAuthorizationActiveAtEventTime ? "bound" : keyBinding.status,
+      key_binding_method:
+        keyBinding.status !== "missing"
+          ? "embedded"
+          : keyAuthorizationActiveAtEventTime
+            ? "key-authorization"
+            : null,
+      key_binding_reasons: keyBinding.status === "missing" && keyAuthorizationActiveAtEventTime ? [] : keyBinding.reasons,
+      key_authorization_status: keyAuthorizationStatus,
+      key_authorization_object_id: keyAuthorization?.object_id ?? null,
+      key_authorization_reasons: keyAuthorizationReasons,
       authority_scope_status: authorityScope.status,
       authority_scope_reasons: authorityScope.reasons,
       revocation_status: revocationStatus,

@@ -84,8 +84,9 @@ Working resolution for this iteration: keep them as explicit repo artifacts and 
 Still open: whether the next build slice should automate those roles as local scripts, Codex workflows, or service-side agents once the verifier API exists.
 
 ## OQ-023 - Does DigiD need a first-class signed key-binding object for non-self-controlled agents?
-Working resolution for v0.3: express key binding inside issuer-signed artifacts via `dgd.attestation.subject_key` and `dgd.delegation.delegate_key` (kid + public-key digest) so delegated authority is bound to a specific signing key and verifier downgrades are deterministic.
-Still open: whether later profiles should introduce a dedicated signed key-authorization object (or binding-set semantics) to support rotation overlap, multi-key delegates, delegated custodianship, and emergency revocation without reissuing every attestation/delegation.
+Working resolution for v0.3: express primary key binding inside issuer-signed artifacts via `dgd.attestation.subject_key` and `dgd.delegation.delegate_key` (kid + public-key digest) so delegated authority is bound to a specific signing key and verifier downgrades are deterministic.
+Working resolution for rotation overlap: support an optional issuer-signed `dgd.key_authorization` object referencing the existing delegation and binding the rotated delegate signing key, so verifiers can preserve high-trust delegated states without requiring immediate reissuance of every attestation/delegation.
+Still open: whether DigiD should treat `dgd.key_authorization` as a permanent primitive (with richer scope and lifecycle semantics) or keep it narrowly constrained to short-lived rotation bridges while requiring reissuance for long-term multi-key delegates, delegated custodianship, and emergency recovery workflows.
 
 ## OQ-024 - How should DigiD evolve reference verifier interfaces without losing scope discipline?
 Working resolution for now: the reference repo can keep shipping protocol, trust-model, fixtures, reference verifier logic, and limited local or demo interfaces that expose transparent diagnostics.

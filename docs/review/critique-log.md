@@ -399,3 +399,26 @@ It is the per-iteration critique ledger, separate from `design-feedback-log.md`,
 - deferred to next loops:
   - deterministic negative fixtures
   - boundary decision on any future verifier API
+
+## CL-003 - Key rotation overlap critique (key authorization bridge)
+- date: 2026-04-20
+- timestamp: 2026-04-20 17:36 America/Vancouver
+- reviewed slice:
+  - optional `dgd.key_authorization` object for delegated key rotation overlap
+  - verifier downgrade avoidance when issuer explicitly authorizes the rotated delegate signing key
+  - fixture coverage for rotation overlap without reissuing every base object
+- strengths:
+  - reduces operational pressure to immediately reissue every attestation/delegation on routine key rotation while keeping issuer intent signed and explicit
+  - keeps the trust claim centered on owner/issuer authority rather than “an authenticated agent key”
+  - creates a narrow and testable posture for rotation overlap instead of silently broadening `delegate_key` into an unbounded multi-key list
+- concerns:
+  - adds another trust-bearing object type; verifiers and adapters must preserve its diagnostics so “authorized rotation” does not become invisible authority drift
+  - if `dgd.key_authorization` becomes long-lived, it risks morphing into a de facto multi-key delegation mechanism without explicit policy or audit semantics
+  - issuer workflows for safe rotation (approval, signing cadence, revocation distribution) remain out of scope here; the reference layer should resist implementing those operational surfaces
+- protocol concerns:
+  - the object must be strictly tied to `delegation_id` and must not widen authority scope or replace delegation requirements
+  - the authorization must be key-digest bound (not kid-only) to avoid kid-confusion and silent key replacement attacks
+- recommended changes:
+  1. keep `dgd.key_authorization` explicitly framed as a short-lived overlap bridge in docs and fixtures
+  2. ensure the portable result contract preserves `key_binding_method` + `key_authorization_status` so adapters cannot launder the distinction
+  3. add one negative fixture where a key authorization exists but does not match the delegation or key digest, proving deterministic rejection/downgrade behavior

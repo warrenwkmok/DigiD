@@ -366,3 +366,21 @@ It should stay tightly coupled to build slices so attack paths feed the next imp
   - adapter-facing mismatch-state contracts
   - no hosted service work in the current reference scope
 
+## RT-003 - Delegated key authorization red-team pass
+- date: 2026-04-20
+- timestamp: 2026-04-20 17:36 America/Vancouver
+- reviewed slice:
+  - `dgd.key_authorization` as a rotation overlap bridge for delegated agents
+  - verifier behavior when `subject_key` / `delegate_key` bindings no longer match the signing key
+- attack scenarios:
+  - attacker attempts to reuse a legitimate `dgd.key_authorization` across a different delegation by swapping `delegation_id` or relying on a verifier that does not check the issuer/delegation linkage
+  - attacker crafts a kid-collision / silent key replacement attempt where the `kid` matches but the public key material differs, hoping the verifier checks only kid and not digest
+  - attacker presents an expired or revoked key authorization and counts on a UI showing the positive trust label without surfacing the warning channel
+- integration risks:
+  - adapters might render `org-issued-agent` while dropping `key_binding_method`/`key_authorization_status`, hiding whether the issuer actually bound the live signing key
+  - a future hosted verifier service might be tempted to absorb key-rotation approvals, issuance logs, or revocation distribution into this repo’s reference scope
+- recommended mitigations:
+  1. require `issuer_id` to match the referenced delegation issuer and require `authorized_key.public_key_digest` equality, not kid-only
+  2. treat expired/revoked key authorization as a first-class downgrade path with stable warning codes
+  3. preserve machine-readable evidence (`key_binding_method`, `key_authorization_*`) in the portable result contract so adapter UIs cannot silently smooth trust transitions
+

@@ -1,0 +1,37 @@
+{
+  "object_type": "dgd.communication",
+  "schema_version": "0.3",
+  "object_id": "dgd:communication:voice_key_authorization_01",
+  "status": "active",
+  "channel": "voice",
+  "channel_subtype": "outbound-call",
+  "session_id": "dgd:session:voice_key_authorization_01",
+  "sender": {
+    "identity_id": "dgd:identity:agent_01",
+    "identity_class": "agent",
+    "verification_state": "delegated-agent"
+  },
+  "operator_id": "dgd:identity:org_acme",
+  "delegation_id": "dgd:delegation:agent_01_voice",
+  "purpose": "support-follow-up",
+  "payload": {
+    "content_type": "session-manifest",
+    "content_digest": "sha256:c84772ff8f01adb110430968b2733767cc35cb9bf566632abd95fd4653e2ee13",
+    "content_length": 128,
+    "media_mode": "real-time-voice"
+  },
+  "timestamps": {
+    "created_at": "2026-04-15T00:08:05.000Z",
+    "session_started_at": "2026-04-15T00:08:10.000Z",
+    "session_ended_at": null
+  },
+  "created_at": "2026-04-15T00:08:05.000Z",
+  "proof": {
+    "cryptosuite": "urn:dgd:cryptosuite:ed25519-jcs-sha256:0.3",
+    "type": "ed25519-2020",
+    "kid": "dgd:key:agent_01:key-2026-05",
+    "created_at": "2026-04-15T00:08:05.000Z",
+    "canonicalization": "JCS",
+    "signature": "PAz7kcPa/v+3orefAUL9c+NUQQfh55OM3rkUEZlZcghHvheEKl9YEs8ttXg+34DxTZEqu3KP0DzCcbGDRYhICg=="
+  }
+}

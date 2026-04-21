@@ -470,3 +470,15 @@ Every meaningful critique should end up in one of these states:
 - action taken: Reworded architecture docs, changelog entries, open questions, and review logs to use neutral reference-scope language rather than open/closed or repo-separation strategy framing.
 - linked docs: `CHANGELOG.md`, `docs/architecture/*`, `docs/review/open-questions.md`, `docs/review/design-feedback-log.md`, `docs/review/critique-log.md`, `docs/review/red-team-log.md`
 - notes: Boundary handling remains part of the operating workflow, not the public repo narrative.
+
+## DF-026 - Add issuer-signed key authorization for delegated key rotation overlap
+- source: `2026-04-20 DigiD 3h loop`
+- date: 2026-04-20
+- timestamp: 2026-04-20 17:36 America/Vancouver
+- area: protocol
+- severity: high
+- status: applied
+- summary: Delegated key binding makes downgrade behavior deterministic, but it also forces issuers to reissue every attestation/delegation immediately when an agent rotates signing keys. DigiD needs a narrowly-scoped way to bridge key rotation overlap without widening authority.
+- action taken: Added optional `dgd.key_authorization` (issuer-signed, delegation-referenced, key-digest bound) and updated the reference verifier to treat it as an alternative binding method for delegated signing keys when `subject_key` / `delegate_key` bindings no longer match due to rotation.
+- linked docs: `docs/protocol/object-schemas.md`, `docs/protocol/signing-and-provenance.md`, `docs/protocol/normative-protocol-draft.md`, `docs/review/open-questions.md`
+- notes: This stays in reference scope by shipping protocol semantics, verifier logic, and fixtures, while leaving issuer/admin rotation workflows and any registry/policy platform outside this repo.

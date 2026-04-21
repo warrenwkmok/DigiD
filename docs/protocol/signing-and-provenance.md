@@ -144,6 +144,11 @@ For the first implementation, DigiD should explicitly model:
 - emergency revocation (`revoked_at` via `dgd.revocation` or `key.revoked` event)
 - rotation overlap, where old and new keys may both verify during a bounded transition window
 
+Rotation overlap posture (v0.3 reference):
+- for delegated agents, the safest default is to reissue the issuer-signed `dgd.attestation` and `dgd.delegation` with updated `subject_key` / `delegate_key` bindings when the delegate rotates signing keys
+- when an issuer cannot reissue immediately, v0.3 MAY use an issuer-signed `dgd.key_authorization` referencing the existing delegation and binding the new key (`authorized_key.kid` + `authorized_key.public_key_digest`)
+- `dgd.key_authorization` is intended as a short-lived overlap bridge, not as an indefinite multi-key delegation mechanism
+
 Verifier guidance:
 - revoked keys MUST fail current-time trust resolution
 - expired keys SHOULD fail current-time trust resolution and MAY remain historically valid for event-time review

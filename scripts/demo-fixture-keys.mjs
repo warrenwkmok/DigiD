@@ -18,6 +18,9 @@ export const DEMO_FIXTURE_KEY_MATERIAL = Object.freeze({
   agent_01: {
     pkcs8_der_base64: "MC4CAQAwBQYDK2VwBCIEIElmcGngNSu4bkRzFV/fgKU+GbEvNxAOB83Y9JllT8AT"
   },
+  agent_01_rotated: {
+    pkcs8_der_base64: "MC4CAQAwBQYDK2VwBCIEIJhsiJcXZ1wTR5tyW5BhGU6cE22B/r3ztLgKDu65FW+Z"
+  },
   human_01: {
     pkcs8_der_base64: "MC4CAQAwBQYDK2VwBCIEIFZaTKfmMTnpmGXtai4i+cSsrpSikrpWINIrWQaqU+oB"
   },
@@ -25,4 +28,3 @@ export const DEMO_FIXTURE_KEY_MATERIAL = Object.freeze({
     pkcs8_der_base64: "MC4CAQAwBQYDK2VwBCIEIKrYaT/f+nD/uqmCvTaXU1dKEHrsaTj2bN+Ceeb2ewe/"
   }
 });
-

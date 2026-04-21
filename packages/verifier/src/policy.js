@@ -112,7 +112,7 @@ function parseDigest(value) {
   };
 }
 
-function digestSpkiDerBase64(spkiDerBase64) {
+export function digestSpkiDerBase64(spkiDerBase64) {
   if (!spkiDerBase64 || typeof spkiDerBase64 !== "string") {
     return null;
   }

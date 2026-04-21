@@ -1,0 +1,100 @@
+{
+  "manifest_type": "dgd.fixture_manifest",
+  "schema_version": "0.3",
+  "manifest_id": "dgd:manifest:voice_key_authorization_rotation",
+  "scenario_id": "voice-key-authorization-rotation",
+  "scenario_class": "delegated-agent-voice",
+  "description": "Delegated agent rotated signing key, authorized by issuer without reissuing delegation",
+  "lineage_group": "demo-voice-key-authorization-01",
+  "verification_time": "2026-04-15T00:08:30.000Z",
+  "verification_defaults": {
+    "mode": "dual",
+    "revocation_max_age_seconds": 300,
+    "trusted_issuer_ids": [
+      "dgd:identity:org_acme"
+    ]
+  },
+  "objects": [
+    {
+      "role": "organization_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/org.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_identity",
+      "object_type": "dgd.identity",
+      "path": "fixtures/demo/key-authorization/agent.identity.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_attestation",
+      "object_type": "dgd.attestation",
+      "path": "fixtures/demo/agent.attestation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "agent_delegation",
+      "object_type": "dgd.delegation",
+      "path": "fixtures/demo/agent.delegation.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "key_authorization",
+      "object_type": "dgd.key_authorization",
+      "path": "fixtures/demo/key-authorization/key.authorization.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "communication_anchor",
+      "object_type": "dgd.communication",
+      "path": "fixtures/demo/key-authorization/voice.communication.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_object",
+      "object_type": "dgd.session",
+      "path": "fixtures/demo/key-authorization/voice.session.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_started_event",
+      "object_type": "dgd.event",
+      "path": "fixtures/demo/key-authorization/events/voice.session.started.json",
+      "required": true,
+      "stable_across_lineage": true
+    },
+    {
+      "role": "session_announcement_message",
+      "object_type": "dgd.message",
+      "path": "fixtures/demo/key-authorization/messages/voice.session.announcement.json",
+      "required": true,
+      "stable_across_lineage": true
+    }
+  ],
+  "expected_outcome": {
+    "compact_label": "Org-issued agent for Acme Support",
+    "decision": "allow-with-trust-indicator",
+    "resolved_trust_state": "org-issued-agent",
+    "warning_codes": [],
+    "error_count": 0,
+    "checks": {
+      "signature_valid": true,
+      "event_time_valid": true,
+      "current_time_valid": true,
+      "owner_binding_status": "bound",
+      "key_binding_status": "bound",
+      "authority_scope_status": "in-scope",
+      "revocation_status": "clear",
+      "freshness_status": "fresh",
+      "replay_status": "clear"
+    }
+  }
+}
